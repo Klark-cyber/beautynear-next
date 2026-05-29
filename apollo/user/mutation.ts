@@ -19,12 +19,17 @@ export const SIGN_UP = gql`
 			memberDesc
 			memberWarnings
 			memberBlocks
-			memberProperties
+			memberSalons
 			memberRank
 			memberArticles
 			memberPoints
 			memberLikes
 			memberViews
+			memberExperience
+			memberSpecialty
+			memberPortfolio
+			memberLatitude
+			memberLongitude
 			deletedAt
 			createdAt
 			updatedAt
@@ -48,11 +53,16 @@ export const LOGIN = gql`
 			memberDesc
 			memberWarnings
 			memberBlocks
-			memberProperties
+			memberSalons
 			memberRank
 			memberPoints
 			memberLikes
 			memberViews
+			memberExperience
+			memberSpecialty
+			memberPortfolio
+			memberLatitude
+			memberLongitude
 			deletedAt
 			createdAt
 			updatedAt
@@ -74,7 +84,7 @@ export const UPDATE_MEMBER = gql`
 			memberImage
 			memberAddress
 			memberDesc
-			memberProperties
+			memberSalons
 			memberRank
 			memberArticles
 			memberPoints
@@ -82,6 +92,11 @@ export const UPDATE_MEMBER = gql`
 			memberViews
 			memberWarnings
 			memberBlocks
+			memberExperience
+			memberSpecialty
+			memberPortfolio
+			memberLatitude
+			memberLongitude
 			deletedAt
 			createdAt
 			updatedAt
@@ -105,7 +120,7 @@ export const LIKE_TARGET_MEMBER = gql`
 			memberDesc
 			memberWarnings
 			memberBlocks
-			memberProperties
+			memberSalons
 			memberRank
 			memberPoints
 			memberLikes
@@ -119,91 +134,227 @@ export const LIKE_TARGET_MEMBER = gql`
 `;
 
 /**************************
- *        PROPERTY        *
+ *         SALON          *
  *************************/
 
-export const CREATE_PROPERTY = gql`
-	mutation CreateProperty($input: PropertyInput!) {
-		createProperty(input: $input) {
+export const CREATE_SALON = gql`
+	mutation CreateSalon($input: SalonInput!) {
+		createSalon(input: $input) {
 			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
+			salonType
+			salonStatus
+			salonLocation
+			salonAddress
+			salonTitle
+			salonDesc
+			salonImages
+			salonPhone
+			salonWorkHours
+			salonInstagram
+			salonViews
+			salonLikes
+			salonComments
+			salonRank
+			salonFollowers
+			depositAmount
+			salonLatitude
+			salonLongitude
 			memberId
-			soldAt
 			deletedAt
-			constructedAt
 			createdAt
 			updatedAt
 		}
 	}
 `;
 
-export const UPDATE_PROPERTY = gql`
-	mutation UpdateProperty($input: PropertyUpdate!) {
-		updateProperty(input: $input) {
+export const UPDATE_SALON = gql`
+	mutation UpdateSalon($input: SalonUpdate!) {
+		updateSalon(input: $input) {
 			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
+			salonType
+			salonStatus
+			salonLocation
+			salonAddress
+			salonTitle
+			salonDesc
+			salonImages
+			salonPhone
+			salonWorkHours
+			salonInstagram
+			salonViews
+			salonLikes
+			salonComments
+			salonRank
+			salonFollowers
+			depositAmount
+			salonLatitude
+			salonLongitude
 			memberId
-			soldAt
 			deletedAt
-			constructedAt
 			createdAt
 			updatedAt
 		}
 	}
 `;
 
-export const LIKE_TARGET_PROPERTY = gql`
-	mutation LikeTargetProperty($input: String!) {
-		likeTargetProperty(propertyId: $input) {
+export const LIKE_TARGET_SALON = gql`
+	mutation LikeTargetSalon($input: String!) {
+		likeTargetSalon(salonId: $input) {
 			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
+			salonType
+			salonStatus
+			salonLocation
+			salonTitle
+			salonViews
+			salonLikes
+			salonComments
+			salonRank
 			memberId
-			soldAt
-			deletedAt
-			constructedAt
 			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const ANNOUNCE_DISCOUNT = gql`
+	mutation AnnounceDiscount($input: String!) {
+		announceDiscount(salonId: $input)
+	}
+`;
+
+export const ANNOUNCE_FREE_SLOT = gql`
+	mutation AnnounceFreeSlot($input: String!) {
+		announceFreeSlot(salonId: $input)
+	}
+`;
+
+/**************************
+ *        SERVICE         *
+ *************************/
+
+export const CREATE_SERVICE = gql`
+	mutation CreateService($input: ServiceInput!) {
+		createService(input: $input) {
+			_id
+			serviceType
+			serviceStatus
+			serviceTitle
+			serviceDesc
+			servicePrice
+			serviceDuration
+			serviceImages
+			serviceViews
+			serviceLikes
+			serviceComments
+			serviceRank
+			serviceRating
+			salonId
+			memberId
+			deletedAt
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const UPDATE_SERVICE = gql`
+	mutation UpdateService($input: ServiceUpdate!) {
+		updateService(input: $input) {
+			_id
+			serviceType
+			serviceStatus
+			serviceTitle
+			serviceDesc
+			servicePrice
+			serviceDuration
+			serviceImages
+			serviceViews
+			serviceLikes
+			serviceComments
+			serviceRank
+			serviceRating
+			salonId
+			memberId
+			deletedAt
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const LIKE_TARGET_SERVICE = gql`
+	mutation LikeTargetService($input: String!) {
+		likeTargetService(serviceId: $input) {
+			_id
+			serviceType
+			serviceStatus
+			serviceTitle
+			servicePrice
+			serviceLikes
+			serviceViews
+			serviceRating
+			salonId
+			memberId
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+/**************************
+ *        BOOKING         *
+ *************************/
+
+export const CREATE_BOOKING = gql`
+	mutation CreateBooking($input: BookingInput!) {
+		createBooking(input: $input) {
+			_id
+			bookingStatus
+			bookingDate
+			bookingTime
+			bookingNote
+			totalAmount
+			depositAmount
+			remainAmount
+			paymentKey
+			paymentStatus
+			serviceId
+			salonId
+			memberId
+			deletedAt
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const CANCEL_BOOKING = gql`
+	mutation CancelBooking($input: String!) {
+		cancelBooking(bookingId: $input) {
+			_id
+			bookingStatus
+			paymentStatus
+			deletedAt
+			updatedAt
+		}
+	}
+`;
+
+export const UPDATE_BOOKING_BY_AGENT = gql`
+	mutation UpdateBookingByAgent($input: BookingUpdate!) {
+		updateBookingByAgent(input: $input) {
+			_id
+			bookingStatus
+			bookingDate
+			bookingTime
+			bookingNote
+			totalAmount
+			depositAmount
+			remainAmount
+			paymentStatus
+			serviceId
+			salonId
+			memberId
 			updatedAt
 		}
 	}
@@ -302,7 +453,7 @@ export const UPDATE_COMMENT = gql`
 `;
 
 /**************************
- *         FOLLOW        *
+ *         FOLLOW         *
  *************************/
 
 export const SUBSCRIBE = gql`

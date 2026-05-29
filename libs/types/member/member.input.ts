@@ -18,7 +18,7 @@ interface AISearch {
 	text?: string;
 }
 
-export interface AgentsInquiry {
+export interface AgentInquiry {
 	page: number;
 	limit: number;
 	sort?: string;

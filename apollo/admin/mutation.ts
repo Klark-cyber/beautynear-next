@@ -17,7 +17,7 @@ export const UPDATE_MEMBER_BY_ADMIN = gql`
 			memberImage
 			memberAddress
 			memberDesc
-			memberProperties
+			memberSalons
 			memberRank
 			memberArticles
 			memberPoints
@@ -25,6 +25,10 @@ export const UPDATE_MEMBER_BY_ADMIN = gql`
 			memberViews
 			memberWarnings
 			memberBlocks
+			memberExperience
+			memberSpecialty
+			memberLatitude
+			memberLongitude
 			deletedAt
 			createdAt
 			updatedAt
@@ -34,62 +38,125 @@ export const UPDATE_MEMBER_BY_ADMIN = gql`
 `;
 
 /**************************
- *        PROPERTY        *
+ *         SALON          *
  *************************/
 
-export const UPDATE_PROPERTY_BY_ADMIN = gql`
-	mutation UpdatePropertyByAdmin($input: PropertyUpdate!) {
-		updatePropertyByAdmin(input: $input) {
+export const UPDATE_SALON_BY_ADMIN = gql`
+	mutation UpdateSalonByAdmin($input: SalonUpdate!) {
+		updateSalonByAdmin(input: $input) {
 			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
+			salonType
+			salonStatus
+			salonLocation
+			salonAddress
+			salonTitle
+			salonDesc
+			salonImages
+			salonPhone
+			salonWorkHours
+			salonViews
+			salonLikes
+			salonComments
+			salonRank
+			salonFollowers
+			depositAmount
 			memberId
-			soldAt
 			deletedAt
-			constructedAt
 			createdAt
 			updatedAt
 		}
 	}
 `;
 
-export const REMOVE_PROPERTY_BY_ADMIN = gql`
-	mutation RemovePropertyByAdmin($input: String!) {
-		removePropertyByAdmin(propertyId: $input) {
+export const REMOVE_SALON_BY_ADMIN = gql`
+	mutation RemoveSalonByAdmin($input: String!) {
+		removeSalonByAdmin(salonId: $input) {
 			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
+			salonType
+			salonStatus
+			salonTitle
 			memberId
-			soldAt
 			deletedAt
-			constructedAt
 			createdAt
+			updatedAt
+		}
+	}
+`;
+
+/**************************
+ *        SERVICE         *
+ *************************/
+
+export const UPDATE_SERVICE_BY_ADMIN = gql`
+	mutation UpdateServiceByAdmin($input: ServiceUpdate!) {
+		updateServiceByAdmin(input: $input) {
+			_id
+			serviceType
+			serviceStatus
+			serviceTitle
+			servicePrice
+			serviceDuration
+			serviceViews
+			serviceLikes
+			serviceComments
+			serviceRank
+			serviceRating
+			salonId
+			memberId
+			deletedAt
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const REMOVE_SERVICE_BY_ADMIN = gql`
+	mutation RemoveServiceByAdmin($input: String!) {
+		removeServiceByAdmin(serviceId: $input) {
+			_id
+			serviceType
+			serviceStatus
+			serviceTitle
+			salonId
+			memberId
+			deletedAt
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+/**************************
+ *        BOOKING         *
+ *************************/
+
+export const UPDATE_BOOKING_BY_ADMIN = gql`
+	mutation UpdateBookingByAdmin($input: BookingUpdate!) {
+		updateBookingByAdmin(input: $input) {
+			_id
+			bookingStatus
+			bookingDate
+			bookingTime
+			totalAmount
+			depositAmount
+			remainAmount
+			paymentStatus
+			serviceId
+			salonId
+			memberId
+			deletedAt
+			updatedAt
+		}
+	}
+`;
+
+export const CANCEL_BOOKING_BY_ADMIN = gql`
+	mutation CancelBookingByAdmin($input: String!) {
+		cancelBookingByAdmin(bookingId: $input) {
+			_id
+			bookingStatus
+			paymentStatus
+			deletedAt
 			updatedAt
 		}
 	}
@@ -124,10 +191,6 @@ export const REMOVE_BOARD_ARTICLE_BY_ADMIN = gql`
 			articleCategory
 			articleStatus
 			articleTitle
-			articleContent
-			articleImage
-			articleViews
-			articleLikes
 			memberId
 			createdAt
 			updatedAt

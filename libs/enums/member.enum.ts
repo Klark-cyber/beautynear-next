@@ -13,5 +13,6 @@ export enum MemberStatus {
 export enum MemberAuthType {
 	PHONE = 'PHONE',
 	EMAIL = 'EMAIL',
-	TELEGRAM = 'TELEGRAM',
+	KAKAO = 'KAKAO',
+	NAVER = 'NAVER',
 }

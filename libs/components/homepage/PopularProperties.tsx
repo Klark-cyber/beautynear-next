@@ -6,9 +6,9 @@ import { Autoplay, Navigation, Pagination } from 'swiper';
 import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 import PopularPropertyCard from './PopularPropertyCard';
-import { Property } from '../../types/property/property';
+import { Property } from '../../types/service/service';
 import Link from 'next/link';
-import { PropertiesInquiry } from '../../types/property/property.input';
+import { PropertiesInquiry } from '../../types/service/service.input';
 import { GET_PROPERTIES } from '../../../apollo/user/query';
 import { useQuery } from '@apollo/client';
 import { T } from '../../types/common';
@@ -23,19 +23,19 @@ const PopularProperties = (props: PopularPropertiesProps) => {
 	const [popularProperties, setPopularProperties] = useState<Property[]>([]);
 
 	/** APOLLO REQUESTS **/
-	  const {
+	const {
 		loading: getPropertiesLoading,      // So'rov ketayotgan vaqtda true bo'ladi
 		data: getPropertiesData,            // So'rov muvaffaqiyatli bo'lsa, ma'lumotlar shu yerga keladi
 		error: getPropertiesError,          // Agar xatolik bo'lsa, xato haqida ma'lumot shu yerda bo'ladi
 		refetch: getPropertiesRefetch,      // So'rovni qaytadan yuborish uchun ishlatiladigan funksiya
-	  } = useQuery(GET_PROPERTIES, {        // GET_PROPERTIES - bu sizning GraphQL so'rov (query)ingiz
+	} = useQuery(GET_PROPERTIES, {        // GET_PROPERTIES - bu sizning GraphQL so'rov (query)ingiz
 		fetchPolicy: 'cache-and-network',   // Birinchi keshdan ko'rsatadi, keyin tarmoqdan yangi ma'lumotni olib keshni yangilaydi 
 		variables: { input: initialInput }, // So'rovga yuboriladigan parametrlar (initialInput props-dan kelmoqda)
 		notifyOnNetworkStatusChange: true,  // So'rov qayta yuborilganda (refetch) loading holati o'zgarishini kuzatib boradi
 		onCompleted: (data: T) => {         // So'rov muvaffaqiyatli yakunlanganda ishga tushadigan callback funksiya
-		  setPopularProperties(data?.getProperties?.list); // Kelgan ma'lumotni trendProperties state-iga saqlash
+			setPopularProperties(data?.getProperties?.list); // Kelgan ma'lumotni trendProperties state-iga saqlash
 		},
-	  });
+	});
 	/** HANDLERS **/
 
 	if (!popularProperties) return null;

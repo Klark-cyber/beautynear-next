@@ -1,6 +1,13 @@
 export enum NotificationType {
+	FOLLOW = 'FOLLOW',
 	LIKE = 'LIKE',
 	COMMENT = 'COMMENT',
+	BOOKING_CONFIRMED = 'BOOKING_CONFIRMED',
+	BOOKING_CANCELLED = 'BOOKING_CANCELLED',
+	NEW_POST = 'NEW_POST',
+	DISCOUNT = 'DISCOUNT',
+	FREE_SLOT = 'FREE_SLOT',
+	NEW_REVIEW = 'NEW_REVIEW',
 }
 
 export enum NotificationStatus {
@@ -10,6 +17,8 @@ export enum NotificationStatus {
 
 export enum NotificationGroup {
 	MEMBER = 'MEMBER',
+	SALON = 'SALON',
+	SERVICE = 'SERVICE',
+	BOOKING = 'BOOKING',
 	ARTICLE = 'ARTICLE',
-	PROPERTY = 'PROPERTY',
 }

@@ -1,22 +1,41 @@
 import numeral from 'numeral';
-import { sweetMixinErrorAlert } from './sweetAlert';
+import { sweetMixinErrorAlert } from '../sweetAlert';
 
 export const formatterStr = (value: number | undefined): string => {
 	return numeral(value).format('0,0') != '0' ? numeral(value).format('0,0') : '';
 };
 
-export const likeTargetPropertyHandler = async (likeTargetProperty: any, id: string) => {
+// ── SALON ─────────────────────────────────────────────────────────────────────
+
+export const likeTargetSalonHandler = async (likeTargetSalon: any, id: string) => {
 	try {
-		await likeTargetProperty({
+		await likeTargetSalon({
 			variables: {
 				input: id,
 			},
 		});
 	} catch (err: any) {
-		console.log('ERROR, likeTargetPropertyHandler:', err.message);
+		console.log('ERROR, likeTargetSalonHandler:', err.message);
 		sweetMixinErrorAlert(err.message).then();
 	}
 };
+
+// ── SERVICE ───────────────────────────────────────────────────────────────────
+
+export const likeTargetServiceHandler = async (likeTargetService: any, id: string) => {
+	try {
+		await likeTargetService({
+			variables: {
+				input: id,
+			},
+		});
+	} catch (err: any) {
+		console.log('ERROR, likeTargetServiceHandler:', err.message);
+		sweetMixinErrorAlert(err.message).then();
+	}
+};
+
+// ── BOARD ARTICLE ─────────────────────────────────────────────────────────────
 
 export const likeTargetBoardArticleHandler = async (likeTargetBoardArticle: any, id: string) => {
 	try {
@@ -31,6 +50,8 @@ export const likeTargetBoardArticleHandler = async (likeTargetBoardArticle: any,
 	}
 };
 
+// ── MEMBER ────────────────────────────────────────────────────────────────────
+
 export const likeTargetMemberHandler = async (likeTargetMember: any, id: string) => {
 	try {
 		await likeTargetMember({
@@ -41,5 +62,18 @@ export const likeTargetMemberHandler = async (likeTargetMember: any, id: string)
 	} catch (err: any) {
 		console.log('ERROR, likeTargetMemberHandler:', err.message);
 		sweetMixinErrorAlert(err.message).then();
+	}
+};
+
+// ── SALON OPEN/CLOSE ──────────────────────────────────────────────────────────
+
+export const isSalonOpen = (workHours: string): boolean => {
+	try {
+		const [open, close] = workHours.split('-'); // "09:00-21:00"
+		const now = new Date();
+		const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+		return currentTime >= open && currentTime <= close;
+	} catch {
+		return false;
 	}
 };

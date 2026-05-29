@@ -140,9 +140,12 @@ export const updateUserInfo = (jwtToken: any) => {
 			claims.memberImage === null || claims.memberImage === undefined
 				? '/img/profile/defaultUser.svg'
 				: `${claims.memberImage}`,
+		memberPortfolio: claims.memberPortfolio ?? [],
 		memberAddress: claims.memberAddress ?? '',
 		memberDesc: claims.memberDesc ?? '',
-		memberProperties: claims.memberProperties,
+		memberExperience: claims.memberExperience ?? 0,
+		memberSpecialty: claims.memberSpecialty ?? [],
+		memberSalons: claims.memberSalons,       // memberProperties → memberSalons
 		memberRank: claims.memberRank,
 		memberArticles: claims.memberArticles,
 		memberPoints: claims.memberPoints,
@@ -150,13 +153,15 @@ export const updateUserInfo = (jwtToken: any) => {
 		memberViews: claims.memberViews,
 		memberWarnings: claims.memberWarnings,
 		memberBlocks: claims.memberBlocks,
+		memberLatitude: claims.memberLatitude ?? 0,
+		memberLongitude: claims.memberLongitude ?? 0,
 	});
 };
 
 export const logOut = () => {
 	deleteStorage();
 	deleteUserInfo();
-	window.location.reload(); //user logout bolsa u like bosgan propertylardagi qizil yurakcha yoqoladi
+	window.location.reload();
 };
 
 const deleteStorage = () => {
@@ -174,9 +179,12 @@ const deleteUserInfo = () => {
 		memberNick: '',
 		memberFullName: '',
 		memberImage: '',
+		memberPortfolio: [],
 		memberAddress: '',
 		memberDesc: '',
-		memberProperties: 0,
+		memberExperience: 0,
+		memberSpecialty: [],
+		memberSalons: 0,       // memberProperties → memberSalons
 		memberRank: 0,
 		memberArticles: 0,
 		memberPoints: 0,
@@ -184,5 +192,7 @@ const deleteUserInfo = () => {
 		memberViews: 0,
 		memberWarnings: 0,
 		memberBlocks: 0,
+		memberLatitude: 0,
+		memberLongitude: 0,
 	});
 };

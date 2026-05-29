@@ -5,7 +5,7 @@ import { gql } from '@apollo/client';
  *************************/
 
 export const GET_AGENTS = gql`
-	query GetAgents($input: AgentsInquiry!) {
+	query GetAgents($input: AgentInquiry!) {
 		getAgents(input: $input) {
 			list {
 				_id
@@ -20,11 +20,14 @@ export const GET_AGENTS = gql`
 				memberDesc
 				memberWarnings
 				memberBlocks
-				memberProperties
+				memberSalons
 				memberRank
 				memberPoints
 				memberLikes
 				memberViews
+				memberExperience
+				memberSpecialty
+				memberPortfolio
 				deletedAt
 				createdAt
 				updatedAt
@@ -42,91 +45,297 @@ export const GET_AGENTS = gql`
 	}
 `;
 
-export const GET_MEMBER = gql(`
-query GetMember($input: String!) {
-    getMember(memberId: $input) {
-        _id
-        memberType
-        memberStatus
-        memberAuthType
-        memberPhone
-        memberNick
-        memberFullName
-        memberImage
-        memberAddress
-        memberDesc
-        memberProperties
-        memberArticles
-        memberPoints
-        memberLikes
-        memberViews
-        memberFollowings
-		memberFollowers
-        memberRank
-        memberWarnings
-        memberBlocks
-        deletedAt
-        createdAt
-        updatedAt
-        accessToken
-        meFollowed {
-					followingId
-					followerId
-					myFollowing
-				}
-    }
-}
-`);
+export const GET_MEMBER = gql`
+	query GetMember($input: String!) {
+		getMember(memberId: $input) {
+			_id
+			memberType
+			memberStatus
+			memberAuthType
+			memberPhone
+			memberNick
+			memberFullName
+			memberImage
+			memberAddress
+			memberDesc
+			memberSalons
+			memberArticles
+			memberPoints
+			memberLikes
+			memberViews
+			memberFollowings
+			memberFollowers
+			memberComments
+			memberRank
+			memberWarnings
+			memberBlocks
+			memberExperience
+			memberSpecialty
+			memberPortfolio
+			memberLatitude
+			memberLongitude
+			deletedAt
+			createdAt
+			updatedAt
+			accessToken
+			meFollowed {
+				followingId
+				followerId
+				myFollowing
+			}
+		}
+	}
+`;
 
 /**************************
- *        PROPERTY        *
+ *         SALON          *
  *************************/
 
-export const GET_PROPERTY = gql`
-	query GetProperty($input: String!) {
-		getProperty(propertyId: $input) {
+export const GET_SALON = gql`
+	query GetSalon($input: String!) {
+		getSalon(salonId: $input) {
 			_id
-			propertyType
-			propertyStatus
-			propertyLocation
-			propertyAddress
-			propertyTitle
-			propertyPrice
-			propertySquare
-			propertyBeds
-			propertyRooms
-			propertyViews
-			propertyLikes
-			propertyImages
-			propertyDesc
-			propertyBarter
-			propertyRent
+			salonType
+			salonStatus
+			salonLocation
+			salonAddress
+			salonTitle
+			salonDesc
+			salonImages
+			salonPhone
+			salonWorkHours
+			salonInstagram
+			salonViews
+			salonLikes
+			salonComments
+			salonRank
+			salonFollowers
+			depositAmount
+			salonLatitude
+			salonLongitude
 			memberId
-			soldAt
 			deletedAt
-			constructedAt
 			createdAt
 			updatedAt
 			memberData {
 				_id
 				memberType
-				memberStatus
-				memberAuthType
-				memberPhone
 				memberNick
 				memberFullName
 				memberImage
-				memberAddress
 				memberDesc
-				memberWarnings
-				memberBlocks
-				memberPoints
+				memberExperience
+				memberSpecialty
+				memberPortfolio
+				memberSalons
+				memberRank
 				memberLikes
 				memberViews
+				createdAt
+				updatedAt
+			}
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
+			meFollowed {
+				followingId
+				followerId
+				myFollowing
+			}
+		}
+	}
+`;
+
+export const GET_SALONS = gql`
+	query GetSalons($input: SalonsInquiry!) {
+		getSalons(input: $input) {
+			list {
+				_id
+				salonType
+				salonStatus
+				salonLocation
+				salonAddress
+				salonTitle
+				salonDesc
+				salonImages
+				salonPhone
+				salonWorkHours
+				salonViews
+				salonLikes
+				salonComments
+				salonRank
+				salonFollowers
+				depositAmount
+				salonLatitude
+				salonLongitude
+				memberId
 				deletedAt
 				createdAt
 				updatedAt
-				accessToken
+				memberData {
+					_id
+					memberNick
+					memberFullName
+					memberImage
+					memberExperience
+					memberSpecialty
+					memberRank
+					memberLikes
+					memberViews
+				}
+				meLiked {
+					memberId
+					likeRefId
+					myFavorite
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_AGENT_SALONS = gql`
+	query GetAgentSalons($input: AgentSalonsInquiry!) {
+		getAgentSalons(input: $input) {
+			list {
+				_id
+				salonType
+				salonStatus
+				salonLocation
+				salonAddress
+				salonTitle
+				salonDesc
+				salonImages
+				salonPhone
+				salonWorkHours
+				salonViews
+				salonLikes
+				salonComments
+				salonRank
+				salonFollowers
+				depositAmount
+				memberId
+				deletedAt
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_FAVORITE_SALONS = gql`
+	query GetFavoriteSalons($input: OrdinaryInquiry!) {
+		getFavoriteSalons(input: $input) {
+			list {
+				_id
+				salonType
+				salonStatus
+				salonLocation
+				salonAddress
+				salonTitle
+				salonImages
+				salonViews
+				salonLikes
+				salonRank
+				memberId
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberNick
+					memberFullName
+					memberImage
+					memberRank
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_VISITED_SALONS = gql`
+	query GetVisitedSalons($input: OrdinaryInquiry!) {
+		getVisitedSalons(input: $input) {
+			list {
+				_id
+				salonType
+				salonStatus
+				salonLocation
+				salonAddress
+				salonTitle
+				salonImages
+				salonViews
+				salonLikes
+				salonRank
+				memberId
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberNick
+					memberFullName
+					memberImage
+					memberRank
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
+ *        SERVICE         *
+ *************************/
+
+export const GET_SERVICE = gql`
+	query GetService($input: String!) {
+		getService(serviceId: $input) {
+			_id
+			serviceType
+			serviceStatus
+			serviceTitle
+			serviceDesc
+			servicePrice
+			serviceDuration
+			serviceImages
+			serviceViews
+			serviceLikes
+			serviceComments
+			serviceRank
+			serviceRating
+			salonId
+			memberId
+			deletedAt
+			createdAt
+			updatedAt
+			memberData {
+				_id
+				memberNick
+				memberFullName
+				memberImage
+				memberExperience
+				memberSpecialty
+				memberPortfolio
+				memberRank
+			}
+			salonData {
+				_id
+				salonTitle
+				salonLocation
+				salonAddress
+				salonPhone
+				salonWorkHours
 			}
 			meLiked {
 				memberId
@@ -137,54 +346,40 @@ export const GET_PROPERTY = gql`
 	}
 `;
 
-export const GET_PROPERTIES = gql`
-	query GetProperties($input: PropertiesInquiry!) {
-		getProperties(input: $input) {
+export const GET_SERVICES = gql`
+	query GetServices($input: ServicesInquiry!) {
+		getServices(input: $input) {
 			list {
 				_id
-				propertyType
-				propertyStatus
-				propertyLocation
-				propertyAddress
-				propertyTitle
-				propertyPrice
-				propertySquare
-				propertyBeds
-				propertyRooms
-				propertyViews
-				propertyLikes
-				propertyRank
-				propertyImages
-				propertyDesc
-				propertyBarter
-				propertyRent
+				serviceType
+				serviceStatus
+				serviceTitle
+				serviceDesc
+				servicePrice
+				serviceDuration
+				serviceImages
+				serviceViews
+				serviceLikes
+				serviceComments
+				serviceRank
+				serviceRating
+				salonId
 				memberId
-				soldAt
-				deletedAt
-				constructedAt
 				createdAt
 				updatedAt
 				memberData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
-					memberAddress
-					memberDesc
-					memberWarnings
-					memberBlocks
-					memberProperties
-					memberRank
-					memberPoints
-					memberLikes
-					memberViews
-					deletedAt
-					createdAt
-					updatedAt
+					memberExperience
+					memberSpecialty
+				}
+				salonData {
+					_id
+					salonTitle
+					salonLocation
+					salonAddress
 				}
 				meLiked {
 					memberId
@@ -199,94 +394,31 @@ export const GET_PROPERTIES = gql`
 	}
 `;
 
-export const GET_AGENT_PROPERTIES = gql`
-	query GetAgentProperties($input: AgentPropertiesInquiry!) {
-		getAgentProperties(input: $input) {
+export const GET_AGENT_SERVICES = gql`
+	query GetAgentServices($input: AgentServicesInquiry!) {
+		getAgentServices(input: $input) {
 			list {
 				_id
-				propertyType
-				propertyStatus
-				propertyLocation
-				propertyAddress
-				propertyTitle
-				propertyPrice
-				propertySquare
-				propertyBeds
-				propertyRooms
-				propertyViews
-				propertyLikes
-				propertyImages
-				propertyDesc
-				propertyBarter
-				propertyRent
+				serviceType
+				serviceStatus
+				serviceTitle
+				servicePrice
+				serviceDuration
+				serviceImages
+				serviceViews
+				serviceLikes
+				serviceComments
+				serviceRank
+				serviceRating
+				salonId
 				memberId
-				soldAt
 				deletedAt
-				constructedAt
 				createdAt
 				updatedAt
-			}
-			metaCounter {
-				total
-			}
-		}
-	}
-`;
-
-export const GET_FAVORITES = gql`
-	query GetFavorites($input: OrdenaryInquiry!) {
-		getFavorites(input: $input) {
-			list {
-				_id
-				propertyType
-				propertyStatus
-				propertyLocation
-				propertyAddress
-				propertyTitle
-				propertyPrice
-				propertySquare
-				propertyBeds
-				propertyRooms
-				propertyViews
-				propertyLikes
-				propertyComments
-				propertyRank
-				propertyImages
-				propertyDesc
-				propertyBarter
-				propertyRent
-				memberId
-				soldAt
-				deletedAt
-				constructedAt
-				createdAt
-				updatedAt
-				memberData {
+				salonData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
-					memberNick
-					memberFullName
-					memberImage
-					memberAddress
-					memberDesc
-					memberProperties
-					memberArticles
-					memberPoints
-					memberLikes
-					memberViews
-					memberComments
-					memberFollowings
-					memberFollowers
-					memberRank
-					memberWarnings
-					memberBlocks
-					deletedAt
-					createdAt
-					updatedAt
-					accessToken
+					salonTitle
+					salonLocation
 				}
 			}
 			metaCounter {
@@ -296,60 +428,156 @@ export const GET_FAVORITES = gql`
 	}
 `;
 
-export const GET_VISITED = gql`
-	query GetVisited($input: OrdenaryInquiry!) {
-		getVisited(input: $input) {
+export const GET_FAVORITE_SERVICES = gql`
+	query GetFavoriteServices($input: OrdinaryInquiry!) {
+		getFavoriteServices(input: $input) {
 			list {
 				_id
-				propertyType
-				propertyStatus
-				propertyLocation
-				propertyAddress
-				propertyTitle
-				propertyPrice
-				propertySquare
-				propertyBeds
-				propertyRooms
-				propertyViews
-				propertyLikes
-				propertyComments
-				propertyRank
-				propertyImages
-				propertyDesc
-				propertyBarter
-				propertyRent
+				serviceType
+				serviceStatus
+				serviceTitle
+				servicePrice
+				serviceDuration
+				serviceImages
+				serviceViews
+				serviceLikes
+				serviceRating
+				salonId
 				memberId
-				soldAt
-				deletedAt
-				constructedAt
 				createdAt
 				updatedAt
 				memberData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
-					memberAddress
-					memberDesc
-					memberProperties
-					memberArticles
-					memberPoints
-					memberLikes
-					memberViews
-					memberComments
-					memberFollowings
-					memberFollowers
-					memberRank
-					memberWarnings
-					memberBlocks
-					deletedAt
-					createdAt
-					updatedAt
-					accessToken
+					memberExperience
+				}
+				salonData {
+					_id
+					salonTitle
+					salonLocation
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_VISITED_SERVICES = gql`
+	query GetVisitedServices($input: OrdinaryInquiry!) {
+		getVisitedServices(input: $input) {
+			list {
+				_id
+				serviceType
+				serviceStatus
+				serviceTitle
+				servicePrice
+				serviceDuration
+				serviceImages
+				serviceViews
+				serviceLikes
+				serviceRating
+				salonId
+				memberId
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberNick
+					memberFullName
+					memberImage
+					memberExperience
+				}
+				salonData {
+					_id
+					salonTitle
+					salonLocation
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
+ *        BOOKING         *
+ *************************/
+
+export const GET_MY_BOOKINGS = gql`
+	query GetMyBookings($input: BookingsInquiry!) {
+		getMyBookings(input: $input) {
+			list {
+				_id
+				bookingStatus
+				bookingDate
+				bookingTime
+				bookingNote
+				totalAmount
+				depositAmount
+				remainAmount
+				paymentStatus
+				serviceId
+				salonId
+				memberId
+				createdAt
+				updatedAt
+				salonData {
+					_id
+					salonTitle
+					salonLocation
+					salonAddress
+					salonPhone
+				}
+				serviceData {
+					_id
+					serviceTitle
+					servicePrice
+					serviceDuration
+					serviceImages
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_AGENT_BOOKINGS = gql`
+	query GetAgentBookings($input: AgentBookingsInquiry!) {
+		getAgentBookings(input: $input) {
+			list {
+				_id
+				bookingStatus
+				bookingDate
+				bookingTime
+				bookingNote
+				totalAmount
+				depositAmount
+				remainAmount
+				paymentStatus
+				serviceId
+				salonId
+				memberId
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberNick
+					memberFullName
+					memberImage
+					memberPhone
+				}
+				serviceData {
+					_id
+					serviceTitle
+					servicePrice
+					serviceDuration
 				}
 			}
 			metaCounter {
@@ -381,17 +609,13 @@ export const GET_BOARD_ARTICLE = gql`
 			memberData {
 				_id
 				memberType
-				memberStatus
-				memberAuthType
-				memberPhone
 				memberNick
 				memberFullName
 				memberImage
-				memberAddress
 				memberDesc
 				memberWarnings
 				memberBlocks
-				memberProperties
+				memberSalons
 				memberRank
 				memberPoints
 				memberLikes
@@ -432,20 +656,11 @@ export const GET_BOARD_ARTICLES = gql`
 				}
 				memberData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
-					memberAddress
-					memberDesc
-					memberWarnings
-					memberBlocks
-					memberProperties
+					memberSalons
 					memberRank
-					memberPoints
 					memberLikes
 					memberViews
 					deletedAt
@@ -478,20 +693,11 @@ export const GET_COMMENTS = gql`
 				updatedAt
 				memberData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
-					memberAddress
-					memberDesc
-					memberWarnings
-					memberBlocks
-					memberProperties
+					memberSalons
 					memberRank
-					memberPoints
 					memberLikes
 					memberViews
 					deletedAt
@@ -508,8 +714,9 @@ export const GET_COMMENTS = gql`
 `;
 
 /**************************
- *         FOLLOW        *
+ *         FOLLOW         *
  *************************/
+
 export const GET_MEMBER_FOLLOWERS = gql`
 	query GetMemberFollowers($input: FollowInquiry!) {
 		getMemberFollowers(input: $input) {
@@ -532,15 +739,12 @@ export const GET_MEMBER_FOLLOWERS = gql`
 				followerData {
 					_id
 					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
 					memberAddress
 					memberDesc
-					memberProperties
+					memberSalons
 					memberArticles
 					memberPoints
 					memberLikes
@@ -575,15 +779,12 @@ export const GET_MEMBER_FOLLOWINGS = gql`
 				followingData {
 					_id
 					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
 					memberAddress
 					memberDesc
-					memberProperties
+					memberSalons
 					memberArticles
 					memberPoints
 					memberLikes

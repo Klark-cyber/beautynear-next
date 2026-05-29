@@ -20,16 +20,19 @@ export const GET_ALL_MEMBERS_BY_ADMIN = gql`
 				memberDesc
 				memberWarnings
 				memberBlocks
-				memberProperties
+				memberSalons
 				memberRank
 				memberArticles
 				memberPoints
 				memberLikes
 				memberViews
+				memberExperience
+				memberSpecialty
+				memberLatitude
+				memberLongitude
 				deletedAt
 				createdAt
 				updatedAt
-				accessToken
 			}
 			metaCounter {
 				total
@@ -38,58 +41,49 @@ export const GET_ALL_MEMBERS_BY_ADMIN = gql`
 	}
 `;
 
+
 /**************************
- *        PROPERTY        *
+ *         SALON          *
  *************************/
 
-export const GET_ALL_PROPERTIES_BY_ADMIN = gql`
-	query GetAllPropertiesByAdmin($input: AllPropertiesInquiry!) {
-		getAllPropertiesByAdmin(input: $input) {
+export const GET_ALL_SALONS_BY_ADMIN = gql`
+	query GetAllSalonsByAdmin($input: AllSalonsInquiry!) {
+		getAllSalonsByAdmin(input: $input) {
 			list {
 				_id
-				propertyType
-				propertyStatus
-				propertyLocation
-				propertyAddress
-				propertyTitle
-				propertyPrice
-				propertySquare
-				propertyBeds
-				propertyRooms
-				propertyViews
-				propertyLikes
-				propertyImages
-				propertyDesc
-				propertyBarter
-				propertyRent
+				salonType
+				salonStatus
+				salonLocation
+				salonAddress
+				salonTitle
+				salonDesc
+				salonImages
+				salonPhone
+				salonWorkHours
+				salonViews
+				salonLikes
+				salonComments
+				salonRank
+				salonFollowers
+				depositAmount
+				salonLatitude
+				salonLongitude
 				memberId
-				soldAt
 				deletedAt
-				constructedAt
 				createdAt
 				updatedAt
 				memberData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
-					memberAddress
-					memberDesc
-					memberWarnings
-					memberBlocks
-					memberProperties
+					memberSalons
 					memberRank
-					memberPoints
 					memberLikes
 					memberViews
 					deletedAt
 					createdAt
 					updatedAt
-					accessToken
 				}
 			}
 			metaCounter {
@@ -98,6 +92,106 @@ export const GET_ALL_PROPERTIES_BY_ADMIN = gql`
 		}
 	}
 `;
+
+
+/**************************
+ *        SERVICE         *
+ *************************/
+
+export const GET_ALL_SERVICES_BY_ADMIN = gql`
+	query GetAllServicesByAdmin($input: ServicesInquiry!) {
+		getServices(input: $input) {
+			list {
+				_id
+				serviceType
+				serviceStatus
+				serviceTitle
+				serviceDesc
+				servicePrice
+				serviceDuration
+				serviceImages
+				serviceViews
+				serviceLikes
+				serviceComments
+				serviceRank
+				serviceRating
+				salonId
+				memberId
+				deletedAt
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberNick
+					memberFullName
+					memberImage
+					memberRank
+				}
+				salonData {
+					_id
+					salonTitle
+					salonLocation
+					salonStatus
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+
+/**************************
+ *        BOOKING         *
+ *************************/
+
+export const GET_ALL_BOOKINGS_BY_ADMIN = gql`
+	query GetAllBookingsByAdmin($input: BookingsInquiry!) {
+		getAllBookingsByAdmin(input: $input) {
+			list {
+				_id
+				bookingStatus
+				bookingDate
+				bookingTime
+				bookingNote
+				totalAmount
+				depositAmount
+				remainAmount
+				paymentStatus
+				serviceId
+				salonId
+				memberId
+				deletedAt
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberNick
+					memberFullName
+					memberImage
+					memberPhone
+				}
+				salonData {
+					_id
+					salonTitle
+					salonLocation
+					salonAddress
+				}
+				serviceData {
+					_id
+					serviceTitle
+					servicePrice
+					serviceDuration
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
 
 /**************************
  *      BOARD-ARTICLE     *
@@ -120,26 +214,16 @@ export const GET_ALL_BOARD_ARTICLES_BY_ADMIN = gql`
 				updatedAt
 				memberData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
-					memberAddress
-					memberDesc
-					memberWarnings
-					memberBlocks
-					memberProperties
+					memberSalons
 					memberRank
-					memberPoints
 					memberLikes
 					memberViews
 					deletedAt
 					createdAt
 					updatedAt
-					accessToken
 				}
 			}
 			metaCounter {
@@ -167,26 +251,16 @@ export const GET_COMMENTS = gql`
 				updatedAt
 				memberData {
 					_id
-					memberType
-					memberStatus
-					memberAuthType
-					memberPhone
 					memberNick
 					memberFullName
 					memberImage
-					memberAddress
-					memberDesc
-					memberWarnings
-					memberBlocks
-					memberProperties
+					memberSalons
 					memberRank
-					memberPoints
 					memberLikes
 					memberViews
 					deletedAt
 					createdAt
 					updatedAt
-					accessToken
 				}
 			}
 			metaCounter {
