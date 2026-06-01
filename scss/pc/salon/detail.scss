@@ -1,0 +1,585 @@
+@import '/scss/variables.scss';
+
+#pc-wrap {
+	.salon-detail-page {
+		width: 100%;
+		min-height: 100vh;
+		background: $bg-page;
+
+		.salon-detail-inner {
+			max-width: 1280px;
+			margin: 0 auto;
+			padding: 24px 32px 48px;
+		}
+
+		// ── BACK LINK ─────────────────────────────────────────────────────
+		.back-link {
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			cursor: pointer;
+			color: $primary;
+			font-family: $font;
+			font-size: 13px;
+			font-weight: 600;
+			margin-bottom: 20px;
+			width: fit-content;
+			transition: $transition;
+
+			&:hover {
+				opacity: 0.75;
+			}
+		}
+
+		// ── LEFT COLUMN ───────────────────────────────────────────────────
+		.salon-detail-left {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+			gap: 24px;
+			min-width: 0;
+		}
+
+		// ── GALLERY ───────────────────────────────────────────────────────
+		.gallery-section {
+			background: $white;
+			border-radius: $radius-xl;
+			overflow: hidden;
+			box-shadow: $shadow-card;
+
+			.main-img-wrap {
+				position: relative;
+				height: 420px;
+				overflow: hidden;
+
+				.main-img {
+					width: 100%;
+					height: 100%;
+					object-fit: cover;
+					transition: transform 0.3s ease;
+					cursor: pointer;
+
+					&:hover {
+						transform: scale(1.02);
+					}
+				}
+
+				.open-chip {
+					position: absolute;
+					top: 16px;
+					left: 16px;
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 700;
+					color: $white;
+					border: none;
+
+					&.open {
+						background: #4CAF50;
+					}
+
+					&.closed {
+						background: #e53935;
+					}
+
+					&.small {
+						top: 8px;
+						left: 8px;
+						font-size: 10px;
+					}
+				}
+
+				.like-btn {
+					position: absolute;
+					top: 12px;
+					right: 12px;
+					width: 38px;
+					height: 38px;
+					background: rgba(255, 255, 255, 0.92);
+					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+					transition: $transition;
+
+					&:hover {
+						background: $white;
+						transform: scale(1.1);
+					}
+
+					&.liked {
+						background: rgba(255, 77, 141, 0.1);
+					}
+				}
+			}
+
+			.thumbnails {
+				padding: 12px 16px;
+				overflow-x: auto;
+
+				&::-webkit-scrollbar {
+					display: none;
+				}
+
+				.thumb {
+					width: 80px;
+					height: 60px;
+					border-radius: 8px;
+					background-size: cover;
+					background-position: center;
+					cursor: pointer;
+					flex-shrink: 0;
+					border: 2px solid transparent;
+					transition: $transition;
+
+					&:hover {
+						border-color: $primary-light;
+					}
+
+					&.active {
+						border-color: $primary;
+					}
+				}
+			}
+		}
+
+		// ── SALON INFO ────────────────────────────────────────────────────
+		.salon-info-section {
+			background: $white;
+			border-radius: $radius-lg;
+			padding: 24px;
+			box-shadow: $shadow-card;
+
+			.salon-title {
+				font-family: $font;
+				font-size: 26px;
+				font-weight: 800;
+				color: $text-dark;
+				letter-spacing: -0.5px;
+			}
+
+			.top-chip {
+				background: linear-gradient(135deg, $primary, $primary-light);
+				color: $white;
+				font-family: $font;
+				font-size: 11px;
+				font-weight: 700;
+				border: none;
+				height: 24px;
+			}
+
+			.type-chip {
+				background: rgba(255, 77, 141, 0.08);
+				color: $primary;
+				font-family: $font;
+				font-size: 12px;
+				font-weight: 600;
+				border: 1px solid rgba(255, 77, 141, 0.2);
+				height: 24px;
+			}
+
+			.about-section {
+				margin-top: 20px;
+				padding-top: 20px;
+				border-top: 1px solid rgba(255, 77, 141, 0.08);
+			}
+
+			.section-title {
+				font-family: $font;
+				font-size: 18px;
+				font-weight: 700;
+				color: $text-dark;
+				margin-bottom: 12px;
+			}
+		}
+
+		// ── SERVICES ──────────────────────────────────────────────────────
+		.services-section {
+			background: $white;
+			border-radius: $radius-lg;
+			padding: 24px;
+			box-shadow: $shadow-card;
+
+			.section-title {
+				font-family: $font;
+				font-size: 18px;
+				font-weight: 700;
+				color: $text-dark;
+			}
+
+			.service-card {
+				width: 160px;
+				flex-shrink: 0;
+				border-radius: $radius-md;
+				overflow: hidden;
+				border: 1px solid rgba(255, 77, 141, 0.08);
+				background: $white;
+				box-shadow: $shadow-card;
+				transition: $transition;
+
+				&:hover {
+					transform: translateY(-4px);
+					box-shadow: $shadow-pink;
+					border-color: $primary-border;
+				}
+
+				.svc-img {
+					position: relative;
+					height: 120px;
+					background-size: cover;
+					background-position: center;
+
+					.svc-like-btn {
+						position: absolute;
+						top: 6px;
+						right: 6px;
+						width: 28px;
+						height: 28px;
+						background: rgba(255, 255, 255, 0.9);
+
+						svg {
+							font-size: 13px;
+							color: #666;
+						}
+					}
+				}
+
+				.svc-name {
+					font-family: $font;
+					font-size: 13px;
+					font-weight: 700;
+					color: $text-dark;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+				.svc-price {
+					font-family: $font;
+					font-size: 13px;
+					font-weight: 700;
+					color: $primary;
+					margin-top: 2px;
+				}
+
+				.svc-dur {
+					font-family: $font;
+					font-size: 11px;
+					color: $text-light;
+				}
+
+				.svc-book-btn {
+					width: 100%;
+					margin-top: 8px;
+					padding: 7px;
+					background: linear-gradient(135deg, $primary, $primary-light) !important;
+					color: $white !important;
+					border-radius: 8px !important;
+					font-family: $font !important;
+					font-size: 12px !important;
+					font-weight: 700 !important;
+					box-shadow: 0 2px 8px rgba(255, 77, 141, 0.25) !important;
+					transition: $transition !important;
+
+					&:hover {
+						transform: scale(1.03) !important;
+						box-shadow: 0 4px 16px rgba(255, 77, 141, 0.4) !important;
+					}
+				}
+			}
+		}
+
+		// ── REVIEWS ───────────────────────────────────────────────────────
+		.reviews-section {
+			background: $white;
+			border-radius: $radius-lg;
+			padding: 24px;
+			box-shadow: $shadow-card;
+
+			.section-title {
+				font-family: $font;
+				font-size: 18px;
+				font-weight: 700;
+				color: $text-dark;
+				margin-bottom: 20px;
+			}
+
+			.rating-summary {
+				margin-bottom: 24px;
+				padding-bottom: 24px;
+				border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+
+				.big-rating {
+					font-family: $font;
+					font-size: 48px;
+					font-weight: 900;
+					color: $text-dark;
+					line-height: 1;
+					margin-bottom: 6px;
+				}
+
+				.rating-bar {
+					flex: 1;
+					height: 6px;
+					border-radius: 3px;
+					background: #f0f0f0;
+					overflow: hidden;
+
+					.rating-fill {
+						height: 100%;
+						border-radius: 3px;
+						background: linear-gradient(135deg, $primary, $primary-light);
+						transition: width 0.3s ease;
+					}
+				}
+			}
+
+			.review-list {
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+			}
+
+			.review-card {
+				padding: 16px;
+				border-radius: $radius-md;
+				border: 1px solid rgba(255, 77, 141, 0.08);
+				background: #fafafa;
+				transition: $transition;
+
+				&:hover {
+					border-color: $primary-border;
+					box-shadow: 0 2px 12px rgba(255, 77, 141, 0.06);
+				}
+			}
+
+			.write-review-section {
+				margin-top: 24px;
+				padding-top: 24px;
+				border-top: 1px solid rgba(255, 77, 141, 0.08);
+
+				.review-textarea {
+					width: 100%;
+					min-height: 100px;
+					padding: 12px 16px;
+					border: 1.5px solid rgba(255, 77, 141, 0.2);
+					border-radius: 10px;
+					font-family: $font;
+					font-size: 14px;
+					color: $text-dark;
+					resize: vertical;
+					outline: none;
+					margin-bottom: 12px;
+					transition: border-color 0.2s;
+					box-sizing: border-box;
+
+					&:focus {
+						border-color: $primary;
+					}
+
+					&::placeholder {
+						color: $text-placeholder;
+					}
+				}
+
+				.submit-review-btn {
+					padding: 10px 28px !important;
+					background: linear-gradient(135deg, $primary, $primary-light) !important;
+					color: $white !important;
+					border-radius: 10px !important;
+					font-family: $font !important;
+					font-size: 14px !important;
+					font-weight: 700 !important;
+					box-shadow: 0 4px 16px rgba(255, 77, 141, 0.3) !important;
+					transition: $transition !important;
+
+					&:hover {
+						transform: translateY(-2px) !important;
+						box-shadow: 0 8px 24px rgba(255, 77, 141, 0.4) !important;
+					}
+
+					&:disabled {
+						background: #eee !important;
+						color: #bbb !important;
+						box-shadow: none !important;
+					}
+				}
+			}
+		}
+
+		// ── MAP ───────────────────────────────────────────────────────────
+		.map-section {
+			background: $white;
+			border-radius: $radius-lg;
+			padding: 24px;
+			box-shadow: $shadow-card;
+
+			.section-title {
+				font-family: $font;
+				font-size: 18px;
+				font-weight: 700;
+				color: $text-dark;
+				margin-bottom: 16px;
+			}
+
+			.map-wrap {
+				height: 280px;
+				border-radius: $radius-md;
+				overflow: hidden;
+			}
+		}
+
+		// ── RIGHT SIDEBAR ─────────────────────────────────────────────────
+		.salon-detail-right {
+			width: 340px;
+			flex-shrink: 0;
+			display: flex;
+			flex-direction: column;
+			gap: 16px;
+			position: sticky;
+			top: 100px;
+			align-self: flex-start;
+		}
+
+		// ── BOOKING CARD ──────────────────────────────────────────────────
+		.booking-card {
+			background: $white;
+			border-radius: $radius-xl;
+			padding: 24px;
+			box-shadow: 0 8px 32px rgba(255, 77, 141, 0.1);
+			border: 1px solid rgba(255, 77, 141, 0.1);
+
+			// Time slots
+			.time-slot {
+				padding: 8px 14px;
+				border-radius: 20px;
+				border: 1.5px solid rgba(255, 77, 141, 0.2);
+				font-family: $font;
+				font-size: 13px;
+				font-weight: 500;
+				color: #555;
+				cursor: pointer;
+				transition: $transition;
+
+				&:hover:not(.booked) {
+					border-color: $primary;
+					color: $primary;
+					transform: translateY(-1px);
+				}
+
+				&.selected {
+					background: linear-gradient(135deg, $primary, $primary-light);
+					color: $white;
+					border-color: $primary;
+					box-shadow: 0 4px 12px rgba(255, 77, 141, 0.3);
+				}
+
+				&.booked {
+					background: #f5f5f5;
+					color: #bbb;
+					border-color: #eee;
+					cursor: not-allowed;
+					text-decoration: line-through;
+				}
+			}
+
+			// Book now button
+			.book-now-btn {
+				width: 100%;
+				padding: 14px !important;
+				background: linear-gradient(135deg, $primary, $primary-light) !important;
+				color: $white !important;
+				border-radius: 12px !important;
+				font-family: $font !important;
+				font-size: 15px !important;
+				font-weight: 700 !important;
+				box-shadow: 0 6px 20px rgba(255, 77, 141, 0.35) !important;
+				transition: $transition !important;
+
+				&:hover {
+					transform: translateY(-2px) !important;
+					box-shadow: 0 10px 28px rgba(255, 77, 141, 0.45) !important;
+				}
+
+				&:disabled {
+					background: #eee !important;
+					color: #bbb !important;
+					box-shadow: none !important;
+					transform: none !important;
+				}
+			}
+		}
+
+		// ── SPECIALIST CARD ───────────────────────────────────────────────
+		.specialist-card {
+			background: $white;
+			border-radius: $radius-xl;
+			padding: 24px;
+			box-shadow: $shadow-card;
+			border: 1px solid rgba(255, 77, 141, 0.08);
+
+			.specialty-chip {
+				background: rgba(255, 77, 141, 0.08);
+				color: $primary;
+				font-family: $font;
+				font-size: 11px;
+				font-weight: 600;
+				border: 1px solid rgba(255, 77, 141, 0.15);
+				height: 22px;
+			}
+
+			.view-profile-btn {
+				margin-top: 12px;
+				width: 100%;
+				padding: 10px !important;
+				border: 1.5px solid $primary !important;
+				color: $primary !important;
+				border-radius: 10px !important;
+				font-family: $font !important;
+				font-size: 14px !important;
+				font-weight: 700 !important;
+				transition: $transition !important;
+
+				&:hover {
+					background: rgba(255, 77, 141, 0.06) !important;
+					transform: translateY(-1px) !important;
+				}
+			}
+		}
+
+		// ── SIMILAR SALONS ────────────────────────────────────────────────
+		.similar-section {
+			margin-top: 32px;
+			padding-top: 32px;
+			border-top: 1px solid rgba(255, 77, 141, 0.08);
+
+			.section-title {
+				font-family: $font;
+				font-size: 20px;
+				font-weight: 800;
+				color: $text-dark;
+				margin-bottom: 20px;
+			}
+
+			.similar-card {
+				border-radius: $radius-md;
+				overflow: hidden;
+				background: $white;
+				border: 1px solid rgba(255, 77, 141, 0.08);
+				box-shadow: $shadow-card;
+				cursor: pointer;
+				transition: $transition;
+
+				&:hover {
+					transform: translateY(-4px);
+					box-shadow: $shadow-pink;
+					border-color: $primary-border;
+				}
+
+				.similar-img {
+					height: 140px;
+					background-size: cover;
+					background-position: center;
+					position: relative;
+				}
+			}
+		}
+	}
+}

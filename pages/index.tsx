@@ -1,15 +1,19 @@
 import { NextPage } from 'next';
-import useDeviceDetect from '../libs/hooks/useDeviceDetect';
-import withLayoutMain from '../libs/components/layout/LayoutHome';
-import CommunityBoards from '../libs/components/homepage/CommunityBoards';
-import PopularProperties from '../libs/components/homepage/PopularProperties';
-import TopAgents from '../libs/components/homepage/TopAgents';
-import Events from '../libs/components/homepage/Events';
-import TrendProperties from '../libs/components/homepage/TrendProperties';
-import TopProperties from '../libs/components/homepage/TopProperties';
 import { Stack } from '@mui/material';
-import Advertisement from '../libs/components/homepage/Advertisement';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import withLayoutMain from '../libs/components/layout/LayoutHome';
+import useDeviceDetect from '../libs/hooks/useDeviceDetect';
+import HeroSection from '../libs/components/homepage/Herosection';
+import CategoryChips from '../libs/components/homepage/Categorychips';
+import NearbySalons from '../libs/components/homepage/Nearbysalons';
+import HowItWorks from '../libs/components/homepage/Howitworks';
+import FeaturedClinics from '../libs/components/homepage/Featuredclinics';
+import TrendingServices from '../libs/components/homepage/Trendingservices';
+import PopularSalons from '../libs/components/homepage/Popularsalons';
+import UpcomingEvents from '../libs/components/homepage/Upcomingevents';
+import CommunityHighlights from '../libs/components/homepage/Communityhighlights';
+import NewsletterBanner from '../libs/components/homepage/Newsletterbanner';
+import AppDownload from '../libs/components/homepage/Appdownload';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -22,27 +26,34 @@ const Home: NextPage = () => {
 
 	if (device === 'mobile') {
 		return (
-			<Stack className={'home-page'}>
-				<TrendProperties />
-				<PopularProperties />
-				<Advertisement />
-				<TopProperties />
-				<TopAgents />
-			</Stack>
-		);
-	} else {
-		return (
-			<Stack className={'home-page'}>
-				<TrendProperties />
-				<PopularProperties />
-				<Advertisement />
-				<TopProperties />
-				<TopAgents />
-				<Events />
-				<CommunityBoards />
+			<Stack className="home-page">
+				<HeroSection />
+				<CategoryChips />
+				<TrendingServices />
+				<PopularSalons />
+				<FeaturedClinics />
+				<NewsletterBanner />
+				<UpcomingEvents />
+				<CommunityHighlights />
 			</Stack>
 		);
 	}
+
+	return (
+		<Stack className="home-page">
+			<HeroSection />
+			<CategoryChips />
+			<NearbySalons />
+			<HowItWorks />
+			<FeaturedClinics />
+			<TrendingServices />
+			<PopularSalons />
+			<UpcomingEvents />
+			<CommunityHighlights />
+			<NewsletterBanner />
+			<AppDownload />
+		</Stack>
+	);
 };
 
 export default withLayoutMain(Home);

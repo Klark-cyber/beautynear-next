@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { Pagination, Stack, Typography } from '@mui/material';
-import PropertyCard from '../property/PropertyCard';
+import PropertyCard from '../salon/Saloncard';
 import { Property } from '../../types/service/service';
 import { T } from '../../types/common';
 import { useMutation, useQuery } from '@apollo/client';

@@ -1,0 +1,212 @@
+@import '/scss/variables.scss';
+
+#mobile-wrap {
+    .salon-detail-page {
+        width: 100%;
+        padding-bottom: 80px;
+        background: $bg-page;
+
+        // ── BACK BAR ──────────────────────────────────────────────────────
+        .mobile-back-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: $white;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+            cursor: pointer;
+        }
+
+        // ── GALLERY ───────────────────────────────────────────────────────
+        .mobile-gallery {
+            position: relative;
+            height: 260px;
+            overflow: hidden;
+
+            .open-chip {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                z-index: 2;
+                font-family: $font;
+                font-size: 11px;
+                font-weight: 700;
+                color: $white;
+                border: none;
+
+                &.open {
+                    background: #4CAF50;
+                }
+
+                &.closed {
+                    background: #e53935;
+                }
+            }
+        }
+
+        // ── INFO ──────────────────────────────────────────────────────────
+        .mobile-info {
+            background: $white;
+
+            .salon-name {
+                font-family: $font;
+                font-size: 20px;
+                font-weight: 800;
+                color: $text-dark;
+                letter-spacing: -0.4px;
+            }
+
+            .top-chip {
+                background: linear-gradient(135deg, $primary, $primary-light);
+                color: $white;
+                font-family: $font;
+                font-size: 10px;
+                font-weight: 700;
+                border: none;
+                height: 20px;
+            }
+
+            .type-chip {
+                background: rgba(255, 77, 141, 0.08);
+                color: $primary;
+                font-family: $font;
+                font-size: 11px;
+                font-weight: 600;
+                border: 1px solid rgba(255, 77, 141, 0.2);
+                height: 22px;
+            }
+
+            .like-btn {
+                width: 36px;
+                height: 36px;
+                background: rgba(255, 77, 141, 0.06);
+                border: 1px solid rgba(255, 77, 141, 0.15);
+                transition: $transition;
+
+                &.liked {
+                    background: rgba(255, 77, 141, 0.12);
+                }
+            }
+
+            // Mobile service cards
+            .mobile-service-card {
+                flex-shrink: 0;
+                width: 140px;
+                border-radius: $radius-md;
+                overflow: hidden;
+                background: $white;
+                border: 1px solid rgba(255, 77, 141, 0.08);
+                box-shadow: $shadow-card;
+                padding-bottom: 12px;
+
+                .svc-img {
+                    height: 100px;
+                    background-size: cover;
+                    background-position: center;
+                    background-color: #f5f5f5;
+                }
+
+                .svc-name {
+                    font-family: $font;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: $text-dark;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    padding: 8px 10px 0;
+                }
+
+                .svc-price {
+                    font-family: $font;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: $primary;
+                    padding: 2px 10px 0;
+                }
+
+                .svc-dur {
+                    font-family: $font;
+                    font-size: 10px;
+                    color: $text-light;
+                    padding: 0 10px;
+                }
+
+                .svc-book-btn {
+                    width: calc(100% - 20px) !important;
+                    margin: 8px 10px 0 !important;
+                    padding: 6px !important;
+                    background: linear-gradient(135deg, $primary, $primary-light) !important;
+                    color: $white !important;
+                    border-radius: 6px !important;
+                    font-family: $font !important;
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                }
+            }
+        }
+
+        // ── MOBILE BOOKING CARD ───────────────────────────────────────────
+        .mobile-booking-card {
+            background: $white;
+            border-radius: $radius-xl;
+            padding: 20px;
+            box-shadow: 0 4px 24px rgba(255, 77, 141, 0.1);
+            border: 1px solid rgba(255, 77, 141, 0.1);
+
+            .time-slot {
+                padding: 7px 12px;
+                border-radius: 16px;
+                border: 1.5px solid rgba(255, 77, 141, 0.2);
+                font-family: $font;
+                font-size: 12px;
+                font-weight: 500;
+                color: #555;
+                cursor: pointer;
+                transition: $transition;
+
+                &:active:not(.booked) {
+                    transform: scale(0.95);
+                }
+
+                &.selected {
+                    background: linear-gradient(135deg, $primary, $primary-light);
+                    color: $white;
+                    border-color: $primary;
+                    box-shadow: 0 3px 10px rgba(255, 77, 141, 0.3);
+                }
+
+                &.booked {
+                    background: #f5f5f5;
+                    color: #bbb;
+                    border-color: #eee;
+                    cursor: not-allowed;
+                    text-decoration: line-through;
+                }
+            }
+
+            .book-now-btn {
+                width: 100%;
+                padding: 14px !important;
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 12px !important;
+                font-family: $font !important;
+                font-size: 15px !important;
+                font-weight: 700 !important;
+                box-shadow: 0 4px 16px rgba(255, 77, 141, 0.35) !important;
+                transition: $transition !important;
+
+                &:active {
+                    transform: scale(0.98) !important;
+                }
+
+                &:disabled {
+                    background: #eee !important;
+                    color: #bbb !important;
+                    box-shadow: none !important;
+                }
+            }
+        }
+    }
+}

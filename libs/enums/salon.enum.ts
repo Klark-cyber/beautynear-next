@@ -14,6 +14,7 @@ export enum SalonStatus {
 }
 
 export enum SalonLocation {
+	ALL = 'ALL',        // butun mamlakat bo'ylab (filter da ishlatiladi, DB ga saqlanmaydi)
 	SEOUL = 'SEOUL',
 	BUSAN = 'BUSAN',
 	DAEGU = 'DAEGU',

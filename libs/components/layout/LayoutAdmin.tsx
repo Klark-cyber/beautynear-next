@@ -1,37 +1,29 @@
-import type { ComponentType } from 'react';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { ComponentType } from 'react';
+import {
+	Box, Stack, AppBar, Toolbar, Drawer, Avatar, IconButton,
+	Menu, MenuItem, Divider, Typography, Tooltip, Badge,
+} from '@mui/material';
 import MenuList from '../admin/AdminMenuList';
-import Toolbar from '@mui/material/Toolbar';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import { Menu, MenuItem } from '@mui/material';
-import Drawer from '@mui/material/Drawer';
-import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
-import IconButton from '@mui/material/IconButton';
-import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import Tooltip from '@mui/material/Tooltip';
 import { getJwtToken, logOut, updateUserInfo } from '../../auth';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 import { REACT_APP_API_URL } from '../../config';
 import { MemberType } from '../../enums/member.enum';
-const drawerWidth = 280;
+import { Logout, NotificationsOutlined } from '@mui/icons-material';
+import { useTranslation } from 'next-i18next';
+
+const DRAWER_WIDTH = 260;
 
 const withAdminLayout = (Component: ComponentType) => {
 	return (props: object) => {
 		const router = useRouter();
+		const { t } = useTranslation('common');
 		const user = useReactiveVar(userVar);
-		const [settingsState, setSettingsStateState] = useState(false);
-		const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-		const [openMenu, setOpenMenu] = useState(false);
-		const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-		const [title, setTitle] = useState('admin');
+		const [anchorUser, setAnchorUser] = useState<null | HTMLElement>(null);
 		const [loading, setLoading] = useState(true);
 
-		/** LIFECYCLES **/
 		useEffect(() => {
 			const jwt = getJwtToken();
 			if (jwt) updateUserInfo(jwt);
@@ -44,139 +36,212 @@ const withAdminLayout = (Component: ComponentType) => {
 			}
 		}, [loading, user, router]);
 
-		/** HANDLERS **/
-		const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-			setAnchorElUser(event.currentTarget);
-		};
-
-		const handleCloseUserMenu = () => {
-			setAnchorElUser(null);
-		};
-
-		const logoutHandler = () => {
-			logOut();
-			router.push('/').then();
-		};
-
 		if (!user || user?.memberType !== MemberType.ADMIN) return null;
 
 		return (
-			<main id="pc-wrap" className="admin">
-				<Box component={'div'} sx={{ display: 'flex' }}>
-					<AppBar
-						position="fixed"
+			<Box component="main" id="pc-wrap" className="admin" sx={{ display: 'flex', minHeight: '100vh', background: '#F8F9FC' }}>
+
+				{/* Sidebar Drawer */}
+				<Drawer
+					variant="permanent"
+					anchor="left"
+					className="aside"
+					sx={{
+						width: DRAWER_WIDTH,
+						flexShrink: 0,
+						'& .MuiDrawer-paper': {
+							width: DRAWER_WIDTH,
+							boxSizing: 'border-box',
+							background: 'linear-gradient(160deg, #1a0a12 0%, #2d1020 100%)',
+							border: 'none',
+							boxShadow: '4px 0 20px rgba(0,0,0,0.15)',
+						},
+					}}
+				>
+					{/* Logo */}
+					<Box
+						component="div"
 						sx={{
-							width: `calc(100% - ${drawerWidth}px)`,
-							ml: `${drawerWidth}px`,
-							boxShadow: 'rgb(100 116 139 / 12%) 0px 1px 4px',
-							background: 'none',
+							px: 3,
+							py: 3,
+							borderBottom: '1px solid rgba(255,255,255,0.08)',
 						}}
 					>
-						<Toolbar>
-							<Tooltip title="Open settings">
-								<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-									<Avatar
-										src={
-											user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'
-										}
-									/>
-								</IconButton>
-							</Tooltip>
-							<Menu
-								sx={{ mt: '45px' }}
-								id="menu-appbar"
-								className={'pop-menu'}
-								anchorEl={anchorElUser}
-								anchorOrigin={{
-									vertical: 'top',
-									horizontal: 'right',
+						<Box
+							component="div"
+							sx={{
+								transition: 'filter 0.25s',
+								'&:hover': { filter: 'drop-shadow(0 0 8px rgba(255,133,179,0.5))' },
+							}}
+						>
+							<img src="/img/logo/logoWhite.svg" alt="BeautyNear" height={30} />
+						</Box>
+						<Typography
+							sx={{
+								color: 'rgba(255,255,255,0.4)',
+								fontSize: 11,
+								mt: 0.5,
+								letterSpacing: 1,
+								textTransform: 'uppercase',
+							}}
+						>
+							Admin Panel
+						</Typography>
+					</Box>
+
+					{/* User info */}
+					<Box
+						component="div"
+						sx={{
+							px: 3,
+							py: 2,
+							mx: 2,
+							my: 1.5,
+							borderRadius: 2,
+							background: 'rgba(255,77,141,0.12)',
+							border: '1px solid rgba(255,77,141,0.2)',
+							display: 'flex',
+							alignItems: 'center',
+							gap: 1.5,
+						}}
+					>
+						<Avatar
+							src={user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'}
+							sx={{
+								width: 36,
+								height: 36,
+								border: '2px solid #FF4D8D',
+								transition: 'transform 0.2s',
+								'&:hover': { transform: 'scale(1.1)' },
+							}}
+						/>
+						<Box component="div">
+							<Typography sx={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>
+								{user?.memberNick}
+							</Typography>
+							<Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>
+								Administrator
+							</Typography>
+						</Box>
+					</Box>
+
+					<MenuList />
+				</Drawer>
+
+				{/* Main content */}
+				<Box component="div" sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+
+					{/* Top AppBar */}
+					<AppBar
+						position="sticky"
+						sx={{
+							background: 'rgba(255,255,255,0.95)',
+							backdropFilter: 'blur(12px)',
+							boxShadow: '0 1px 12px rgba(0,0,0,0.06)',
+							borderBottom: '1px solid rgba(255,77,141,0.08)',
+							color: '#333',
+						}}
+					>
+						<Toolbar sx={{ justifyContent: 'flex-end', gap: 1.5, minHeight: '60px !important' }}>
+							{/* Notification */}
+							<IconButton
+								sx={{
+									color: '#666',
+									transition: 'all 0.2s',
+									'&:hover': {
+										color: '#FF4D8D',
+										background: 'rgba(255,77,141,0.08)',
+										'& svg': { animation: 'bellShake 0.4s ease' },
+									},
+									'@keyframes bellShake': {
+										'0%,100%': { transform: 'rotate(0deg)' },
+										'25%': { transform: 'rotate(-15deg)' },
+										'75%': { transform: 'rotate(15deg)' },
+									},
 								}}
-								keepMounted
-								transformOrigin={{
-									vertical: 'top',
-									horizontal: 'right',
-								}}
-								open={Boolean(anchorElUser)}
-								onClose={handleCloseUserMenu}
 							>
+								<Badge badgeContent={2} color="error" sx={{ '& .MuiBadge-badge': { fontSize: 10 } }}>
+									<NotificationsOutlined />
+								</Badge>
+							</IconButton>
+
+							{/* User avatar */}
+							<Tooltip title={t('Account settings')}>
 								<Box
-									component={'div'}
-									onClick={handleCloseUserMenu}
+									component="div"
+									onClick={(e: any) => setAnchorUser(e.currentTarget)}
 									sx={{
-										width: '200px',
+										display: 'flex',
+										alignItems: 'center',
+										gap: 1,
+										cursor: 'pointer',
+										px: 1.5,
+										py: 0.75,
+										borderRadius: 3,
+										border: '1px solid rgba(255,77,141,0.2)',
+										transition: 'all 0.25s',
+										'&:hover': {
+											background: 'rgba(255,77,141,0.06)',
+											borderColor: '#FF4D8D',
+											boxShadow: '0 2px 12px rgba(255,77,141,0.15)',
+										},
 									}}
 								>
-									<Stack sx={{ px: '20px', my: '12px' }}>
-										<Typography variant={'h6'} component={'h6'} sx={{ mb: '4px' }}>
-											{user?.memberNick}
-										</Typography>
-										<Typography variant={'subtitle1'} component={'p'} color={'#757575'}>
-											{user?.memberPhone}
-										</Typography>
-									</Stack>
-									<Divider />
-									<Box component={'div'} sx={{ p: 1, py: '6px' }} onClick={logoutHandler}>
-										<MenuItem sx={{ px: '16px', py: '6px' }}>
-											<Typography variant={'subtitle1'} component={'span'}>
-												Logout
-											</Typography>
-										</MenuItem>
-									</Box>
+									<Avatar
+										src={user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'}
+										sx={{ width: 28, height: 28, border: '2px solid #FF85B3' }}
+									/>
+									<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#333' }}>
+										{user?.memberNick}
+									</Typography>
 								</Box>
+							</Tooltip>
+
+							<Menu
+								anchorEl={anchorUser}
+								open={Boolean(anchorUser)}
+								onClose={() => setAnchorUser(null)}
+								PaperProps={{
+									sx: {
+										mt: 1,
+										borderRadius: 3,
+										boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+										minWidth: 200,
+										overflow: 'hidden',
+									},
+								}}
+							>
+								<Box component="div" sx={{ px: 2, py: 1.5, background: 'linear-gradient(135deg, #FFF0F5, #FFF)' }}>
+									<Typography variant="subtitle2" fontWeight={700}>{user?.memberNick}</Typography>
+									<Typography variant="caption" color="text.secondary">{user?.memberPhone}</Typography>
+								</Box>
+								<Divider />
+								<MenuItem
+									onClick={() => { logOut(); setAnchorUser(null); }}
+									sx={{ gap: 1.5, py: 1.2, fontSize: 14, color: '#e53935', '&:hover': { background: '#FFF5F5' } }}
+								>
+									<Logout fontSize="small" />
+									{t('Logout')}
+								</MenuItem>
 							</Menu>
 						</Toolbar>
 					</AppBar>
 
-					<Drawer
+					{/* Page content */}
+					<Box
+						component="div"
+						id="bunker"
 						sx={{
-							width: drawerWidth,
-							flexShrink: 0,
-							'& .MuiDrawer-paper': {
-								width: drawerWidth,
-								boxSizing: 'border-box',
-							},
+							flex: 1,
+							p: 3,
+							overflow: 'auto',
 						}}
-						variant="permanent"
-						anchor="left"
-						className="aside"
 					>
-						<Toolbar sx={{ flexDirection: 'column', alignItems: 'flexStart' }}>
-							<Stack className={'logo-box'}>
-								<img src={'/img/logo/logoText.svg'} alt={'logo'} />
-							</Stack>
-
-							<Stack
-								className="user"
-								direction={'row'}
-								alignItems={'center'}
-								sx={{
-									bgcolor: openMenu ? 'rgba(255, 255, 255, 0.04)' : 'none',
-									borderRadius: '8px',
-									px: '24px',
-									py: '11px',
-								}}
-							>
-								<Avatar
-									src={user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'}
-								/>
-								<Typography variant={'body2'} p={1} ml={1}>
-									{user?.memberNick} <br />
-									{user?.memberPhone}
-								</Typography>
-							</Stack>
-						</Toolbar>
-
-						<Divider />
-
-						<MenuList />
-					</Drawer>
-
-					<Box component={'div'} id="bunker" sx={{ flexGrow: 1 }}>
-						{/*@ts-ignore*/}
-						<Component {...props} setSnackbar={setSnackbar} setTitle={setTitle} />
+						{/* @ts-ignore */}
+						<Component {...props} />
 					</Box>
 				</Box>
-			</main>
+			</Box>
 		);
 	};
 };

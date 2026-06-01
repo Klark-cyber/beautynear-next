@@ -1,5 +1,36 @@
-/** VARIABLES **/
-
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
+// ── Fonts ─────────────────────────────────────────────────────────────────────
 $font: 'Poppins', sans-serif;
+
+// ── Colors ────────────────────────────────────────────────────────────────────
+$primary: #FF4D8D;
+$primary-light: #FF85B3;
+$primary-pale: rgba(255, 77, 141, 0.08);
+$primary-border: rgba(255, 77, 141, 0.2);
+
+$dark-bg: #1a0a12;
+$dark-bg2: #2d1020;
+
+$text-dark: #1a1a1a;
+$text-mid: #333;
+$text-muted: #666;
+$text-light: #888;
+$text-placeholder: #bbb;
+
+$white: #ffffff;
+$bg-page: #FAFAFA;
+$bg-card: #ffffff;
+
+// ── Shadows ───────────────────────────────────────────────────────────────────
+$shadow-card: 0 2px 16px rgba(0, 0, 0, 0.06);
+$shadow-pink: 0 8px 32px rgba(255, 77, 141, 0.15);
+$shadow-hover: 0 16px 48px rgba(255, 77, 141, 0.15);
+
+// ── Transitions ───────────────────────────────────────────────────────────────
+$transition: all 0.25s ease;
+$transition-slow: all 0.35s ease;
+
+// ── Border radius ─────────────────────────────────────────────────────────────
+$radius-sm: 8px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;

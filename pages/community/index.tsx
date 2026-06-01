@@ -3,7 +3,7 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Stack, Tab, Typography, Button, Pagination } from '@mui/material';
-import CommunityCard from '../../libs/components/common/CommunityCard';
+import CommunityCard from '../../libs/components/common/Ratingstars';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { BoardArticle } from '../../libs/types/board-article/board-article';

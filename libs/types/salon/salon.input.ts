@@ -23,6 +23,8 @@ interface SISearch {
     latitude?: number;
     longitude?: number;
     radius?: number;
+    priceMin?: number;       // yangi — price filter uchun
+    priceMax?: number;       // yangi — price filter uchun
     text?: string;
 }
 
