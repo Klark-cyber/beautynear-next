@@ -1,0 +1,513 @@
+@import '/scss/variables.scss';
+
+#mobile-wrap {
+    .service-detail-page {
+        width: 100%;
+        padding-bottom: 140px;
+        background: $bg-page;
+
+        // ── BACK BAR ──────────────────────────────────────────────────────
+        .mobile-back-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 16px;
+            background: $white;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+            cursor: pointer;
+        }
+
+        // ── BEFORE/AFTER TABS ─────────────────────────────────────────────
+        .before-after-tabs {
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+            padding: 12px 16px 8px;
+            background: $white;
+        }
+
+        // ── MAIN IMAGE ────────────────────────────────────────────────────
+        .mobile-main-img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+        }
+
+        // ── THUMBNAILS ────────────────────────────────────────────────────
+        .mobile-thumbnails {
+            padding: 12px 16px;
+            background: $white;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            .mobile-thumb {
+                width: 60px;
+                height: 50px;
+                border-radius: 8px;
+                background-size: cover;
+                background-position: center;
+                flex-shrink: 0;
+                border: 2px solid transparent;
+                cursor: pointer;
+                transition: $transition;
+
+                &.active {
+                    border-color: $primary;
+                }
+            }
+        }
+
+        // ── SERVICE INFO CARD ─────────────────────────────────────────────
+        .mobile-service-info {
+            background: $white;
+            padding: 16px;
+            margin-bottom: 8px;
+
+            .service-name-mobile {
+                font-family: $font;
+                font-size: 20px;
+                font-weight: 800;
+                color: $text-dark;
+                letter-spacing: -0.4px;
+                flex: 1;
+                margin-right: 8px;
+            }
+
+            .like-btn {
+                padding: 4px;
+                transition: $transition;
+
+                &.liked svg {
+                    color: $primary;
+                }
+            }
+
+            .salon-link-mobile {
+                font-family: $font;
+                font-size: 13px;
+                color: $primary;
+                font-weight: 600;
+                margin-top: 6px;
+                cursor: pointer;
+                display: block;
+                transition: opacity 0.2s;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+
+            .specialist-link-mobile {
+                font-family: $font;
+                font-size: 13px;
+                color: $primary;
+                font-weight: 600;
+                margin-top: 3px;
+                cursor: pointer;
+                display: block;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+
+            .chips-row {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                flex-wrap: wrap;
+                margin-top: 10px;
+            }
+
+            .stats-row {
+                display: flex;
+                flex-direction: row;
+                gap: 16px;
+                margin-top: 8px;
+
+                .stat-item {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+
+                    svg {
+                        font-size: 13px;
+                        color: $text-light;
+                    }
+
+                    span {
+                        font-family: $font;
+                        font-size: 12px;
+                        color: $text-light;
+                    }
+                }
+            }
+        }
+
+        // ── ABOUT SECTION ─────────────────────────────────────────────────
+        .mobile-about {
+            background: $white;
+            padding: 16px;
+            margin-bottom: 8px;
+
+            .section-title-mobile {
+                font-family: $font;
+                font-size: 15px;
+                font-weight: 700;
+                color: $text-dark;
+                margin-bottom: 10px;
+            }
+
+            .about-text {
+                font-family: $font;
+                font-size: 13px;
+                color: $text-muted;
+                line-height: 1.7;
+            }
+        }
+
+        // ── BOOKING SECTION ───────────────────────────────────────────────
+        .mobile-booking-section {
+            background: $white;
+            padding: 16px;
+            margin-bottom: 8px;
+
+            .section-title-mobile {
+                font-family: $font;
+                font-size: 15px;
+                font-weight: 700;
+                color: $text-dark;
+                margin-bottom: 16px;
+            }
+
+            .time-slot {
+                padding: 7px 12px;
+                border-radius: 16px;
+                border: 1.5px solid rgba(255, 77, 141, 0.2);
+                font-family: $font;
+                font-size: 12px;
+                font-weight: 500;
+                color: #555;
+                cursor: pointer;
+                transition: $transition;
+
+                &:active:not(.booked) {
+                    transform: scale(0.95);
+                }
+
+                &.selected {
+                    background: linear-gradient(135deg, $primary, $primary-light);
+                    color: $white;
+                    border-color: $primary;
+                    box-shadow: 0 3px 10px rgba(255, 77, 141, 0.3);
+                }
+
+                &.booked {
+                    background: #f5f5f5;
+                    color: #bbb;
+                    border-color: #eee;
+                    cursor: not-allowed;
+                    text-decoration: line-through;
+                }
+            }
+        }
+
+        // ── SPECIALIST CARD ───────────────────────────────────────────────
+        .mobile-specialist-card {
+            background: $white;
+            padding: 16px;
+            margin-bottom: 8px;
+
+            .section-title-mobile {
+                font-family: $font;
+                font-size: 15px;
+                font-weight: 700;
+                color: $text-dark;
+                margin-bottom: 14px;
+            }
+
+            .specialist-row {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 16px;
+
+                .specialist-info {
+                    flex: 1;
+
+                    .specialist-name {
+                        font-family: $font;
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: $text-dark;
+                    }
+
+                    .specialty-chips {
+                        display: flex;
+                        flex-direction: row;
+                        gap: 4px;
+                        flex-wrap: wrap;
+                        margin-top: 4px;
+                    }
+
+                    .experience-text {
+                        font-family: $font;
+                        font-size: 12px;
+                        color: $text-light;
+                        margin-top: 2px;
+                    }
+                }
+            }
+
+            .specialist-actions {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+                margin-top: 14px;
+            }
+
+            .specialty-chip {
+                background: rgba(255, 77, 141, 0.08);
+                color: $primary;
+                font-family: $font;
+                font-size: 10px;
+                font-weight: 600;
+                border: 1px solid rgba(255, 77, 141, 0.15);
+                height: 20px;
+            }
+
+            .follow-btn {
+                flex: 1;
+                border: 1.5px solid $primary !important;
+                color: $primary !important;
+                border-radius: 8px !important;
+                font-family: $font !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                transition: $transition !important;
+
+                &.following {
+                    background: $primary !important;
+                    color: $white !important;
+                }
+            }
+
+            .view-profile-btn {
+                flex: 1;
+                border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+                color: #555 !important;
+                border-radius: 8px !important;
+                font-family: $font !important;
+                font-size: 12px !important;
+                font-weight: 600 !important;
+            }
+        }
+
+        // ── SALON MINI CARD ───────────────────────────────────────────────
+        .mobile-salon-mini-card {
+            background: $white;
+            padding: 16px;
+            margin-bottom: 8px;
+
+            .section-title-mobile {
+                font-family: $font;
+                font-size: 15px;
+                font-weight: 700;
+                color: $text-dark;
+                margin-bottom: 14px;
+            }
+
+            .salon-mini-row {
+                display: flex;
+                flex-direction: row;
+                gap: 12px;
+                align-items: center;
+                margin-bottom: 14px;
+
+                .salon-mini-img-mobile {
+                    width: 80px;
+                    height: 60px;
+                    border-radius: 8px;
+                    background-size: cover;
+                    background-position: center;
+                    flex-shrink: 0;
+                    background-color: #f5f5f5;
+                }
+
+                .salon-mini-info {
+                    flex: 1;
+
+                    .salon-mini-name {
+                        font-family: $font;
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: $text-dark;
+                    }
+
+                    .salon-mini-address {
+                        font-family: $font;
+                        font-size: 11px;
+                        color: $text-light;
+                        margin-top: 2px;
+                    }
+
+                    .salon-mini-hours {
+                        font-family: $font;
+                        font-size: 11px;
+                        font-weight: 600;
+                        margin-top: 2px;
+
+                        &.open {
+                            color: #4CAF50;
+                        }
+
+                        &.closed {
+                            color: #e53935;
+                        }
+                    }
+                }
+            }
+
+            .salon-mini-actions {
+                display: flex;
+                flex-direction: row;
+                gap: 8px;
+
+                .follow-btn {
+                    flex: 1;
+                    border: 1.5px solid $primary !important;
+                    color: $primary !important;
+                    border-radius: 8px !important;
+                    font-family: $font !important;
+                    font-size: 12px !important;
+                    font-weight: 700 !important;
+                    transition: $transition !important;
+
+                    &.following {
+                        background: $primary !important;
+                        color: $white !important;
+                    }
+                }
+
+                .view-salon-btn {
+                    flex: 1;
+                    border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+                    color: #555 !important;
+                    border-radius: 8px !important;
+                    font-family: $font !important;
+                    font-size: 12px !important;
+                    font-weight: 600 !important;
+                }
+            }
+        }
+
+        // ── REVIEWS ───────────────────────────────────────────────────────
+        .mobile-reviews {
+            background: $white;
+            padding: 16px;
+            margin-bottom: 8px;
+
+            .section-title-mobile {
+                font-family: $font;
+                font-size: 15px;
+                font-weight: 700;
+                color: $text-dark;
+                margin-bottom: 16px;
+            }
+
+            .mobile-review-card {
+                padding-bottom: 16px;
+                margin-bottom: 16px;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+                &:last-child {
+                    border-bottom: none;
+                    margin-bottom: 0;
+                    padding-bottom: 0;
+                }
+
+                .reviewer-name {
+                    font-family: $font;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: $text-dark;
+                }
+
+                .review-date {
+                    font-family: $font;
+                    font-size: 11px;
+                    color: $text-placeholder;
+                }
+
+                .review-text {
+                    font-family: $font;
+                    font-size: 13px;
+                    color: #555;
+                    line-height: 1.6;
+                    margin-top: 8px;
+                }
+            }
+        }
+
+        // ── STICKY BOTTOM BAR ─────────────────────────────────────────────
+        .mobile-sticky-bottom {
+            position: fixed;
+            bottom: 64px;
+            left: 0;
+            right: 0;
+            background: $white;
+            border-top: 1px solid rgba(255, 77, 141, 0.1);
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+            padding: 10px 16px;
+            z-index: 100;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+
+            .price-block {
+                .main-price {
+                    font-family: $font;
+                    font-size: 18px;
+                    font-weight: 800;
+                    color: $primary;
+                }
+
+                .deposit-text {
+                    font-family: $font;
+                    font-size: 11px;
+                    color: $text-light;
+                }
+            }
+
+            .book-now-btn {
+                flex: 1;
+                padding: 12px !important;
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 10px !important;
+                font-family: $font !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                box-shadow: 0 4px 16px rgba(255, 77, 141, 0.35) !important;
+                transition: $transition !important;
+
+                &:active {
+                    transform: scale(0.98) !important;
+                }
+
+                &:disabled {
+                    background: #eee !important;
+                    color: #bbb !important;
+                    box-shadow: none !important;
+                }
+            }
+        }
+    }
+}

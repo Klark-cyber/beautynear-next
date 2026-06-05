@@ -22,6 +22,8 @@ import StarIcon from '@mui/icons-material/Star';
 import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VerifiedIcon from '@mui/icons-material/Verified';
+import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import PersonRemoveOutlinedIcon from '@mui/icons-material/PersonRemoveOutlined';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import Link from 'next/link';
 import moment from 'moment';
@@ -30,7 +32,7 @@ import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import RatingStars from '../../libs/components/common/Ratingstars';
 import EmptyList from '../../libs/components/common/Emptylist';
 import { GET_SALON, GET_SALONS, GET_SERVICES, GET_COMMENTS, GET_MY_BOOKINGS } from '../../apollo/user/query';
-import { LIKE_TARGET_SALON, CREATE_COMMENT, CREATE_BOOKING } from '../../apollo/user/mutation';
+import { LIKE_TARGET_SALON, CREATE_COMMENT, CREATE_BOOKING, SUBSCRIBE, UNSUBSCRIBE } from '../../apollo/user/mutation';
 import { T } from '../../libs/types/common';
 import { Salon } from '../../libs/types/salon/salon';
 import { Service } from '../../libs/types/service/service';
@@ -39,6 +41,7 @@ import { Booking } from '../../libs/types/booking/booking';
 import { CommentInput, CommentsInquiry } from '../../libs/types/comment/comment.input';
 import { CommentGroup } from '../../libs/enums/comment.enum';
 import { BookingStatus } from '../../libs/enums/booking.enum';
+import { FollowGroup } from '../../libs/enums/follow.enum';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { REACT_APP_API_URL } from '../../libs/config';
 import { userVar } from '../../apollo/store';
@@ -92,6 +95,8 @@ const SalonDetail: NextPage = () => {
 	const [selectedTime, setSelectedTime] = useState<string>('');
 	const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 	const [bookingLoading, setBookingLoading] = useState(false);
+	const [isFollowingMember, setIsFollowingMember] = useState(false);
+	const [isFollowingSalon, setIsFollowingSalon] = useState(false);
 
 	// Comment state
 	const [commentInquiry, setCommentInquiry] = useState<CommentsInquiry>({
@@ -111,6 +116,8 @@ const SalonDetail: NextPage = () => {
 
 	/** APOLLO **/
 	const [likeTargetSalon] = useMutation(LIKE_TARGET_SALON);
+	const [subscribe] = useMutation(SUBSCRIBE);
+	const [unsubscribe] = useMutation(UNSUBSCRIBE);
 	const [createComment] = useMutation(CREATE_COMMENT);
 	const [createBooking] = useMutation(CREATE_BOOKING);
 
@@ -201,6 +208,31 @@ const SalonDetail: NextPage = () => {
 			sweetMixinErrorAlert(err.message).then();
 		}
 	}, [user, salonId]);
+
+
+	const followHandler = useCallback(async (
+		group: FollowGroup,
+		targetId: string,
+		isFollowing: boolean,
+		setter: (v: boolean) => void,
+	) => {
+		try {
+			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
+			const input: any = {};
+			if (group === FollowGroup.MEMBER) input.followingId = targetId;
+			if (group === FollowGroup.SALON) input.salonId = targetId;
+			if (isFollowing) {
+				await unsubscribe({ variables: { input } });
+				setter(false);
+			} else {
+				await subscribe({ variables: { input } });
+				setter(true);
+			}
+			await sweetTopSmallSuccessAlert(isFollowing ? 'Unfollowed' : 'Following!', 800);
+		} catch (err: any) {
+			sweetMixinErrorAlert(err.message).then();
+		}
+	}, [user]);
 
 	const bookingHandler = useCallback(async () => {
 		try {
@@ -737,6 +769,18 @@ const SalonDetail: NextPage = () => {
 							</Stack>
 						</Stack>
 
+						{/* Follow salon */}
+						<Stack direction="row" gap={1} sx={{ mt: 1 }}>
+							<Button
+								fullWidth
+								className={`follow-btn ${isFollowingSalon ? 'following' : ''}`}
+								startIcon={isFollowingSalon ? <PersonRemoveOutlinedIcon /> : <PersonAddOutlinedIcon />}
+								onClick={() => followHandler(FollowGroup.SALON, String(salon._id), isFollowingSalon, setIsFollowingSalon)}
+							>
+								{isFollowingSalon ? t('Following') : t('Follow Salon')}
+							</Button>
+						</Stack>
+
 						{/* Specialist card */}
 						{salon.memberData && (
 							<Stack className="specialist-card">
@@ -778,11 +822,21 @@ const SalonDetail: NextPage = () => {
 										)}
 									</Box>
 
-									<Link href={`/member?memberId=${salon.memberData._id}`}>
-										<Button fullWidth className="view-profile-btn">
-											{t('View Profile')}
+									<Stack direction="row" gap={1} sx={{ width: '100%' }}>
+										<Button
+											fullWidth
+											className={`follow-btn ${isFollowingMember ? 'following' : ''}`}
+											startIcon={isFollowingMember ? <PersonRemoveOutlinedIcon /> : <PersonAddOutlinedIcon />}
+											onClick={() => followHandler(FollowGroup.MEMBER, String(salon.memberData!._id), isFollowingMember, setIsFollowingMember)}
+										>
+											{isFollowingMember ? t('Following') : t('Follow')}
 										</Button>
-									</Link>
+										<Link href={`/member?memberId=${salon.memberData._id}`}>
+											<Button fullWidth className="view-profile-btn">
+												{t('View Profile')}
+											</Button>
+										</Link>
+									</Stack>
 								</Stack>
 							</Stack>
 						)}

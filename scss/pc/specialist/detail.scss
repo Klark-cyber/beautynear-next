@@ -1,0 +1,456 @@
+@import '/scss/variables.scss';
+
+#pc-wrap {
+    .specialist-detail-page {
+        width: 100%;
+        min-height: 100vh;
+        background: $bg-page;
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 32px 48px;
+
+        // ── BACK LINK ─────────────────────────────────────────────────────
+        .sp-back-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            color: $primary;
+            font-family: $font;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            width: fit-content;
+            transition: $transition;
+
+            &:hover {
+                opacity: 0.75;
+            }
+        }
+
+        // ── COVER PHOTO ───────────────────────────────────────────────────
+        .sp-detail-cover {
+            width: 100%;
+            height: 320px;
+            border-radius: $radius-xl;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 0;
+
+            .sp-cover-overlay {
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to bottom,
+                        transparent 30%,
+                        rgba(0, 0, 0, 0.7) 100%);
+            }
+
+            .sp-cover-info {
+                position: absolute;
+                bottom: 24px;
+                left: 28px;
+                z-index: 2;
+            }
+
+            .sp-cover-chip {
+                font-family: $font;
+                font-size: 12px;
+                font-weight: 600;
+                color: $white;
+                padding: 4px 12px;
+                border-radius: 20px;
+                display: inline-block;
+                margin-right: 6px;
+                margin-top: 4px;
+                backdrop-filter: blur(4px);
+            }
+
+            .sp-cover-like {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.15);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                transition: $transition;
+                z-index: 2;
+
+                &:hover {
+                    background: rgba(255, 255, 255, 0.25);
+                    transform: scale(1.1);
+                }
+
+                &.liked {
+                    background: rgba(255, 77, 141, 0.3);
+                }
+            }
+        }
+
+        // ── PROFILE CARD (overlap) ─────────────────────────────────────────
+        .sp-profile-card {
+            background: $white;
+            border-radius: $radius-xl;
+            padding: 24px 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+            margin-top: -32px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 20px;
+
+            .sp-profile-avatar {
+                width: 100px;
+                height: 100px;
+                border: 4px solid $white;
+                box-shadow: 0 4px 16px rgba(255, 77, 141, 0.2);
+                flex-shrink: 0;
+            }
+
+            .sp-online-dot-lg {
+                position: absolute;
+                bottom: 4px;
+                left: 80px;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #4CAF50;
+                border: 2.5px solid $white;
+            }
+
+            .sp-follow-btn {
+                border: 1.5px solid $primary !important;
+                color: $primary !important;
+                border-radius: 10px !important;
+                font-family: $font !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                padding: 7px 20px !important;
+                transition: $transition !important;
+
+                &:hover {
+                    background: rgba(255, 77, 141, 0.06) !important;
+                    transform: translateY(-1px) !important;
+                }
+
+                &.following {
+                    background: $primary !important;
+                    color: $white !important;
+                }
+            }
+
+            .sp-like-action-btn {
+                border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+                color: #555 !important;
+                border-radius: 10px !important;
+                font-family: $font !important;
+                font-size: 13px !important;
+                font-weight: 600 !important;
+                padding: 7px 20px !important;
+                transition: $transition !important;
+
+                &:hover {
+                    background: #f5f5f5 !important;
+                }
+
+                &.liked {
+                    border-color: $primary !important;
+                    color: $primary !important;
+                }
+            }
+
+            .sp-share-btn {
+                border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+                border-radius: 10px !important;
+                color: #888 !important;
+                transition: $transition !important;
+
+                &:hover {
+                    color: $primary !important;
+                    border-color: $primary !important;
+                }
+            }
+        }
+
+        // ── MAIN LAYOUT ───────────────────────────────────────────────────
+        .sp-detail-main {
+            display: flex;
+            flex-direction: row;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .sp-detail-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        .sp-detail-right {
+            width: 340px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: sticky;
+            top: 100px;
+            align-self: flex-start;
+        }
+
+        // ── SECTION ───────────────────────────────────────────────────────
+        .sp-detail-section {
+            background: $white;
+            border-radius: $radius-lg;
+            padding: 24px;
+            box-shadow: $shadow-card;
+
+            .sp-section-title {
+                font-family: $font;
+                font-size: 17px;
+                font-weight: 700;
+                color: $text-dark;
+                margin-bottom: 14px;
+            }
+        }
+
+        // ── PORTFOLIO MASONRY ─────────────────────────────────────────────
+        .sp-portfolio-masonry {
+            column-count: 3;
+            column-gap: 10px;
+
+            .sp-portfolio-item {
+                break-inside: avoid;
+                border-radius: 12px;
+                background-size: cover;
+                background-position: center;
+                margin-bottom: 10px;
+                position: relative;
+                overflow: hidden;
+                cursor: pointer;
+                transition: $transition;
+
+                &:hover {
+                    transform: scale(1.02);
+
+                    .sp-portfolio-overlay {
+                        opacity: 1;
+                    }
+                }
+
+                .sp-portfolio-overlay {
+                    position: absolute;
+                    inset: 0;
+                    background: rgba(0, 0, 0, 0.45);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transition: opacity 0.2s;
+                    border-radius: 12px;
+
+                    .sp-book-look-btn {
+                        background: rgba(255, 255, 255, 0.9) !important;
+                        color: $primary !important;
+                        border-radius: 8px !important;
+                        font-family: $font !important;
+                        font-size: 11px !important;
+                        font-weight: 700 !important;
+                        padding: 5px 12px !important;
+                    }
+                }
+            }
+        }
+
+        // ── SERVICE CARDS ─────────────────────────────────────────────────
+        .sp-service-card {
+            width: 160px;
+            flex-shrink: 0;
+            border-radius: $radius-md;
+            overflow: hidden;
+            background: $white;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+            box-shadow: $shadow-card;
+            transition: $transition;
+
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: $shadow-pink;
+            }
+
+            .sp-service-img {
+                height: 110px;
+                background-size: cover;
+                background-position: center;
+                background-color: #f5f5f5;
+            }
+
+            .sp-book-btn-sm {
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 8px !important;
+                font-family: $font !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                padding: 5px !important;
+            }
+        }
+
+        // ── REVIEW CARD ───────────────────────────────────────────────────
+        .sp-review-card {
+            padding: 16px;
+            border-radius: $radius-md;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+            background: #fafafa;
+            transition: $transition;
+
+            &:hover {
+                border-color: $primary-border;
+            }
+        }
+
+        // ── REVIEW TEXTAREA ───────────────────────────────────────────────
+        .sp-review-textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 12px 16px;
+            border: 1.5px solid $primary-border;
+            border-radius: 10px;
+            font-family: $font;
+            font-size: 14px;
+            color: $text-dark;
+            resize: vertical;
+            outline: none;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+
+            &:focus {
+                border-color: $primary;
+            }
+
+            &::placeholder {
+                color: $text-placeholder;
+            }
+        }
+
+        .sp-submit-review-btn {
+            padding: 9px 24px !important;
+            background: linear-gradient(135deg, $primary, $primary-light) !important;
+            color: $white !important;
+            border-radius: 10px !important;
+            font-family: $font !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+
+            &:disabled {
+                background: #eee !important;
+                color: #bbb !important;
+            }
+        }
+
+        // ── BOOKING CARD ──────────────────────────────────────────────────
+        .sp-booking-card {
+            background: $white;
+            border-radius: $radius-xl;
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(255, 77, 141, 0.1);
+            border: 1px solid rgba(255, 77, 141, 0.1);
+
+            .sp-time-slot {
+                padding: 7px 13px;
+                border-radius: 20px;
+                border: 1.5px solid rgba(255, 77, 141, 0.2);
+                font-family: $font;
+                font-size: 12px;
+                font-weight: 500;
+                color: #555;
+                cursor: pointer;
+                transition: $transition;
+
+                &:hover:not(.booked) {
+                    border-color: $primary;
+                    color: $primary;
+                    transform: translateY(-1px);
+                }
+
+                &.selected {
+                    background: linear-gradient(135deg, $primary, $primary-light);
+                    color: $white;
+                    border-color: $primary;
+                    box-shadow: 0 4px 12px rgba(255, 77, 141, 0.3);
+                }
+
+                &.booked {
+                    background: #f5f5f5;
+                    color: #bbb;
+                    border-color: #eee;
+                    cursor: not-allowed;
+                    text-decoration: line-through;
+                }
+            }
+
+            .sp-book-now-btn {
+                width: 100%;
+                padding: 13px !important;
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 12px !important;
+                font-family: $font !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                box-shadow: 0 6px 20px rgba(255, 77, 141, 0.35) !important;
+                transition: $transition !important;
+
+                &:hover {
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 10px 28px rgba(255, 77, 141, 0.45) !important;
+                }
+
+                &:disabled {
+                    background: #eee !important;
+                    color: #bbb !important;
+                    box-shadow: none !important;
+                    transform: none !important;
+                }
+            }
+        }
+
+        // ── SALON CARD ────────────────────────────────────────────────────
+        .sp-salon-card {
+            background: $white;
+            border-radius: $radius-xl;
+            padding: 20px;
+            box-shadow: $shadow-card;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+
+            .sp-salon-img {
+                height: 100px;
+                border-radius: $radius-md;
+                background-size: cover;
+                background-position: center;
+            }
+
+            .sp-view-salon-btn {
+                border: 1.5px solid $primary !important;
+                color: $primary !important;
+                border-radius: 8px !important;
+                font-family: $font !important;
+                font-size: 12px !important;
+                font-weight: 600 !important;
+                transition: $transition !important;
+
+                &:hover {
+                    background: rgba(255, 77, 141, 0.06) !important;
+                }
+            }
+        }
+    }
+}

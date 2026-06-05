@@ -1,0 +1,257 @@
+@import '/scss/variables.scss';
+
+#mobile-wrap {
+    .specialist-detail-page {
+        padding-bottom: 120px;
+        background: $bg-page;
+
+        // ── COVER ─────────────────────────────────────────────────────────
+        .sp-detail-cover-mobile {
+            height: 280px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+
+            .sp-back-btn-mobile {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                width: 36px;
+                height: 36px;
+                background: rgba(0, 0, 0, 0.35);
+                backdrop-filter: blur(4px);
+                border-radius: 50%;
+            }
+
+            .sp-like-btn-cover {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                width: 36px;
+                height: 36px;
+                background: rgba(0, 0, 0, 0.35);
+                backdrop-filter: blur(4px);
+                border-radius: 50%;
+            }
+        }
+
+        // ── AVATAR OVERLAP ────────────────────────────────────────────────
+        .sp-online-dot-lg {
+            position: absolute;
+            bottom: 4px;
+            right: 4px;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #4CAF50;
+            border: 2px solid $white;
+        }
+
+        // ── NAME + CHIPS ──────────────────────────────────────────────────
+        .sp-specialty-chip {
+            font-family: $font;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 10px;
+            border-radius: 12px;
+            border: 1px solid;
+            display: inline-block;
+        }
+
+        // ── ACTION BUTTONS ────────────────────────────────────────────────
+        .sp-follow-btn {
+            border: 1.5px solid $primary !important;
+            color: $primary !important;
+            border-radius: 10px !important;
+            font-family: $font !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            transition: $transition !important;
+
+            &:active {
+                transform: scale(0.97) !important;
+            }
+
+            &.following {
+                background: $primary !important;
+                color: $white !important;
+            }
+        }
+
+        .sp-like-action-btn {
+            border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+            color: #555 !important;
+            border-radius: 10px !important;
+            font-family: $font !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            transition: $transition !important;
+
+            &.liked {
+                border-color: $primary !important;
+                color: $primary !important;
+                background: rgba(255, 77, 141, 0.06) !important;
+            }
+        }
+
+        .sp-share-btn {
+            border: 1.5px solid rgba(0, 0, 0, 0.1) !important;
+            border-radius: 10px !important;
+            color: #888 !important;
+            transition: $transition !important;
+
+            &:hover {
+                color: $primary !important;
+                border-color: $primary !important;
+            }
+        }
+
+        // ── TABS ──────────────────────────────────────────────────────────
+        .MuiTabs-root {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: $white;
+        }
+
+        // ── PORTFOLIO GRID ────────────────────────────────────────────────
+        .sp-portfolio-grid-mobile {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+
+            .sp-portfolio-item-mobile {
+                height: 100px;
+                border-radius: 8px;
+                background-size: cover;
+                background-position: center;
+                background-color: #f5f5f5;
+                cursor: pointer;
+                transition: $transition;
+
+                &:active {
+                    transform: scale(0.97);
+                }
+            }
+        }
+
+        // ── SERVICE CARD ──────────────────────────────────────────────────
+        .mobile-service-row {
+            background: $white;
+            border-radius: $radius-md;
+            overflow: hidden;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+            box-shadow: $shadow-card;
+            padding: 12px;
+            display: flex;
+            flex-direction: row;
+            gap: 12px;
+            align-items: center;
+
+            .mobile-service-thumb {
+                width: 70px;
+                height: 60px;
+                border-radius: 8px;
+                background-size: cover;
+                background-position: center;
+                background-color: #f5f5f5;
+                flex-shrink: 0;
+            }
+
+            .mobile-service-info {
+                flex: 1;
+
+                .svc-title {
+                    font-family: $font;
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: $text-dark;
+                    margin-bottom: 2px;
+                }
+
+                .svc-price {
+                    font-family: $font;
+                    font-size: 12px;
+                    font-weight: 700;
+                    color: $primary;
+                    margin-bottom: 1px;
+                }
+
+                .svc-duration {
+                    font-family: $font;
+                    font-size: 11px;
+                    color: $text-light;
+                }
+            }
+        }
+
+        .sp-book-btn-sm {
+            background: linear-gradient(135deg, $primary, $primary-light) !important;
+            color: $white !important;
+            border-radius: 8px !important;
+            font-family: $font !important;
+            font-size: 11px !important;
+            font-weight: 700 !important;
+            padding: 5px 10px !important;
+            white-space: nowrap !important;
+        }
+
+        // ── REVIEWS ───────────────────────────────────────────────────────
+        .mobile-review-card {
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+            &:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .reviewer-name {
+                font-family: $font;
+                font-size: 13px;
+                font-weight: 600;
+                color: $text-dark;
+            }
+
+            .review-date {
+                font-family: $font;
+                font-size: 11px;
+                color: $text-placeholder;
+            }
+
+            .review-text {
+                font-family: $font;
+                font-size: 13px;
+                color: #555;
+                line-height: 1.6;
+                margin-top: 8px;
+            }
+        }
+
+        // ── STICKY BOTTOM ─────────────────────────────────────────────────
+        .sp-book-now-btn {
+            width: 100%;
+            padding: 13px !important;
+            background: linear-gradient(135deg, $primary, $primary-light) !important;
+            color: $white !important;
+            border-radius: 12px !important;
+            font-family: $font !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 4px 16px rgba(255, 77, 141, 0.35) !important;
+            transition: $transition !important;
+
+            &:active {
+                transform: scale(0.98) !important;
+            }
+
+            &:disabled {
+                background: #eee !important;
+                color: #bbb !important;
+                box-shadow: none !important;
+            }
+        }
+    }
+}

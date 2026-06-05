@@ -1,0 +1,389 @@
+@import '/scss/variables.scss';
+
+#pc-wrap {
+    .specialists-page {
+        width: 100%;
+        min-height: 100vh;
+        background: $bg-page;
+
+        // ── TOP BAR ───────────────────────────────────────────────────────
+        .sp-top-bar {
+            background: $white;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+
+            .sp-top-inner {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 14px 32px;
+
+                .sp-find-btn {
+                    padding: 10px 24px !important;
+                    background: linear-gradient(135deg, $primary, $primary-light) !important;
+                    color: $white !important;
+                    border-radius: 10px !important;
+                    font-family: $font !important;
+                    font-size: 14px !important;
+                    font-weight: 700 !important;
+                    white-space: nowrap !important;
+                    box-shadow: 0 4px 16px rgba(255, 77, 141, 0.3) !important;
+                    transition: $transition !important;
+
+                    &:hover {
+                        transform: translateY(-2px) !important;
+                        box-shadow: 0 8px 24px rgba(255, 77, 141, 0.4) !important;
+                    }
+                }
+            }
+
+            .sp-chips-bar {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 10px 32px 14px;
+                overflow-x: auto;
+
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .sp-chip {
+                    padding: 6px 18px;
+                    border-radius: 20px;
+                    font-family: $font;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #666;
+                    border: 1.5px solid rgba(255, 77, 141, 0.15);
+                    background: $white;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    flex-shrink: 0;
+                    transition: $transition;
+
+                    &:hover {
+                        border-color: $primary;
+                        color: $primary;
+                        transform: translateY(-1px);
+                    }
+
+                    &.active {
+                        background: $primary;
+                        color: $white;
+                        border-color: $primary;
+                        box-shadow: 0 4px 12px rgba(255, 77, 141, 0.3);
+                    }
+                }
+            }
+        }
+
+        // ── MAIN ──────────────────────────────────────────────────────────
+        .sp-main {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px 32px 48px;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .sp-sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 120px;
+        }
+
+        .sp-content {
+            flex: 1;
+
+            .sp-results-count {
+                font-family: $font;
+                font-size: 15px;
+                color: $text-dark;
+            }
+
+            .sp-sort-chip {
+                padding: 5px 14px;
+                border-radius: 20px;
+                font-family: $font;
+                font-size: 12px;
+                font-weight: 500;
+                color: #666;
+                cursor: pointer;
+                transition: $transition;
+
+                &:hover {
+                    color: $primary;
+                }
+
+                &.active {
+                    background: rgba(255, 77, 141, 0.1);
+                    color: $primary;
+                    font-weight: 700;
+                }
+            }
+        }
+
+        // ── FILTER SIDEBAR ────────────────────────────────────────────────
+        .sp-filter-sidebar {
+            background: $white;
+            border-radius: $radius-lg;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+            box-shadow: $shadow-card;
+            overflow: hidden;
+
+            .sp-filter-top {
+                padding: 16px 18px;
+                border-bottom: 1px solid rgba(255, 77, 141, 0.06);
+
+                .sp-filter-main-title {
+                    font-family: $font;
+                    font-size: 14px;
+                    font-weight: 700;
+                    color: $text-dark;
+                }
+            }
+
+            .sp-filter-section {
+                border-bottom: 1px solid rgba(255, 77, 141, 0.05);
+
+                .sp-filter-header {
+                    padding: 12px 18px 8px;
+                    cursor: pointer;
+                    transition: background 0.2s;
+
+                    &:hover {
+                        background: rgba(255, 77, 141, 0.02);
+                    }
+
+                    .sp-filter-title {
+                        font-family: $font;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: $text-dark;
+                        text-transform: uppercase;
+                        letter-spacing: 0.4px;
+                    }
+                }
+
+                .sp-filter-body {
+                    padding: 4px 18px 14px;
+                }
+            }
+
+            .sp-apply-btn {
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 10px !important;
+                font-family: $font !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                padding: 10px !important;
+                box-shadow: 0 4px 16px rgba(255, 77, 141, 0.3) !important;
+                margin-bottom: 8px !important;
+
+                &:hover {
+                    transform: translateY(-1px) !important;
+                }
+            }
+
+            .sp-reset-btn {
+                color: #aaa !important;
+                font-family: $font !important;
+                font-size: 12px !important;
+
+                &:hover {
+                    color: $primary !important;
+                }
+            }
+        }
+
+        // ── MASONRY GRID ──────────────────────────────────────────────────
+        .sp-masonry-grid {
+            column-count: 3;
+            column-gap: 16px;
+
+            .sp-card {
+                break-inside: avoid;
+                background: $white;
+                border-radius: 20px;
+                overflow: hidden;
+                border: 1px solid rgba(255, 77, 141, 0.06);
+                box-shadow: 0 4px 20px rgba(255, 77, 141, 0.06);
+                margin-bottom: 16px;
+                transition: $transition;
+
+                &:hover {
+                    transform: translateY(-6px);
+                    box-shadow: 0 12px 36px rgba(255, 77, 141, 0.14);
+                }
+
+                .sp-card-cover {
+                    position: relative;
+                    background-size: cover;
+                    background-position: center;
+                    cursor: pointer;
+                    transition: transform 0.3s;
+
+                    &:hover {
+                        transform: scale(1.03);
+                    }
+
+                    .sp-badge-top {
+                        position: absolute;
+                        top: 10px;
+                        left: 10px;
+                        background: linear-gradient(135deg, $primary, $primary-light);
+                        color: $white;
+                        font-family: $font;
+                        font-size: 10px;
+                        font-weight: 700;
+                        padding: 3px 9px;
+                        border-radius: 8px;
+                    }
+
+                    .sp-like-btn {
+                        position: absolute;
+                        top: 8px;
+                        right: 8px;
+                        width: 32px;
+                        height: 32px;
+                        background: rgba(255, 255, 255, 0.9);
+                        transition: $transition;
+
+                        &:hover {
+                            background: $white;
+                            transform: scale(1.1);
+                        }
+
+                        &.liked {
+                            background: rgba(255, 77, 141, 0.1);
+                        }
+                    }
+
+                    .sp-views-overlay {
+                        position: absolute;
+                        bottom: 8px;
+                        right: 10px;
+                        background: rgba(0, 0, 0, 0.45);
+                        border-radius: 6px;
+                        padding: 2px 7px;
+                    }
+                }
+
+                .sp-card-info {
+                    padding: 14px;
+
+                    .sp-avatar-wrap {
+                        position: relative;
+                        flex-shrink: 0;
+
+                        .sp-avatar {
+                            width: 36px;
+                            height: 36px;
+                            border-radius: 50%;
+                            object-fit: cover;
+                            border: 2px solid $primary-light;
+                        }
+
+                        .sp-online-dot {
+                            position: absolute;
+                            bottom: 1px;
+                            right: 1px;
+                            width: 9px;
+                            height: 9px;
+                            border-radius: 50%;
+                            background: #4CAF50;
+                            border: 1.5px solid $white;
+                        }
+                    }
+
+                    .sp-name {
+                        font-family: $font;
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: $text-dark;
+                        cursor: pointer;
+                        transition: color 0.2s;
+
+                        &:hover {
+                            color: $primary;
+                        }
+                    }
+
+                    .sp-specialty-chip {
+                        font-family: $font;
+                        font-size: 10px;
+                        font-weight: 600;
+                        padding: 2px 8px;
+                        border-radius: 10px;
+                        border: 1px solid;
+                    }
+
+                    .sp-salon-text {
+                        font-family: $font;
+                        font-size: 11px;
+                        color: $primary;
+                        font-weight: 600;
+                        margin-bottom: 2px;
+                        cursor: pointer;
+
+                        &:hover {
+                            opacity: 0.8;
+                        }
+                    }
+
+                    .sp-location-text {
+                        font-family: $font;
+                        font-size: 11px;
+                        color: $text-light;
+                        display: flex;
+                        align-items: center;
+                        gap: 2px;
+                    }
+
+                    .sp-follow-btn {
+                        border: 1.5px solid $primary !important;
+                        color: $primary !important;
+                        border-radius: 10px !important;
+                        font-family: $font !important;
+                        font-size: 12px !important;
+                        font-weight: 700 !important;
+                        padding: 5px !important;
+                        transition: $transition !important;
+
+                        &:hover {
+                            background: rgba(255, 77, 141, 0.06) !important;
+                            transform: translateY(-1px) !important;
+                        }
+
+                        &.following {
+                            background: $primary !important;
+                            color: $white !important;
+                        }
+                    }
+
+                    .sp-book-btn {
+                        background: linear-gradient(135deg, $primary, $primary-light) !important;
+                        color: $white !important;
+                        border-radius: 10px !important;
+                        font-family: $font !important;
+                        font-size: 12px !important;
+                        font-weight: 700 !important;
+                        padding: 5px !important;
+                        box-shadow: 0 3px 12px rgba(255, 77, 141, 0.25) !important;
+                        transition: $transition !important;
+
+                        &:hover {
+                            transform: translateY(-1px) !important;
+                            box-shadow: 0 6px 20px rgba(255, 77, 141, 0.35) !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

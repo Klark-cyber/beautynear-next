@@ -1,0 +1,534 @@
+@import '/scss/variables.scss';
+
+// ── SALON CARD (mobile) ───────────────────────────────────────────────────────
+.salon-card {
+    position: relative;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    background: $white;
+    border: 1px solid rgba(255, 77, 141, 0.08);
+    box-shadow: $shadow-card;
+    transition: $transition;
+
+    &:active {
+        transform: scale(0.98);
+    }
+
+    .salon-card-img {
+        position: relative;
+        height: 180px;
+        background-size: cover;
+        background-position: center;
+        background-color: #f5f5f5;
+
+        .open-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 3px 9px;
+            border-radius: 7px;
+            font-family: $font;
+            font-size: 10px;
+            font-weight: 700;
+            color: $white;
+
+            &.open {
+                background: #4CAF50;
+            }
+
+            &.closed {
+                background: #e53935;
+            }
+        }
+
+        .top-badge {
+            position: absolute;
+            top: 10px;
+            left: 52px;
+            padding: 3px 9px;
+            border-radius: 7px;
+            font-family: $font;
+            font-size: 10px;
+            font-weight: 700;
+            color: $white;
+            background: linear-gradient(135deg, $primary, $primary-light);
+        }
+
+        .like-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: $transition;
+
+            &.liked {
+                background: rgba(255, 77, 141, 0.12);
+            }
+        }
+    }
+
+    .salon-card-info {
+        padding: 12px 14px;
+
+        .salon-title {
+            font-family: $font;
+            font-size: 14px;
+            font-weight: 700;
+            color: $text-dark;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 3px;
+        }
+
+        .salon-location {
+            font-family: $font;
+            font-size: 11px;
+            color: $text-muted;
+            margin-bottom: 3px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .salon-specialist {
+            font-family: $font;
+            font-size: 11px;
+            color: $text-muted;
+            margin-bottom: 5px;
+        }
+
+        .salon-tags {
+            display: flex;
+            flex-direction: row;
+            gap: 4px;
+            flex-wrap: wrap;
+            margin-bottom: 6px;
+
+            .salon-tag {
+                font-family: $font;
+                font-size: 9px;
+                font-weight: 600;
+                padding: 2px 7px;
+                border-radius: 6px;
+                background: rgba(255, 77, 141, 0.08);
+                color: $primary;
+                border: 1px solid rgba(255, 77, 141, 0.2);
+            }
+        }
+
+        .salon-divider {
+            height: 1px;
+            background: rgba(0, 0, 0, 0.06);
+            margin: 6px 0;
+        }
+
+        .salon-price {
+            font-family: $font;
+            font-size: 14px;
+            font-weight: 700;
+            color: $primary;
+        }
+
+        .salon-deposit {
+            font-family: $font;
+            font-size: 10px;
+            color: $text-light;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .salon-stats {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+
+            span {
+                font-family: $font;
+                font-size: 10px;
+                color: $text-light;
+                display: flex;
+                align-items: center;
+                gap: 3px;
+            }
+        }
+
+        .book-now-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px !important;
+            background: linear-gradient(135deg, $primary, $primary-light) !important;
+            color: $white !important;
+            border-radius: 8px !important;
+            font-family: $font !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            box-shadow: 0 3px 10px rgba(255, 77, 141, 0.2) !important;
+
+            &:active {
+                transform: scale(0.97) !important;
+            }
+        }
+    }
+}
+
+// ── SERVICE CARD (mobile general) ────────────────────────────────────────────
+.service-card-general {
+    width: 140px;
+    flex-shrink: 0;
+    border-radius: $radius-md;
+    overflow: hidden;
+    background: $white;
+    border: 1px solid rgba(255, 77, 141, 0.08);
+    box-shadow: $shadow-card;
+    transition: $transition;
+
+    &:active {
+        transform: scale(0.97);
+    }
+
+    .svc-cover {
+        height: 100px;
+        background-size: cover;
+        background-position: center;
+        background-color: #f5f5f5;
+
+        .svc-like {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 26px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+
+            &.liked {
+                background: rgba(255, 77, 141, 0.12);
+            }
+        }
+    }
+
+    .svc-info {
+        padding: 8px 10px;
+
+        .svc-title {
+            font-family: $font;
+            font-size: 11px;
+            font-weight: 700;
+            color: $text-dark;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-bottom: 2px;
+        }
+
+        .svc-price {
+            font-family: $font;
+            font-size: 11px;
+            font-weight: 700;
+            color: $primary;
+            margin-bottom: 1px;
+        }
+
+        .svc-duration {
+            font-family: $font;
+            font-size: 10px;
+            color: $text-light;
+        }
+
+        .svc-book-btn {
+            width: 100%;
+            margin-top: 6px;
+            padding: 5px !important;
+            background: linear-gradient(135deg, $primary, $primary-light) !important;
+            color: $white !important;
+            border-radius: 6px !important;
+            font-family: $font !important;
+            font-size: 10px !important;
+            font-weight: 700 !important;
+        }
+    }
+}
+
+// ── PAGINATION (mobile) ───────────────────────────────────────────────────────
+.pagination-box {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 16px 0 8px;
+
+    .MuiPagination-root {
+        .MuiPaginationItem-root {
+            font-family: $font;
+            font-size: 12px;
+            border-radius: 8px;
+            min-width: 32px;
+            height: 32px;
+            transition: $transition;
+
+            &:hover {
+                background: rgba(255, 77, 141, 0.08);
+                color: $primary;
+            }
+
+            &.Mui-selected {
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white;
+                font-weight: 700;
+                box-shadow: 0 2px 8px rgba(255, 77, 141, 0.3);
+            }
+        }
+    }
+}
+
+// ── EMPTY LIST (mobile) ───────────────────────────────────────────────────────
+.empty-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 36px 16px;
+    width: 100%;
+
+    .empty-emoji {
+        font-size: 40px;
+        margin-bottom: 12px;
+        animation: emptyFloat 3s ease-in-out infinite;
+
+        @keyframes emptyFloat {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-6px);
+            }
+        }
+    }
+
+    .empty-title {
+        font-family: $font;
+        font-size: 16px;
+        font-weight: 700;
+        color: $text-dark;
+        margin-bottom: 6px;
+        text-align: center;
+    }
+
+    .empty-desc {
+        font-family: $font;
+        font-size: 13px;
+        color: $text-light;
+        text-align: center;
+        margin-bottom: 16px;
+        max-width: 240px;
+        line-height: 1.6;
+    }
+
+    .empty-btn {
+        padding: 9px 20px !important;
+        background: linear-gradient(135deg, $primary, $primary-light) !important;
+        color: $white !important;
+        border-radius: 10px !important;
+        font-family: $font !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        box-shadow: 0 4px 14px rgba(255, 77, 141, 0.25) !important;
+    }
+}
+
+// ── RATING STARS (mobile) ─────────────────────────────────────────────────────
+.rating-stars {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+
+    .star {
+        color: #FFB800;
+        line-height: 1;
+    }
+
+    .star-empty {
+        color: #e0e0e0;
+    }
+
+    .rating-number {
+        font-family: $font;
+        font-weight: 600;
+        color: $text-dark;
+        margin-left: 3px;
+    }
+
+    .rating-count {
+        font-family: $font;
+        color: $text-light;
+        margin-left: 2px;
+    }
+
+    &.small {
+
+        .star,
+        .star-empty {
+            font-size: 11px;
+        }
+
+        .rating-number {
+            font-size: 11px;
+        }
+
+        .rating-count {
+            font-size: 10px;
+        }
+    }
+
+    &.medium {
+
+        .star,
+        .star-empty {
+            font-size: 14px;
+        }
+
+        .rating-number {
+            font-size: 13px;
+        }
+
+        .rating-count {
+            font-size: 12px;
+        }
+    }
+}
+
+// ── TYPE CHIP (mobile shared) ─────────────────────────────────────────────────
+.type-chip-shared {
+    padding: 4px 12px;
+    border-radius: 16px;
+    font-family: $font;
+    font-size: 11px;
+    font-weight: 500;
+    background: rgba(255, 77, 141, 0.08);
+    color: $primary;
+    border: 1px solid rgba(255, 77, 141, 0.2);
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: $transition;
+
+    &.active {
+        background: $primary;
+        color: $white;
+        border-color: $primary;
+    }
+}
+
+// ── FOLLOW BUTTON (mobile shared) ────────────────────────────────────────────
+.follow-btn-shared {
+    border: 1.5px solid $primary !important;
+    color: $primary !important;
+    border-radius: 8px !important;
+    font-family: $font !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    transition: $transition !important;
+
+    &:active {
+        transform: scale(0.96) !important;
+    }
+
+    &.following {
+        background: $primary !important;
+        color: $white !important;
+        border-color: $primary !important;
+    }
+}
+
+// ── TIME SLOT (mobile shared) ─────────────────────────────────────────────────
+.time-slot-shared {
+    padding: 6px 12px;
+    border-radius: 16px;
+    border: 1.5px solid rgba(255, 77, 141, 0.2);
+    font-family: $font;
+    font-size: 12px;
+    font-weight: 500;
+    color: #555;
+    cursor: pointer;
+    transition: $transition;
+
+    &:active:not(.booked) {
+        transform: scale(0.95);
+    }
+
+    &.selected {
+        background: linear-gradient(135deg, $primary, $primary-light);
+        color: $white;
+        border-color: $primary;
+        box-shadow: 0 3px 10px rgba(255, 77, 141, 0.3);
+    }
+
+    &.booked {
+        background: #f5f5f5;
+        color: #bbb;
+        border-color: #eee;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
+}
+
+// ── IMAGE UPLOADER (mobile) ───────────────────────────────────────────────────
+.image-uploader {
+    width: 100%;
+    border: 2px dashed rgba(255, 77, 141, 0.25);
+    border-radius: $radius-lg;
+    padding: 24px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    background: rgba(255, 77, 141, 0.02);
+    transition: $transition;
+
+    &:active {
+        border-color: $primary;
+        background: rgba(255, 77, 141, 0.06);
+    }
+
+    .upload-icon {
+        font-size: 32px;
+        margin-bottom: 10px;
+        color: $primary;
+        opacity: 0.6;
+    }
+
+    .upload-title {
+        font-family: $font;
+        font-size: 13px;
+        font-weight: 600;
+        color: $text-dark;
+        margin-bottom: 3px;
+        text-align: center;
+    }
+
+    .upload-desc {
+        font-family: $font;
+        font-size: 11px;
+        color: $text-light;
+        text-align: center;
+    }
+}

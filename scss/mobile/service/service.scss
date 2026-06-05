@@ -1,0 +1,290 @@
+@import '/scss/variables.scss';
+
+#mobile-wrap {
+    .services-page {
+        width: 100%;
+        padding-bottom: 80px;
+        background: $bg-page;
+
+        // ── SEARCH BAR ────────────────────────────────────────────────────
+        .mobile-search-bar {
+            padding: 12px 16px 8px;
+            background: $white;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        // ── TYPE CHIPS ────────────────────────────────────────────────────
+        .mobile-type-chips {
+            padding: 10px 16px;
+            background: $white;
+            overflow-x: auto;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.06);
+            display: flex;
+            flex-direction: row;
+            gap: 8px;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+
+            .type-chip {
+                padding: 5px 14px;
+                border-radius: 16px;
+                font-family: $font;
+                font-size: 12px;
+                font-weight: 500;
+                color: #555;
+                border: 1.5px solid rgba(255, 77, 141, 0.15);
+                background: $white;
+                cursor: pointer;
+                white-space: nowrap;
+                flex-shrink: 0;
+                transition: $transition;
+
+                &.active {
+                    background: $primary;
+                    color: $white;
+                    border-color: $primary;
+                    box-shadow: 0 3px 10px rgba(255, 77, 141, 0.25);
+                }
+            }
+        }
+
+        // ── RESULTS HEADER ────────────────────────────────────────────────
+        .results-header {
+            padding: 10px 16px;
+            background: $white;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.06);
+        }
+
+        // ── HORIZONTAL SERVICE CARD ───────────────────────────────────────
+        .service-mobile-card {
+            background: $white;
+            border-radius: $radius-md;
+            overflow: hidden;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+            box-shadow: $shadow-card;
+            transition: $transition;
+
+            &:active {
+                transform: scale(0.98);
+            }
+
+            .mobile-svc-img {
+                width: 130px;
+                flex-shrink: 0;
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                min-height: 140px;
+                background-color: #f5f5f5;
+
+                .trending-badge-sm {
+                    position: absolute;
+                    top: 8px;
+                    left: 8px;
+                    background: linear-gradient(135deg, $primary, $primary-light);
+                    border-radius: 6px;
+                    padding: 3px 7px;
+                    font-family: $font;
+                    font-size: 10px;
+                    color: $white;
+                    font-weight: 700;
+                }
+            }
+
+            .mobile-svc-info {
+                flex: 1;
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+
+                .mobile-svc-name {
+                    font-family: $font;
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: $text-dark;
+                    cursor: pointer;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    flex: 1;
+                    transition: color 0.2s;
+
+                    &:hover {
+                        color: $primary;
+                    }
+                }
+
+                .salon-link {
+                    font-family: $font;
+                    font-size: 11px;
+                    color: $primary;
+                    font-weight: 600;
+                    margin-bottom: 2px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                    display: block;
+                }
+
+                .specialist-text {
+                    font-family: $font;
+                    font-size: 11px;
+                    color: $text-light;
+                    margin-bottom: 2px;
+                }
+
+                .duration-text {
+                    font-family: $font;
+                    font-size: 11px;
+                    color: $text-light;
+                    margin-bottom: 6px;
+                }
+
+                .price-row {
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .mobile-svc-price {
+                        font-family: $font;
+                        font-size: 14px;
+                        font-weight: 700;
+                        color: $primary;
+                    }
+
+                    .book-btn-sm {
+                        background: linear-gradient(135deg, $primary, $primary-light) !important;
+                        color: $white !important;
+                        border-radius: 6px !important;
+                        font-family: $font !important;
+                        font-size: 11px !important;
+                        font-weight: 700 !important;
+                        padding: 5px 12px !important;
+                        min-width: 0 !important;
+                        box-shadow: 0 2px 8px rgba(255, 77, 141, 0.25) !important;
+                    }
+                }
+
+                .stats-row {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 10px;
+                    margin-top: 4px;
+
+                    span {
+                        font-family: $font;
+                        font-size: 10px;
+                        color: $text-placeholder;
+                    }
+                }
+            }
+        }
+
+        // ── BOTTOM BAR ────────────────────────────────────────────────────
+        .mobile-bottom-bar {
+            position: fixed;
+            bottom: 64px;
+            left: 0;
+            right: 0;
+            background: $white;
+            border-top: 1px solid rgba(255, 77, 141, 0.1);
+            box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+            z-index: 100;
+            height: 52px;
+            display: flex;
+            flex-direction: row;
+
+            .mobile-filter-btn {
+                flex: 1;
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 0 !important;
+                font-family: $font !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                border-right: 1px solid rgba(255, 255, 255, 0.3) !important;
+            }
+
+            .mobile-sort-select {
+                flex: 1;
+                border-radius: 0 !important;
+                border: none !important;
+                font-family: $font !important;
+                font-size: 13px !important;
+
+                fieldset {
+                    border: none !important;
+                }
+            }
+        }
+
+        // ── FILTER SIDEBAR (drawer) ───────────────────────────────────────
+        .service-filter {
+            background: $white;
+            border-radius: $radius-lg $radius-lg 0 0;
+
+            .filter-header {
+                padding: 16px 20px;
+                border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+
+                .filter-title {
+                    font-family: $font;
+                    font-size: 15px;
+                    font-weight: 700;
+                    color: $text-dark;
+                }
+            }
+
+            .filter-section {
+                border-bottom: 1px solid rgba(255, 77, 141, 0.06);
+
+                .filter-section-header {
+                    padding: 12px 20px 8px;
+                    cursor: pointer;
+
+                    .filter-section-title {
+                        font-family: $font;
+                        font-size: 12px;
+                        font-weight: 700;
+                        color: $text-dark;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                    }
+                }
+
+                .filter-section-body {
+                    padding: 4px 20px 12px;
+
+                    .filter-check-row {
+                        margin-bottom: 2px;
+                    }
+                }
+            }
+
+            .apply-btn {
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 10px !important;
+                font-family: $font !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                padding: 12px !important;
+                box-shadow: 0 4px 16px rgba(255, 77, 141, 0.3) !important;
+                margin-bottom: 8px !important;
+            }
+
+            .reset-btn {
+                color: #888 !important;
+                font-family: $font !important;
+                font-size: 13px !important;
+            }
+        }
+    }
+}

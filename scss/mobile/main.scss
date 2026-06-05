@@ -3,7 +3,7 @@
 @import '/scss/mobile/general.scss';
 
 /** HOMEPAGE **/
-@import '/scss/mobile/homepage';
+@import '/scss/mobile/homepage/homepage';
 
 /** SALON **/
 // @import '/scss/mobile/salon';        ← keyinroq qo'shiladi
@@ -67,4 +67,4 @@ body::-webkit-scrollbar {
 
 /** ACCOUNT **/
 @import '/scss/mobile/account/join';
-@import '/scss/mobile/salon-detail';
+@import '/scss/mobile/salon/detail';

@@ -1,5 +1,5 @@
 import { ServiceStatus, ServiceType } from '../../enums/service.enum';
-import { MeLiked, TotalCounter } from '../common';
+import { MeLiked, MeFollowed, TotalCounter } from '../common';
 import { Member } from '../member/member';
 import { Salon } from '../salon/salon';
 
@@ -17,6 +17,7 @@ export interface Service {
 	serviceComments: number;
 	serviceRank: number;
 	serviceRating: number;
+	serviceFollowers: number;
 	salonId: string;
 	memberId: string;
 	deletedAt?: Date;
@@ -24,6 +25,7 @@ export interface Service {
 	updatedAt: Date;
 	/** from aggregation **/
 	meLiked?: MeLiked[];
+	meFollowed?: MeFollowed[];
 	memberData?: Member;
 	salonData?: Salon;
 }

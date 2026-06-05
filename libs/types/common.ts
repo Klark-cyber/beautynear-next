@@ -4,6 +4,12 @@ export interface MeLiked {
 	myFavorite: boolean;
 }
 
+export interface MeFollowed {
+	followingId: string;
+	followerId: string;
+	myFollowing: boolean;
+}
+
 export interface TotalCounter {
 	total: number;
 }

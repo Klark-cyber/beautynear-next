@@ -4,6 +4,8 @@ import { gql } from '@apollo/client';
  *         MEMBER         *
  *************************/
 
+// apollo/user/query.ts da GET_AGENTS ni shu bilan almashtiring:
+
 export const GET_AGENTS = gql`
 	query GetAgents($input: AgentInquiry!) {
 		getAgents(input: $input) {
@@ -24,6 +26,8 @@ export const GET_AGENTS = gql`
 				memberRank
 				memberPoints
 				memberLikes
+				memberFollowers
+				memberFollowings
 				memberViews
 				memberExperience
 				memberSpecialty
@@ -31,11 +35,15 @@ export const GET_AGENTS = gql`
 				deletedAt
 				createdAt
 				updatedAt
-				accessToken
 				meLiked {
 					memberId
 					likeRefId
 					myFavorite
+				}
+				meFollowed {
+					followingId
+					followerId
+					myFollowing
 				}
 			}
 			metaCounter {
@@ -815,5 +823,15 @@ export const GET_MEMBER_FOLLOWINGS = gql`
 				total
 			}
 		}
+	}
+`;
+
+/**************************
+ *         FOLLOW         *
+ *************************/
+
+export const CHECK_FOLLOWING = gql`
+	query CheckFollowing($input: FollowToggleInput!) {
+		checkFollowing(input: $input)
 	}
 `;

@@ -6,16 +6,16 @@
 @import '/scss/pc/homepage/homepage';
 
 /** SALON **/
-// @import '/scss/pc/salon/salon';           ← keyinroq qo'shiladi
+@import '/scss/pc/salon/salon';
 @import '/scss/pc/salon/detail.scss';
 
 /** SERVICE **/
-// @import '/scss/pc/service/service';       ← keyinroq qo'shiladi
-// @import '/scss/pc/service/detail.scss';
+@import '/scss/pc/service/service';
+@import '/scss/pc/service/detail.scss';
 
 /** SPECIALIST **/
-// @import '/scss/pc/specialist/specialist'; ← keyinroq qo'shiladi
-// @import '/scss/pc/specialist/detail.scss';
+@import '/scss/pc/specialist/specialist';
+@import '/scss/pc/specialist/detail';
 
 /** MYPAGE **/
 // @import '/scss/pc/mypage/mypage.scss';    ← keyinroq qo'shiladi

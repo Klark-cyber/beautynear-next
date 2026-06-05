@@ -1,316 +1,714 @@
-.property-big-card-box {
+@import '/scss/variables.scss';
+
+// ── SALON CARD ────────────────────────────────────────────────────────────────
+.salon-card {
 	position: relative;
-	margin-right: 8px;
-	margin-left: 8px;
-	margin-bottom: 35px;
-	width: 410px;
-	height: 455px;
-	display: flex;
-	flex-direction: column;
-	.card-img {
+	border-radius: $radius-lg;
+	overflow: hidden;
+	background: $white;
+	border: 1px solid rgba(255, 77, 141, 0.08);
+	box-shadow: $shadow-card;
+	transition: $transition;
+	cursor: pointer;
+
+	&:hover {
+		transform: translateY(-6px);
+		box-shadow: $shadow-hover;
+		border-color: rgba(255, 77, 141, 0.2);
+	}
+
+	.salon-card-img {
 		position: relative;
-		width: 100%;
-		height: 264px;
+		height: 200px;
 		background-size: cover;
-		border-radius: 12px 12px 0px 0px;
-		cursor: pointer;
-		div.status {
+		background-position: center;
+		transition: transform 0.3s;
+
+		&:hover {
+			transform: scale(1.03);
+		}
+
+		.open-badge {
 			position: absolute;
-			padding: 6px 34px;
-			left: 20px;
-			top: 20px;
-			display: flex;
-			align-items: center;
-			border-radius: 6px;
-			background: #eb6753;
-			img {
-				width: 14px;
-				height: 14px;
-			}
-			span {
-				margin-left: 5px;
-				color: #fff;
-				font-family: $font;
-				font-size: 12px;
-				font-style: normal;
-				font-weight: 600;
-				line-height: normal;
-				text-transform: uppercase;
-			}
-		}
-		div.price {
-			position: absolute;
-			padding: 8px 12px;
-			left: 20px;
-			bottom: 20px;
-			border-radius: 6px;
-			background: #fff;
-			color: #181a20;
-			font-family: $font;
-			font-size: 15px;
-			font-style: normal;
-			font-weight: 600;
-			line-height: normal;
-		}
-	}
-	.info {
-		padding: 20px 22px 17px;
-		display: flex;
-		flex-direction: column;
-		box-sizing: border-box;
-		border-radius: 0px 0px 12px 12px;
-		border: 1px solid #ddd;
-		border-top: none;
-		background: #fff;
-		.title {
-			overflow: hidden;
-			color: #181a20;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			font-family: $font;
-			font-size: 15px;
-			font-style: normal;
-			font-weight: 600;
-			line-height: normal;
-			text-transform: capitalize;
-			cursor: pointer;
-		}
-		.desc {
-			margin-top: 5px;
-			overflow: hidden;
-			color: #717171;
-			font-family: $font;
-			font-size: 13px;
-			font-style: normal;
-			font-weight: 400;
-			line-height: normal;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-		.options {
-			margin-top: 15px;
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			div {
-				display: flex;
-				flex-direction: row;
-				img {
-					margin-right: 5px;
-					width: 17px;
-					height: 17px;
-				}
-				span {
-					color: #181a20;
-					font-family: $font;
-					font-size: 13px;
-					font-style: normal;
-					font-weight: 400;
-					line-height: normal;
-				}
-			}
-		}
-		.bott {
-			display: flex;
-			flex-direction: row;
-			justify-content: space-between;
-			align-items: center;
-			div {
-				width: 65px;
-				display: flex;
-				flex-direction: row;
-				align-items: center;
-				justify-content: space-between;
-			}
-			p {
-				color: #181a20;
-				font-family: $font;
-				font-size: 13px;
-				font-style: normal;
-				font-weight: 500;
-				line-height: normal;
-				text-transform: capitalize;
-			}
-			span {
-				margin-left: 6px;
-				color: rgba(143, 143, 143, 0.54);
-				font-family: $font;
-				font-size: 15px;
-				font-style: normal;
-				font-weight: 500;
-				line-height: normal;
-				text-transform: capitalize;
-			}
-			button {
-				margin-left: 15px;
-				width: 16px;
-				height: 16px;
-				box-sizing: border-box;
-			}
-			.buttons-box {
-				width: auto;
-				height: auto;
-				display: flex;
-				flex-direction: row;
-				gap: 7px;
-			}
-		}
-	}
-}
-.agent-general-card {
-	position: relative;
-	margin-right: 27px;
-	margin-bottom: 34px;
-	display: flex;
-	flex-direction: column;
-	.agent-img {
-		border-radius: 12px;
-		width: 233px;
-		height: 273px;
-		background-size: 100% 100%;
-		background-repeat: no-repeat;
-		cursor: pointer;
-		div {
-			position: absolute;
-			padding: 12px;
 			top: 12px;
 			left: 12px;
-			border-radius: 6px;
-			background: #eb6753;
-			color: #fff;
+			padding: 3px 10px;
+			border-radius: 8px;
 			font-family: $font;
-			font-size: 12px;
-			font-style: normal;
-			font-weight: 600;
-			line-height: normal;
+			font-size: 11px;
+			font-weight: 700;
+			color: $white;
+
+			&.open {
+				background: #4CAF50;
+			}
+
+			&.closed {
+				background: #e53935;
+			}
+		}
+
+		.top-badge {
+			position: absolute;
+			top: 12px;
+			left: 56px;
+			padding: 3px 10px;
+			border-radius: 8px;
+			font-family: $font;
+			font-size: 11px;
+			font-weight: 700;
+			color: $white;
+			background: linear-gradient(135deg, $primary, $primary-light);
+		}
+
+		.like-btn {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			width: 32px;
+			height: 32px;
+			background: rgba(255, 255, 255, 0.92);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: $transition;
+			border: none;
+
+			&:hover {
+				background: $white;
+				transform: scale(1.1);
+			}
+
+			&.liked {
+				background: rgba(255, 77, 141, 0.1);
+			}
+		}
+
+		.views-overlay {
+			position: absolute;
+			bottom: 8px;
+			right: 10px;
+			background: rgba(0, 0, 0, 0.45);
+			border-radius: 6px;
+			padding: 2px 8px;
+			display: flex;
+			align-items: center;
+			gap: 4px;
 		}
 	}
-	.agent-desc {
-		margin-top: 23px;
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		.agent-info {
-			display: flex;
-			flex-direction: column;
-			strong {
-				color: #181a20;
-				font-family: $font;
-				font-size: 15px;
-				font-style: normal;
-				font-weight: 600;
-				line-height: normal;
-				cursor: pointer;
-			}
-			span {
-				color: #181a20;
-				font-family: $font;
-				font-size: 15px;
-				font-style: normal;
-				font-weight: 400;
-				line-height: 28px;
+
+	.salon-card-info {
+		padding: 14px 16px;
+
+		.salon-title {
+			font-family: $font;
+			font-size: 15px;
+			font-weight: 700;
+			color: $text-dark;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			margin-bottom: 4px;
+			cursor: pointer;
+			transition: color 0.2s;
+
+			&:hover {
+				color: $primary;
 			}
 		}
-		.buttons {
-			width: auto;
+
+		.salon-location {
+			font-family: $font;
+			font-size: 12px;
+			color: $text-muted;
+			margin-bottom: 4px;
+			display: flex;
+			align-items: center;
+			gap: 3px;
+		}
+
+		.salon-specialist {
+			font-family: $font;
+			font-size: 12px;
+			color: $text-muted;
+			margin-bottom: 6px;
+		}
+
+		.salon-tags {
 			display: flex;
 			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			svg {
-				width: 24px;
-				height: 24px;
-				cursor: pointer;
+			gap: 4px;
+			flex-wrap: wrap;
+			margin-bottom: 8px;
+
+			.salon-tag {
+				font-family: $font;
+				font-size: 10px;
+				font-weight: 600;
+				padding: 2px 8px;
+				border-radius: 8px;
+				background: rgba(255, 77, 141, 0.08);
+				color: $primary;
+				border: 1px solid rgba(255, 77, 141, 0.2);
 			}
-			.view-cnt {
-				font-size: 13px;
+		}
+
+		.salon-divider {
+			height: 1px;
+			background: rgba(0, 0, 0, 0.06);
+			margin: 8px 0;
+		}
+
+		.salon-price {
+			font-family: $font;
+			font-size: 15px;
+			font-weight: 700;
+			color: $primary;
+		}
+
+		.salon-deposit {
+			font-family: $font;
+			font-size: 11px;
+			color: $text-light;
+			display: flex;
+			align-items: center;
+			gap: 3px;
+		}
+
+		.salon-stats {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 12px;
+
+			span {
+				font-family: $font;
+				font-size: 11px;
+				color: $text-light;
+				display: flex;
+				align-items: center;
+				gap: 3px;
+			}
+		}
+
+		.book-now-btn {
+			width: 100%;
+			margin-top: 10px;
+			padding: 9px !important;
+			background: linear-gradient(135deg, $primary, $primary-light) !important;
+			color: $white !important;
+			border-radius: 8px !important;
+			font-family: $font !important;
+			font-size: 13px !important;
+			font-weight: 700 !important;
+			box-shadow: 0 3px 12px rgba(255, 77, 141, 0.25) !important;
+			transition: $transition !important;
+
+			&:hover {
+				transform: scale(1.02) !important;
+				box-shadow: 0 6px 20px rgba(255, 77, 141, 0.4) !important;
 			}
 		}
 	}
 }
-.community-general-card-config {
+
+// ── SERVICE CARD (general) ────────────────────────────────────────────────────
+.service-card-general {
 	position: relative;
-	height: auto;
-	gap: 20px;
-	border-radius: 12px;
+	border-radius: $radius-md;
+	overflow: hidden;
+	background: $white;
+	border: 1px solid rgba(255, 77, 141, 0.08);
+	box-shadow: $shadow-card;
+	transition: $transition;
 	cursor: pointer;
-	.image-box {
-		width: 100%;
-		height: 283px;
-		.card-img {
-			width: 100%;
-			height: 100%;
-			border-radius: 12px;
+	width: 160px;
+	flex-shrink: 0;
+
+	&:hover {
+		transform: translateY(-4px);
+		box-shadow: $shadow-pink;
+		border-color: $primary-border;
+	}
+
+	.svc-cover {
+		height: 120px;
+		background-size: cover;
+		background-position: center;
+		background-color: #f5f5f5;
+		position: relative;
+
+		.svc-like {
+			position: absolute;
+			top: 6px;
+			right: 6px;
+			width: 28px;
+			height: 28px;
+			background: rgba(255, 255, 255, 0.9);
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: $transition;
+
+			&:hover {
+				background: $white;
+			}
+
+			&.liked {
+				background: rgba(255, 77, 141, 0.12);
+			}
 		}
 	}
-	.desc-box {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-between;
-		align-items: center;
-		width: 100%;
-		height: 80px;
-		.title {
-			color: #717171;
+
+	.svc-info {
+		padding: 10px 12px;
+
+		.svc-title {
+			font-family: $font;
+			font-size: 12px;
+			font-weight: 700;
+			color: $text-dark;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			margin-bottom: 2px;
+		}
+
+		.svc-price {
+			font-family: $font;
+			font-size: 12px;
+			font-weight: 700;
+			color: $primary;
+			margin-bottom: 2px;
+		}
+
+		.svc-duration {
+			font-family: $font;
+			font-size: 11px;
+			color: $text-light;
+		}
+
+		.svc-book-btn {
+			width: 100%;
+			margin-top: 8px;
+			padding: 6px !important;
+			background: linear-gradient(135deg, $primary, $primary-light) !important;
+			color: $white !important;
+			border-radius: 6px !important;
+			font-family: $font !important;
+			font-size: 11px !important;
+			font-weight: 700 !important;
+		}
+	}
+}
+
+// ── PAGINATION ────────────────────────────────────────────────────────────────
+.pagination-box {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	padding: 24px 0 8px;
+
+	.MuiPagination-root {
+		.MuiPaginationItem-root {
 			font-family: $font;
 			font-size: 13px;
-			font-style: normal;
-			font-weight: 400;
-			line-height: normal;
-		}
-		.desc {
-			color: #181a20;
-			font-family: $font;
-			font-size: 15px;
-			font-style: normal;
-			font-weight: 600;
-			line-height: 26px;
-			text-transform: capitalize;
-		}
-		.buttons {
-			width: auto;
-			display: flex;
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-			svg {
-				width: 24px;
-				height: 24px;
-				cursor: pointer;
+			border-radius: 8px;
+			transition: $transition;
+
+			&:hover {
+				background: rgba(255, 77, 141, 0.08);
+				color: $primary;
 			}
-			.view-cnt {
-				font-size: 13px;
+
+			&.Mui-selected {
+				background: linear-gradient(135deg, $primary, $primary-light) !important;
+				color: $white;
+				font-weight: 700;
+				box-shadow: 0 3px 10px rgba(255, 77, 141, 0.3);
 			}
 		}
 	}
-	.date-box {
-		position: absolute;
-		width: 70px;
-		height: 69.014px;
+}
+
+// ── EMPTY LIST ────────────────────────────────────────────────────────────────
+.empty-list {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 48px 20px;
+	width: 100%;
+
+	.empty-emoji {
+		font-size: 48px;
+		margin-bottom: 16px;
+		animation: emptyFloat 3s ease-in-out infinite;
+
+		@keyframes emptyFloat {
+
+			0%,
+			100% {
+				transform: translateY(0);
+			}
+
+			50% {
+				transform: translateY(-8px);
+			}
+		}
+	}
+
+	.empty-title {
+		font-family: $font;
+		font-size: 18px;
+		font-weight: 700;
+		color: $text-dark;
+		margin-bottom: 8px;
+		text-align: center;
+	}
+
+	.empty-desc {
+		font-family: $font;
+		font-size: 14px;
+		color: $text-light;
+		text-align: center;
+		margin-bottom: 20px;
+		max-width: 280px;
+		line-height: 1.6;
+	}
+
+	.empty-btn {
+		padding: 10px 24px !important;
+		background: linear-gradient(135deg, $primary, $primary-light) !important;
+		color: $white !important;
+		border-radius: 10px !important;
+		font-family: $font !important;
+		font-size: 13px !important;
+		font-weight: 700 !important;
+		box-shadow: 0 4px 16px rgba(255, 77, 141, 0.25) !important;
+		transition: $transition !important;
+
+		&:hover {
+			transform: translateY(-2px) !important;
+			box-shadow: 0 8px 24px rgba(255, 77, 141, 0.35) !important;
+		}
+	}
+}
+
+// ── RATING STARS ──────────────────────────────────────────────────────────────
+.rating-stars {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 2px;
+
+	.star {
+		color: #FFB800;
+		line-height: 1;
+	}
+
+	.star-empty {
+		color: #e0e0e0;
+	}
+
+	.rating-number {
+		font-family: $font;
+		font-weight: 600;
+		color: $text-dark;
+		margin-left: 4px;
+	}
+
+	.rating-count {
+		font-family: $font;
+		color: $text-light;
+		margin-left: 2px;
+	}
+
+	&.small {
+
+		.star,
+		.star-empty {
+			font-size: 12px;
+		}
+
+		.rating-number {
+			font-size: 12px;
+		}
+
+		.rating-count {
+			font-size: 11px;
+		}
+	}
+
+	&.medium {
+
+		.star,
+		.star-empty {
+			font-size: 15px;
+		}
+
+		.rating-number {
+			font-size: 14px;
+		}
+
+		.rating-count {
+			font-size: 13px;
+		}
+	}
+
+	&.large {
+
+		.star,
+		.star-empty {
+			font-size: 20px;
+		}
+
+		.rating-number {
+			font-size: 18px;
+		}
+
+		.rating-count {
+			font-size: 16px;
+		}
+	}
+}
+
+// ── CONFIRM MODAL ─────────────────────────────────────────────────────────────
+.confirm-modal {
+	background: $white;
+	border-radius: $radius-xl;
+	padding: 32px;
+	width: 360px;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+	outline: none;
+	animation: popIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+	@keyframes popIn {
+		0% {
+			transform: scale(0.85);
+			opacity: 0;
+		}
+
+		100% {
+			transform: scale(1);
+			opacity: 1;
+		}
+	}
+
+	.modal-icon {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background: rgba(255, 77, 141, 0.08);
+		display: flex;
 		align-items: center;
 		justify-content: center;
-		top: 235px;
-		right: 20px;
-		border-radius: 12px;
-		background: #fff;
-		box-shadow: 0px 6px 15px 0px rgba(64, 79, 104, 0.05);
-		.month {
-			color: #181a20;
-			text-align: center;
-			font-family: $font;
-			font-size: 13px;
-			font-style: normal;
-			font-weight: 400;
-			line-height: normal;
+		margin: 0 auto 16px;
+		font-size: 24px;
+	}
+
+	.modal-title {
+		font-family: $font;
+		font-size: 18px;
+		font-weight: 700;
+		color: $text-dark;
+		text-align: center;
+		margin-bottom: 8px;
+	}
+
+	.modal-desc {
+		font-family: $font;
+		font-size: 14px;
+		color: $text-light;
+		text-align: center;
+		line-height: 1.6;
+		margin-bottom: 24px;
+	}
+
+	.modal-confirm-btn {
+		background: linear-gradient(135deg, $primary, $primary-light) !important;
+		color: $white !important;
+		border-radius: 10px !important;
+		font-family: $font !important;
+		font-size: 14px !important;
+		font-weight: 700 !important;
+		padding: 11px !important;
+		box-shadow: 0 4px 16px rgba(255, 77, 141, 0.3) !important;
+		transition: $transition !important;
+
+		&:hover {
+			transform: translateY(-2px) !important;
 		}
-		.day {
-			color: #181a20;
-			font-family: $font;
-			font-size: 20px;
-			font-style: normal;
-			font-weight: 600;
-			line-height: normal;
+	}
+
+	.modal-cancel-btn {
+		border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
+		color: #555 !important;
+		border-radius: 10px !important;
+		font-family: $font !important;
+		font-size: 14px !important;
+		font-weight: 600 !important;
+		padding: 11px !important;
+		transition: $transition !important;
+
+		&:hover {
+			background: #f5f5f5 !important;
 		}
+	}
+}
+
+// ── IMAGE UPLOADER ────────────────────────────────────────────────────────────
+.image-uploader {
+	width: 100%;
+	border: 2px dashed rgba(255, 77, 141, 0.25);
+	border-radius: $radius-lg;
+	padding: 32px 20px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: $transition;
+	background: rgba(255, 77, 141, 0.02);
+
+	&:hover {
+		border-color: $primary;
+		background: rgba(255, 77, 141, 0.04);
+	}
+
+	&.dragging {
+		border-color: $primary;
+		background: rgba(255, 77, 141, 0.06);
+		transform: scale(1.01);
+	}
+
+	.upload-icon {
+		font-size: 40px;
+		margin-bottom: 12px;
+		color: $primary;
+		opacity: 0.6;
+	}
+
+	.upload-title {
+		font-family: $font;
+		font-size: 14px;
+		font-weight: 600;
+		color: $text-dark;
+		margin-bottom: 4px;
+	}
+
+	.upload-desc {
+		font-family: $font;
+		font-size: 12px;
+		color: $text-light;
+	}
+}
+
+// ── TYPE CHIP (shared) ────────────────────────────────────────────────────────
+.type-chip-shared {
+	padding: 4px 14px;
+	border-radius: 20px;
+	font-family: $font;
+	font-size: 12px;
+	font-weight: 600;
+	background: rgba(255, 77, 141, 0.08);
+	color: $primary;
+	border: 1px solid rgba(255, 77, 141, 0.2);
+	cursor: pointer;
+	transition: $transition;
+	white-space: nowrap;
+
+	&:hover {
+		background: rgba(255, 77, 141, 0.14);
+		transform: translateY(-1px);
+	}
+
+	&.active {
+		background: $primary;
+		color: $white;
+		border-color: $primary;
+		box-shadow: 0 3px 10px rgba(255, 77, 141, 0.3);
+	}
+}
+
+// ── SORT CHIPS (shared) ───────────────────────────────────────────────────────
+.sort-chip-shared {
+	padding: 5px 14px;
+	border-radius: 20px;
+	font-family: $font;
+	font-size: 12px;
+	font-weight: 500;
+	color: #666;
+	cursor: pointer;
+	transition: $transition;
+
+	&:hover {
+		color: $primary;
+	}
+
+	&.active {
+		background: rgba(255, 77, 141, 0.1);
+		color: $primary;
+		font-weight: 700;
+	}
+}
+
+// ── FOLLOW BUTTON (shared) ────────────────────────────────────────────────────
+.follow-btn-shared {
+	border: 1.5px solid $primary !important;
+	color: $primary !important;
+	border-radius: 10px !important;
+	font-family: $font !important;
+	font-size: 13px !important;
+	font-weight: 700 !important;
+	transition: $transition !important;
+
+	&:hover {
+		background: rgba(255, 77, 141, 0.06) !important;
+		transform: translateY(-1px) !important;
+	}
+
+	&.following {
+		background: $primary !important;
+		color: $white !important;
+		border-color: $primary !important;
+	}
+}
+
+// ── TIME SLOT (shared) ────────────────────────────────────────────────────────
+.time-slot-shared {
+	padding: 7px 14px;
+	border-radius: 20px;
+	border: 1.5px solid rgba(255, 77, 141, 0.2);
+	font-family: $font;
+	font-size: 13px;
+	font-weight: 500;
+	color: #555;
+	cursor: pointer;
+	transition: $transition;
+
+	&:hover:not(.booked) {
+		border-color: $primary;
+		color: $primary;
+		transform: translateY(-1px);
+	}
+
+	&.selected {
+		background: linear-gradient(135deg, $primary, $primary-light);
+		color: $white;
+		border-color: $primary;
+		box-shadow: 0 4px 12px rgba(255, 77, 141, 0.3);
+	}
+
+	&.booked {
+		background: #f5f5f5;
+		color: #bbb;
+		border-color: #eee;
+		cursor: not-allowed;
+		text-decoration: line-through;
 	}
 }

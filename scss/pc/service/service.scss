@@ -1,0 +1,372 @@
+@import '/scss/variables.scss';
+
+#pc-wrap {
+    .services-page {
+        width: 100%;
+        min-height: 100vh;
+        background: $bg-page;
+
+        .services-top-bar {
+            background: $white;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+
+            .services-top-inner {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 14px 32px;
+
+                .find-now-btn {
+                    padding: 10px 24px;
+                    background: linear-gradient(135deg, $primary, $primary-light);
+                    color: $white;
+                    border-radius: 10px;
+                    font-family: $font;
+                    font-size: 14px;
+                    font-weight: 700;
+                    white-space: nowrap;
+                    box-shadow: 0 4px 16px rgba(255, 77, 141, 0.3);
+                    transition: $transition;
+
+                    &:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 24px rgba(255, 77, 141, 0.4);
+                    }
+                }
+            }
+
+            .type-chips-bar {
+                max-width: 1280px;
+                margin: 0 auto;
+                padding: 10px 32px 14px;
+                overflow-x: auto;
+
+                &::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .type-chip {
+                    padding: 6px 16px;
+                    border-radius: 20px;
+                    font-family: $font;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #555;
+                    border: 1.5px solid rgba(255, 77, 141, 0.15);
+                    background: $white;
+                    cursor: pointer;
+                    white-space: nowrap;
+                    flex-shrink: 0;
+                    transition: $transition;
+
+                    &:hover {
+                        border-color: $primary;
+                        color: $primary;
+                        transform: translateY(-1px);
+                    }
+
+                    &.active {
+                        background: $primary;
+                        color: $white;
+                        border-color: $primary;
+                        box-shadow: 0 4px 12px rgba(255, 77, 141, 0.3);
+                    }
+                }
+            }
+        }
+
+        .services-main {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px 32px;
+            gap: 24px;
+            align-items: flex-start;
+        }
+
+        .services-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+            position: sticky;
+            top: 120px;
+        }
+
+        .services-content {
+            flex: 1;
+
+            .results-header {
+                margin-bottom: 20px;
+
+                .results-count {
+                    font-family: $font;
+                    font-size: 16px;
+                    color: $text-dark;
+                    font-weight: 500;
+                }
+
+                .sort-chip {
+                    padding: 6px 14px;
+                    border-radius: 20px;
+                    font-family: $font;
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #555;
+                    cursor: pointer;
+                    transition: $transition;
+
+                    &:hover {
+                        color: $primary;
+                    }
+
+                    &.active {
+                        background: rgba(255, 77, 141, 0.1);
+                        color: $primary;
+                        font-weight: 700;
+                    }
+                }
+            }
+
+            .services-grid {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+        }
+    }
+
+    // ── SERVICE FILTER ────────────────────────────────────────────────────────
+    .service-filter {
+        background: $white;
+        border-radius: $radius-lg;
+        border: 1px solid rgba(255, 77, 141, 0.08);
+        box-shadow: $shadow-card;
+        overflow: hidden;
+
+        .filter-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+
+            .filter-title {
+                font-family: $font;
+                font-size: 15px;
+                font-weight: 700;
+                color: $text-dark;
+            }
+        }
+
+        .filter-section {
+            border-bottom: 1px solid rgba(255, 77, 141, 0.06);
+
+            .filter-section-header {
+                padding: 14px 20px 10px;
+                cursor: pointer;
+                transition: background 0.2s;
+
+                &:hover {
+                    background: rgba(255, 77, 141, 0.02);
+                }
+
+                .filter-section-title {
+                    font-family: $font;
+                    font-size: 13px;
+                    font-weight: 700;
+                    color: $text-dark;
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+            }
+
+            .filter-section-body {
+                padding: 4px 20px 14px;
+
+                .filter-check-row {
+                    margin-bottom: 2px;
+                }
+            }
+        }
+
+        .apply-btn {
+            background: linear-gradient(135deg, $primary, $primary-light) !important;
+            color: $white !important;
+            border-radius: 10px !important;
+            font-family: $font !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            padding: 12px !important;
+            box-shadow: 0 4px 16px rgba(255, 77, 141, 0.3) !important;
+            margin-bottom: 8px !important;
+            transition: $transition !important;
+
+            &:hover {
+                transform: translateY(-2px) !important;
+            }
+        }
+
+        .reset-btn {
+            color: #888 !important;
+            font-family: $font !important;
+            font-size: 13px !important;
+
+            &:hover {
+                color: $primary !important;
+            }
+        }
+    }
+
+    // ── SERVICE CARD ──────────────────────────────────────────────────────────
+    .service-card {
+        width: calc(33.33% - 14px);
+        border-radius: $radius-lg;
+        overflow: hidden;
+        background: $white;
+        border: 1px solid rgba(255, 77, 141, 0.08);
+        box-shadow: $shadow-card;
+        transition: $transition;
+
+        &:hover {
+            transform: translateY(-6px);
+            box-shadow: $shadow-hover;
+            border-color: rgba(255, 77, 141, 0.2);
+        }
+
+        .service-card-img {
+            position: relative;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+
+            &:hover {
+                transform: scale(1.03);
+            }
+
+            .trending-badge {
+                position: absolute;
+                top: 12px;
+                left: 12px;
+                background: linear-gradient(135deg, $primary, $primary-light);
+                border-radius: 8px;
+                padding: 4px 8px;
+                display: flex;
+                align-items: center;
+                gap: 3px;
+
+                svg {
+                    color: $white;
+                }
+            }
+
+            .like-btn {
+                position: absolute;
+                top: 8px;
+                right: 8px;
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.92);
+                transition: $transition;
+
+                &:hover {
+                    transform: scale(1.1);
+                    background: $white;
+                }
+
+                &.liked {
+                    background: rgba(255, 77, 141, 0.1);
+                }
+            }
+
+            .views-overlay {
+                position: absolute;
+                bottom: 10px;
+                right: 12px;
+                background: rgba(0, 0, 0, 0.5);
+                border-radius: 6px;
+                padding: 3px 8px;
+                color: $white;
+            }
+        }
+
+        .service-card-info {
+            padding: 14px 16px;
+
+            .service-name {
+                font-family: $font;
+                font-size: 14px;
+                font-weight: 700;
+                color: $text-dark;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                flex: 1;
+                cursor: pointer;
+                transition: color 0.2s;
+
+                &:hover {
+                    color: $primary;
+                }
+            }
+
+            .salon-link {
+                font-family: $font;
+                font-size: 12px;
+                color: $primary;
+                font-weight: 600;
+                cursor: pointer;
+                display: block;
+                margin-bottom: 2px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+            }
+
+            .specialist-text {
+                font-family: $font;
+                font-size: 12px;
+                color: $text-muted;
+                margin-bottom: 4px;
+            }
+
+            .service-divider {
+                height: 1px;
+                background: rgba(0, 0, 0, 0.06);
+                margin: 10px 0;
+            }
+
+            .service-price {
+                font-family: $font;
+                font-size: 15px;
+                font-weight: 700;
+                color: $primary;
+            }
+
+            .book-btn {
+                width: 100%;
+                margin-top: 10px;
+                padding: 9px !important;
+                background: linear-gradient(135deg, $primary, $primary-light) !important;
+                color: $white !important;
+                border-radius: 8px !important;
+                font-family: $font !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                box-shadow: 0 3px 12px rgba(255, 77, 141, 0.3) !important;
+                transition: $transition !important;
+
+                &:hover {
+                    transform: scale(1.02) !important;
+                    box-shadow: 0 6px 20px rgba(255, 77, 141, 0.4) !important;
+                }
+            }
+        }
+    }
+}

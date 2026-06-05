@@ -457,11 +457,13 @@ export const UPDATE_COMMENT = gql`
  *************************/
 
 export const SUBSCRIBE = gql`
-	mutation Subscribe($input: String!) {
+	mutation Subscribe($input: FollowToggleInput!) {
 		subscribe(input: $input) {
 			_id
 			followingId
 			followerId
+			salonId
+			serviceId
 			createdAt
 			updatedAt
 		}
@@ -469,11 +471,13 @@ export const SUBSCRIBE = gql`
 `;
 
 export const UNSUBSCRIBE = gql`
-	mutation Unsubscribe($input: String!) {
+	mutation Unsubscribe($input: FollowToggleInput!) {
 		unsubscribe(input: $input) {
 			_id
 			followingId
 			followerId
+			salonId
+			serviceId
 			createdAt
 			updatedAt
 		}
