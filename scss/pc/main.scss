@@ -1393,6 +1393,19 @@
 	}
 }
 
+/* ── Mobil qurilmalarda #pc-wrap 1300px kenglikni bekor qilish ───────────────
+   SSR da #pc-wrap min-width:1300px yuboriladi. Ba'zi mobil brauzerlar (Samsung
+   Internet, Chrome Android) buni ko'rib layout viewport ni 1300px ga
+   kengaytiradi, natijada width:100% = 1300px bo'lib, kontent faqat chap ~50%
+   da ko'rinadi. Bu media query ushbu muammoni CSS darajasida to'xtatadi. */
+@media screen and (max-width: 1024px) {
+	#pc-wrap {
+		min-width: 0 !important;
+		max-width: 100vw !important;
+		overflow-x: hidden !important;
+	}
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    MOBILE LAYOUT
    ═══════════════════════════════════════════════════════════════════════════ */

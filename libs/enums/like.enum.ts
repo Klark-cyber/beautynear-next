@@ -1,5 +1,4 @@
 export enum LikeGroup {
-	MEMBER = 'MEMBER',
 	SALON = 'SALON',
 	SERVICE = 'SERVICE',
 	COMMENT = 'COMMENT',

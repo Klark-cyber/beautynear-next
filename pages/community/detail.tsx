@@ -422,7 +422,7 @@ const CommunityDetail: NextPage = ({
 
 			{/* Izohni tahrirlash — responsive modal */}
 			<Backdrop open={openBackdrop} className="edit-comment-backdrop" onClick={cancelButtonHandler}>
-				<Box component="div" className="edit-comment-modal" onClick={(e) => e.stopPropagation()}>
+				<Box component="div" className="edit-comment-modal" onClick={(e: React.MouseEvent<HTMLDivElement>) => e.stopPropagation()}>
 					<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
 						<Typography className="ecm-title">{t('Update comment')}</Typography>
 						<IconButton size="small" onClick={cancelButtonHandler}><CloseIcon sx={{ fontSize: 18 }} /></IconButton>

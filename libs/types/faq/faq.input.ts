@@ -1,5 +1,5 @@
 import { FaqCategory, FaqStatus } from '../../enums/faq.enum';
-import { Direction } from '../common';
+import { Direction } from '../../enums/common.enum';
 
 interface AFISearch {
 	faqStatus?: FaqStatus;

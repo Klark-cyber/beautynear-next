@@ -36,7 +36,6 @@ function createIsomorphicLink() {
 					...getHeaders(),
 				},
 			}));
-			console.warn('requesting.. ', operation);
 			return forward(operation);
 		});
 
@@ -57,9 +56,9 @@ function createIsomorphicLink() {
 			},
 		});
 
-		const errorLink = onError(({ graphQLErrors, networkError, response }) => {
+		const errorLink = onError(({ graphQLErrors, networkError }) => {
 			if (graphQLErrors) {
-				graphQLErrors.map(({ message, locations, path, extensions }) =>
+				graphQLErrors.map(({ message, locations, path }) =>
 					console.log(`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`),
 				);
 			}

@@ -1,5 +1,5 @@
 import { NoticeType, NoticeStatus } from '../../enums/notice.enum';
-import { Direction } from '../common';
+import { Direction } from '../../enums/common.enum';
 
 interface ANISearch {
 	noticeStatus?: NoticeStatus;

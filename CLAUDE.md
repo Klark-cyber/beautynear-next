@@ -270,17 +270,23 @@ Article: createBoardArticle, updateBoardArticle, likeTargetBoardArticle
 - ✅ Geo filter ($geoNear, 50km default, fallback to all if no results)
 
 ### Frontend:
-- ✅ All enums
+- ✅ All enums (LikeGroup/ViewGroup: MEMBER removed; MemberStatus: INACTIVE/PAUSE added)
 - ✅ All types (member, salon, service, booking, comment, follow, like, view, board-article, common)
 - ✅ apollo/store.ts
 - ✅ apollo/user/mutation.ts + query.ts
-- ✅ apollo/admin/mutation.ts + query.ts
+- ✅ apollo/admin/mutation.ts + query.ts (GET_ALL_SERVICES_BY_ADMIN resolver fixed)
 - ✅ libs/config.ts
 - ✅ libs/auth/index.ts
 - ✅ libs/utils/index.ts
-- ✅ libs/hooks/useDeviceDetect.ts
-- ✅ Top.tsx, Footer.tsx, Chat.tsx
+- ✅ libs/hooks/useDeviceDetect.ts (UA + window.innerWidth ≤ 1024 check)
+- ✅ Top.tsx, Footer.tsx, Chat.tsx (lang: RU fixed; unused imports removed)
 - ✅ LayoutMain.tsx, LayoutBasic.tsx, LayoutFull.tsx, LayoutAdmin.tsx
+- ✅ apollo/client.ts (console.warn removed, unused vars cleaned)
+- ✅ Imageuploader.tsx + community/detail.tsx (implicit any fixed)
+- ✅ Direction import fixed in faq/inquiry/notice input types
+- ✅ MyProperties.tsx + PropertyCard.tsx deleted (unused Nestar leftovers)
+- ✅ **Mobile 50% width fix** (2026-07-11): scss/app.scss — overflow-x:hidden on html/body; scss/pc/main.scss — @media(max-width:1024px) #pc-wrap {min-width:0}
+- ✅ **TypeScript build: 0 errors** (2026-07-11)
 
 ---
 
@@ -315,11 +321,15 @@ Article: createBoardArticle, updateBoardArticle, likeTargetBoardArticle
 ## 📝 Notes for Claude
 
 - `property/` folder is DELETED in frontend — never reference it
+- `MyProperties.tsx` + `PropertyCard.tsx` DELETED — agent salon management not yet reimplemented
 - Import `MeLiked`, `TotalCounter`, `T` from `types/common` (not property)
 - `memberProperties` is now `memberSalons` everywhere
 - `AgentsInquiry` is now `AgentInquiry` in frontend types
+- `CommentGroup.MEMBER` — KEEP IT, intentionally added for specialist review system
+- `LikeGroup.MEMBER` + `ViewGroup.MEMBER` — REMOVED (unused, not in backend)
 - Admin layout uses dark gradient sidebar (not white)
 - Mobile has bottom tab nav (5 tabs: Home, Search, Bookings, Community, Profile)
 - Chat is floating button (bottom-right), not inline
 - All pages need both desktop and mobile versions
 - SCSS classes should match Nestar naming patterns where possible
+- Direction enum: import from `libs/enums/common.enum.ts` (NOT from `types/common`)

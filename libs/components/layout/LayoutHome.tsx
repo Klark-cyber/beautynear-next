@@ -57,35 +57,10 @@ const withLayoutMain = (Component: any) => {
 						<title>BeautyNear</title>
 						<meta name="title" content="BeautyNear" />
 					</Head>
-					<Stack id="mobile-wrap">
-						<Stack id="top">
-							<Top />
-						</Stack>
-
-						<Stack className="header-main">
-							<Box component="div" className="hero-bg-mobile" />
-							<Box component="div" className="hero-overlay-mobile" />
-							<Stack className="hero-mobile-content">
-								<Typography className="hero-h1-mobile">
-									{'Find Your'}<br />
-									<span className="pink">{'Perfect Beauty'}</span><br />
-									{'Near You'}
-								</Typography>
-								<Typography className="hero-sub-mobile">
-									{t('Discover premium Korean salons & clinics near your location.')}
-								</Typography>
-								<HeaderFilter />
-							</Stack>
-						</Stack>
-
-						<Stack id="main">
-							<Component {...props} />
-						</Stack>
-
-						<Stack id="footer">
-							<Footer />
-						</Stack>
-					</Stack>
+					{/* ⚠️ TUZATILDI: eski Top/hero-mobile/Footer skeletoni olib
+					    tashlandi — MobileHome endi o'zining header, hero va
+					    pastki navigatsiyasini o'z ichida to'liq boshqaradi. */}
+					<Component {...props} />
 				</>
 			);
 		}

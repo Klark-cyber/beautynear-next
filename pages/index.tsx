@@ -13,6 +13,7 @@ import PopularSalons from '../libs/components/homepage/Popularsalons';
 import EventsCommunity from '../libs/components/homepage/EventsCommunity';
 import NewsletterBanner from '../libs/components/homepage/Newsletterbanner';
 import AppDownload from '../libs/components/homepage/Appdownload';
+import MobileHome from '../libs/components/homepage/MobileHome';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -24,16 +25,7 @@ const Home: NextPage = () => {
 	const device = useDeviceDetect();
 
 	if (device === 'mobile') {
-		return (
-			<Stack className="home-page">
-				<CategoryChips />
-				<TrendingServices />
-				<PopularSalons />
-				<FeaturedClinics />
-				<AdReel />
-				<EventsCommunity />
-			</Stack>
-		);
+		return <MobileHome />;
 	}
 
 	return (

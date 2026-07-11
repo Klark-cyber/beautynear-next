@@ -95,7 +95,7 @@ const ImageUploader = ({
 			<Box
 				component="div"
 				onClick={() => !loading && inputRef.current?.click()}
-				onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+				onDragOver={(e: React.DragEvent<HTMLDivElement>) => { e.preventDefault(); setDragOver(true); }}
 				onDragLeave={() => setDragOver(false)}
 				onDrop={handleDrop}
 				sx={{
@@ -191,7 +191,7 @@ const ImageUploader = ({
 				<Box
 					component="div"
 					onClick={() => !loading && inputRef.current?.click()}
-					onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+					onDragOver={(e: React.DragEvent<HTMLDivElement>) => { e.preventDefault(); setDragOver(true); }}
 					onDragLeave={() => setDragOver(false)}
 					onDrop={handleDrop}
 					sx={{

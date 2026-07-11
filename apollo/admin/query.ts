@@ -100,7 +100,7 @@ export const GET_ALL_SALONS_BY_ADMIN = gql`
 
 export const GET_ALL_SERVICES_BY_ADMIN = gql`
 	query GetAllServicesByAdmin($input: ServicesInquiry!) {
-		getServices(input: $input) {
+		getAllServicesByAdmin(input: $input) {
 			list {
 				_id
 				serviceType
