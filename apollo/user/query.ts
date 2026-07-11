@@ -86,6 +86,11 @@ export const GET_MEMBER = gql`
 			createdAt
 			updatedAt
 			accessToken
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
 			meFollowed {
 				followingId
 				followerId
@@ -122,6 +127,16 @@ export const GET_SALON = gql`
 			salonLatitude
 			salonLongitude
 			memberId
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
+			meFollowed {
+				followerId
+				followingId
+				myFollowing
+			}
 			deletedAt
 			createdAt
 			updatedAt
@@ -140,6 +155,11 @@ export const GET_SALON = gql`
 				memberLikes
 				memberViews
 				createdAt
+				meFollowed {
+					followerId
+					followingId
+					myFollowing
+				}
 				updatedAt
 			}
 			meLiked {
@@ -324,9 +344,19 @@ export const GET_SERVICE = gql`
 			serviceRating
 			salonId
 			memberId
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
 			deletedAt
 			createdAt
 			updatedAt
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
 			memberData {
 				_id
 				memberNick
@@ -540,6 +570,7 @@ export const GET_MY_BOOKINGS = gql`
 					salonLocation
 					salonAddress
 					salonPhone
+					salonImages
 				}
 				serviceData {
 					_id
@@ -612,6 +643,11 @@ export const GET_BOARD_ARTICLE = gql`
 			articleLikes
 			articleComments
 			memberId
+			meLiked {
+				memberId
+				likeRefId
+				myFavorite
+			}
 			createdAt
 			updatedAt
 			memberData {
@@ -833,5 +869,84 @@ export const GET_MEMBER_FOLLOWINGS = gql`
 export const CHECK_FOLLOWING = gql`
 	query CheckFollowing($input: FollowToggleInput!) {
 		checkFollowing(input: $input)
+	}
+`;
+/**************************
+ *           FAQ          *
+ *************************/
+
+export const GET_FAQS = gql`
+	query GetFaqs($input: FaqsInquiry!) {
+		getFaqs(input: $input) {
+			list {
+				_id
+				faqCategory
+				faqQuestion
+				faqAnswer
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
+ *         NOTICE         *
+ *************************/
+
+export const GET_NOTICES = gql`
+	query GetNotices($input: NoticesInquiry!) {
+		getNotices(input: $input) {
+			list {
+				_id
+				noticeType
+				noticeTitle
+				noticeContent
+				noticeViews
+				noticePinned
+				createdAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_NOTICE = gql`
+	query GetNotice($noticeId: String!) {
+		getNotice(noticeId: $noticeId) {
+			_id
+			noticeType
+			noticeTitle
+			noticeContent
+			noticeViews
+			noticePinned
+			createdAt
+		}
+	}
+`;
+
+/**************************
+ *         INQUIRY        *
+ *************************/
+
+export const GET_MY_INQUIRIES = gql`
+	query GetMyInquiries($input: MyInquiriesInquiry!) {
+		getMyInquiries(input: $input) {
+			list {
+				_id
+				inquiryStatus
+				inquirySubject
+				inquiryMessage
+				inquiryReply
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
 	}
 `;

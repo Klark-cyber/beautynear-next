@@ -251,16 +251,20 @@
                         right: 8px;
                         width: 32px;
                         height: 32px;
-                        background: rgba(255, 255, 255, 0.9);
+                        background: rgba(0, 0, 0, 0.35);
+                        backdrop-filter: blur(4px);
+                        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                        border: 1px solid rgba(255, 255, 255, 0.3);
                         transition: $transition;
 
                         &:hover {
-                            background: $white;
+                            background: rgba(0, 0, 0, 0.5);
                             transform: scale(1.1);
                         }
 
                         &.liked {
-                            background: rgba(255, 77, 141, 0.1);
+                            background: rgba(255, 255, 255, 0.95);
+                            border-color: transparent;
                         }
                     }
 

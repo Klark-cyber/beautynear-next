@@ -34,14 +34,34 @@ const withLayoutBasic = (Component: any) => {
 					desc: 'Discover premium K-Beauty salons near you',
 					bgImage: '/img/banner/salons.jpg',
 				},
-				'/services': {
+				// ⚠️ TUZATILDI: avval '/salons/[id]' uchun konfiguratsiya
+				// umuman yo'q edi — salon detail sahifasi doim standart
+				// (BeautyNear) banner bilan ochilar edi.
+				'/salons/[id]': {
+					title: 'Salon Details',
+					desc: 'Explore this salon and book your appointment',
+					bgImage: '/img/banner/salons.jpg',
+				},
+				// ⚠️ TUZATILDI: '/services' -> '/service' (haqiqiy yo'l birlik)
+				'/service': {
 					title: 'Explore Services',
 					desc: 'Browse trending beauty treatments',
 					bgImage: '/img/banner/services.jpg',
 				},
-				'/specialists': {
+				'/service/[id]': {
+					title: 'Service Details',
+					desc: 'Everything you need to know before booking',
+					bgImage: '/img/banner/services.jpg',
+				},
+				// ⚠️ TUZATILDI: '/specialists' -> '/specialist' (haqiqiy yo'l birlik)
+				'/specialist': {
 					title: 'Meet Our Specialists',
 					desc: 'Expert beauty professionals near you',
+					bgImage: '/img/banner/specialists.jpg',
+				},
+				'/specialist/detail': {
+					title: 'Specialist Profile',
+					desc: 'Explore their work & services',
 					bgImage: '/img/banner/specialists.jpg',
 				},
 				'/mypage': {
@@ -65,8 +85,8 @@ const withLayoutBasic = (Component: any) => {
 					bgImage: '/img/banner/cs.jpg',
 				},
 				'/account/join': {
-					title: 'Welcome Back',
-					desc: 'Login or create your account',
+					title: 'Welcome to BeautyNear',
+					desc: 'Login or create your account to get started',
 					bgImage: '/img/banner/auth.jpg',
 				},
 				'/member': {
@@ -78,6 +98,7 @@ const withLayoutBasic = (Component: any) => {
 			return configs[router.pathname] ?? { title: 'BeautyNear', desc: '', bgImage: '/img/banner/default.jpg' };
 		}, [router.pathname]);
 
+		/** MOBILE **/
 		if (device === 'mobile') {
 			return (
 				<>
@@ -119,6 +140,7 @@ const withLayoutBasic = (Component: any) => {
 			);
 		}
 
+		/** PC **/
 		return (
 			<>
 				<Head>
@@ -130,88 +152,92 @@ const withLayoutBasic = (Component: any) => {
 					</Stack>
 
 					{/* Page banner header */}
-					<Box
-						component="div"
-						className="header-basic"
-						sx={{
-							position: 'relative',
-							height: 220,
-							backgroundImage: `url(${pageConfig.bgImage})`,
-							backgroundSize: 'cover',
-							backgroundPosition: 'center',
-							overflow: 'hidden',
-							'&::before': {
-								content: '""',
-								position: 'absolute',
-								inset: 0,
-								background: 'linear-gradient(135deg, rgba(26,10,18,0.85) 0%, rgba(255,77,141,0.3) 100%)',
-							},
-						}}
-					>
-						<Stack
+					{true && (
+						<Box
+							component="div"
+							className="header-basic"
 							sx={{
 								position: 'relative',
-								zIndex: 1,
-								height: '100%',
-								maxWidth: 1280,
-								mx: 'auto',
-								px: 4,
-								justifyContent: 'center',
+								height: 220,
+								marginTop: '72px',
+								backgroundImage: `url(${pageConfig.bgImage})`,
+								backgroundSize: 'cover',
+								backgroundPosition: 'center',
+								backgroundColor: '#FFE4EF',
+								overflow: 'hidden',
+								'&::before': {
+									content: '""',
+									position: 'absolute',
+									inset: 0,
+									background: 'linear-gradient(135deg, rgba(26,10,18,0.85) 0%, rgba(255,77,141,0.3) 100%)',
+								},
 							}}
 						>
-							<Typography
+							<Stack
 								sx={{
-									fontSize: 36,
-									fontWeight: 800,
-									color: '#fff',
-									mb: 0.75,
-									letterSpacing: -0.5,
-									textShadow: '0 2px 12px rgba(0,0,0,0.3)',
+									position: 'relative',
+									zIndex: 1,
+									height: '100%',
+									maxWidth: 1280,
+									mx: 'auto',
+									px: 4,
+									justifyContent: 'center',
 								}}
 							>
-								{t(pageConfig.title)}
-							</Typography>
-							{pageConfig.desc && (
 								<Typography
 									sx={{
-										fontSize: 15,
-										color: 'rgba(255,255,255,0.75)',
-										fontWeight: 400,
+										fontSize: 36,
+										fontWeight: 800,
+										color: '#fff',
+										mb: 0.75,
+										letterSpacing: -0.5,
+										textShadow: '0 2px 12px rgba(0,0,0,0.3)',
 									}}
 								>
-									{t(pageConfig.desc)}
+									{t(pageConfig.title)}
 								</Typography>
-							)}
-
-							{/* Decorative dots */}
-							<Box
-								component="div"
-								sx={{
-									position: 'absolute',
-									right: 80,
-									top: '50%',
-									transform: 'translateY(-50%)',
-									display: 'flex',
-									gap: 1,
-									opacity: 0.3,
-								}}
-							>
-								{[40, 60, 80, 50, 30].map((size, i) => (
-									<Box
-										key={i}
-										component="div"
+								{pageConfig.desc && (
+									<Typography
 										sx={{
-											width: size,
-											height: size,
-											borderRadius: '50%',
-											border: '2px solid #FF85B3',
+											fontSize: 15,
+											color: 'rgba(255,255,255,0.75)',
+											fontWeight: 400,
 										}}
-									/>
-								))}
-							</Box>
-						</Stack>
-					</Box>
+									>
+										{t(pageConfig.desc)}
+									</Typography>
+								)}
 
+								<Box
+									component="div"
+									sx={{
+										position: 'absolute',
+										right: 80,
+										top: '50%',
+										transform: 'translateY(-50%)',
+										display: 'flex',
+										gap: 1,
+										opacity: 0.3,
+									}}
+								>
+									{[40, 60, 80, 50, 30].map((size, i) => (
+										<Box
+											key={i}
+											component="div"
+											sx={{
+												width: size,
+												height: size,
+												borderRadius: '50%',
+												border: '2px solid #FF85B3',
+											}}
+										/>
+									))}
+								</Box>
+							</Stack>
+						</Box>
+					)}
+
+					{/* Full page (login) — navbar ostida 64px bo'shliq kerak */}
 					<Stack id="main" sx={{ flex: 1 }}>
 						<Component {...props} />
 					</Stack>

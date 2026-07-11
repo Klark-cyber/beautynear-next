@@ -269,3 +269,98 @@ export const GET_COMMENTS = gql`
 		}
 	}
 `;
+/**************************
+ *           FAQ          *
+ *************************/
+
+export const GET_ALL_FAQS_BY_ADMIN = gql`
+	query GetAllFaqsByAdmin($input: AllFaqsInquiry!) {
+		getAllFaqsByAdmin(input: $input) {
+			list {
+				_id
+				faqCategory
+				faqStatus
+				faqQuestion
+				faqAnswer
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
+ *         NOTICE         *
+ *************************/
+
+export const GET_ALL_NOTICES_BY_ADMIN = gql`
+	query GetAllNoticesByAdmin($input: AllNoticesInquiry!) {
+		getAllNoticesByAdmin(input: $input) {
+			list {
+				_id
+				noticeType
+				noticeStatus
+				noticeTitle
+				noticeContent
+				noticeViews
+				noticePinned
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
+ *         INQUIRY        *
+ *************************/
+
+export const GET_ALL_INQUIRIES_BY_ADMIN = gql`
+	query GetAllInquiriesByAdmin($input: AllInquiriesInquiry!) {
+		getAllInquiriesByAdmin(input: $input) {
+			list {
+				_id
+				inquiryStatus
+				inquirySubject
+				inquiryMessage
+				inquiryReply
+				memberId
+				createdAt
+				updatedAt
+				memberData {
+					_id
+					memberNick
+					memberPhone
+					memberImage
+				}
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+export const GET_AGENT_REQUESTS = gql`
+	query GetAgentRequests($input: MembersInquiry!) {
+		getAgentRequests(input: $input) {
+			list {
+				_id
+				memberNick
+				memberFullName
+				memberPhone
+				memberImage
+				memberEmail
+				createdAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;

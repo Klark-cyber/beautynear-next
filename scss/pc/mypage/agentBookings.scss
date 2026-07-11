@@ -1,0 +1,49 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   AGENT BOOKINGS ("Booking Requests" — MyPage ichida)
+   ⚠️ .booking-row, .booking-salon-name, .booking-service, .filter-tabs,
+   .follow-page-frame kabi klasslar allaqachon myBookings.scss/mypage.scss
+   ichida (.mypage-content scope'i ostida) mavjud — bu komponent ham
+   className="mypage-content" ildizidan foydalangani uchun ular avtomatik
+   qo'llaniladi, qayta yozish shart emas. Faqat yangi .status-select
+   qo'shiladi.
+   main.scss ga: @import '/scss/pc/mypage/agentBookings';
+═══════════════════════════════════════════════════════════════════════ */
+
+.mypage-page {
+    .mypage-main {
+        .mypage-content {
+            .status-select {
+                height: 32px;
+                border-radius: 8px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #fff !important;
+
+                .MuiSelect-select {
+                    padding: 4px 24px 4px 12px !important;
+                }
+
+                .MuiOutlinedInput-notchedOutline {
+                    border: none !important;
+                }
+
+                &.paused {
+                    background: #F5A623;
+                }
+
+                &.active {
+                    background: #3EA043;
+                }
+
+                &.deleted {
+                    background: #9e9e9e;
+                }
+
+                .MuiSelect-icon {
+                    color: #fff !important;
+                }
+            }
+        }
+    }
+}

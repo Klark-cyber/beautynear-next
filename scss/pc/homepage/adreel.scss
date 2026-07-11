@@ -1,0 +1,139 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   AD REEL — Homepage'dagi doimiy aylanib turuvchi salon reklama videosi
+   main.scss ga: @import '/scss/pc/homepage/adreel';
+═══════════════════════════════════════════════════════════════════════ */
+
+.ad-reel-section {
+    width: 100%;
+    padding: 100px 0 120px;
+    background: #FFF8FA;
+    perspective: 1800px;
+
+    .ar-frame {
+        position: relative;
+        width: calc(1300px + (100vw - 1300px) * 0.6);
+        min-width: 1300px;
+        max-width: 1760px;
+        height: 560px;
+        margin: 0 auto;
+        border-radius: 28px;
+        overflow: hidden;
+
+        /* "Oldinga chiqib turgan" effekt — nozik burilish + kop qatlamli
+		   soya, videoni sahifadan "kotarilib" turgandek korsatadi */
+        transform: rotateX(3deg) scale(1.02);
+        transform-style: preserve-3d;
+        box-shadow:
+            0 20px 40px rgba(255, 77, 141, 0.14),
+            0 45px 90px rgba(255, 77, 141, 0.16),
+            0 0 0 1px rgba(255, 255, 255, 0.6);
+        transition: transform 0.5s ease;
+
+        &:hover {
+            transform: rotateX(0deg) scale(1.03);
+        }
+
+        &::before {
+            content: '';
+            position: absolute;
+            inset: -14px;
+            border-radius: 36px;
+            background: linear-gradient(135deg, #FFE3ED, #FFF8FA 60%);
+            z-index: -1;
+            transform: translateZ(-40px);
+        }
+    }
+
+    .ar-video {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transform: translate(-50%, -50%);
+    }
+
+    .ar-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg,
+                rgba(0, 0, 0, 0.15) 0%,
+                rgba(0, 0, 0, 0.1) 40%,
+                rgba(0, 0, 0, 0.75) 100%);
+        z-index: 1;
+    }
+
+    .ar-content {
+        position: absolute;
+        left: 56px;
+        bottom: 56px;
+        z-index: 2;
+        max-width: 560px;
+
+        .ar-eyebrow {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #FF85B3 !important;
+            margin-bottom: 10px !important;
+        }
+
+        .ar-title {
+            font-family: 'Playfair Display', serif !important;
+            font-size: 44px !important;
+            font-weight: 800 !important;
+            color: #fff !important;
+            line-height: 1.15 !important;
+            margin-bottom: 12px !important;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .ar-sub {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 15px !important;
+            color: rgba(255, 255, 255, 0.85) !important;
+            line-height: 1.6 !important;
+        }
+    }
+}
+
+/* Mobil moslashuv */
+@media (max-width: 1340px) {
+    .ad-reel-section {
+        padding: 60px 0 70px;
+    }
+
+    .ad-reel-section .ar-frame {
+        width: 92vw;
+        min-width: unset;
+        height: 420px;
+        border-radius: 20px;
+        transform: none;
+
+        &:hover {
+            transform: none;
+        }
+
+        &::before {
+            inset: -8px;
+            border-radius: 26px;
+        }
+    }
+
+    .ad-reel-section .ar-content {
+        left: 28px;
+        bottom: 32px;
+        max-width: 85%;
+
+        .ar-title {
+            font-size: 28px !important;
+        }
+
+        .ar-sub {
+            font-size: 13px !important;
+        }
+    }
+}

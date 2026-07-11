@@ -17,7 +17,7 @@ import moment from 'moment';
 const CommunityHighlights = () => {
     const { t } = useTranslation('common');
     const device = useDeviceDetect();
-    const [articles, setArticles] = useState < BoardArticle[] > ([]);
+    const [articles, setArticles] = useState<BoardArticle[]>([]);
 
     useQuery(GET_BOARD_ARTICLES, {
         fetchPolicy: 'cache-and-network',
@@ -34,8 +34,12 @@ const CommunityHighlights = () => {
     if (!articles.length) return null;
 
     const ArticleCard = ({ article }: { article: BoardArticle }) => {
-        const img = article.articleImage ? `${REACT_APP_API_URL}/${article.articleImage}` : '/img/community/default.jpg';
-        const authorImg = article.memberData?.memberImage ? `${REACT_APP_API_URL}/${article.memberData.memberImage}` : '/img/profile/defaultUser.svg';
+        const img = article.articleImage
+            ? (article.articleImage.startsWith('http') ? article.articleImage : `${REACT_APP_API_URL}/${article.articleImage}`)
+            : '/img/community/default.jpg';
+        const authorImg = article.memberData?.memberImage
+            ? (article.memberData.memberImage.startsWith('http') ? article.memberData.memberImage : `${REACT_APP_API_URL}/${article.memberData.memberImage}`)
+            : '/img/profile/defaultUser.svg';
 
         return (
             <Link href={`/community/detail?articleCategory=${article.articleCategory}&id=${article._id}`}>

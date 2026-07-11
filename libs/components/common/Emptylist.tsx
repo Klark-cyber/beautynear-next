@@ -8,6 +8,7 @@ interface EmptyListProps {
 	desc?: string;
 	buttonText?: string;
 	buttonHref?: string;
+	onButtonClick?: () => void; // ⚠️ YANGI — oddiy navigatsiya emas, maxsus handler (masalan to'liq reset) uchun
 	emoji?: string;
 }
 
@@ -16,6 +17,7 @@ const EmptyList = ({
 	desc,
 	buttonText,
 	buttonHref,
+	onButtonClick,
 	emoji = '🔍',
 }: EmptyListProps) => {
 	const { t } = useTranslation('common');
@@ -84,9 +86,9 @@ const EmptyList = ({
 				{desc ?? t('Try adjusting your search or filters')}
 			</Typography>
 
-			{buttonText && buttonHref && (
+			{buttonText && (buttonHref || onButtonClick) && (
 				<Button
-					onClick={() => router.push(buttonHref)}
+					onClick={() => (onButtonClick ? onButtonClick() : router.push(buttonHref!))}
 					sx={{
 						px: 3,
 						py: 1.25,

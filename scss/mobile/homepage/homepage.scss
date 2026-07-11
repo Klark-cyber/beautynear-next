@@ -861,3 +861,141 @@
         }
     }
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// HAQIQIY mobil hero (LayoutHome.tsx dan) — .header-main, .hero-bg-mobile
+// va h.k. avval FAQAT desktop CSS'da mavjud edi (min-width:1300px bilan),
+// shuning uchun mobil ekranda element chapga "tiqilib qolgan" edi.
+// ═══════════════════════════════════════════════════════════════════════
+#mobile-wrap {
+    .header-main {
+        position: relative;
+        width: 100%;
+        min-width: 0; // ⚠️ Desktop'dagi min-width:1300px ni bekor qilish
+        max-width: 100%;
+        margin: 0;
+        height: 460px;
+        overflow: hidden;
+        border-radius: 0 0 20px 20px;
+
+        .hero-bg-mobile {
+            position: absolute;
+            inset: 0;
+            background-image: url('/img/banner/hero.jpg');
+            background-size: cover;
+            background-position: center;
+            background-color: #FFF8FA;
+            z-index: 0;
+        }
+
+        .hero-overlay-mobile {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(255, 248, 250, 0.55) 0%,
+                    rgba(255, 248, 250, 0.75) 55%,
+                    rgba(255, 248, 250, 0.95) 100%);
+            z-index: 1;
+        }
+
+        .hero-mobile-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            padding: 40px 20px 24px;
+
+            .hero-h1-mobile {
+                font-family: 'Playfair Display', serif !important;
+                font-size: 30px !important;
+                font-weight: 800 !important;
+                line-height: 1.2 !important;
+                color: #1a1a1a !important;
+
+                .pink {
+                    color: #FF4D8D;
+                }
+            }
+
+            .hero-sub-mobile {
+                margin-top: 10px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13.5px !important;
+                color: #666 !important;
+                line-height: 1.6 !important;
+                margin-bottom: 18px !important;
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// AD REEL (video) — mobil uchun aniq, #mobile-wrap orqali kuchli qoida
+// (avvalgi faqat @media qoidasi CSS yuklash tartibiga qarab yetarlicha
+// kuchli bolmasligi mumkin edi)
+// ═══════════════════════════════════════════════════════════════════════
+#mobile-wrap {
+    .ad-reel-section {
+        padding: 40px 0 48px !important;
+
+        .ar-frame {
+            width: 92vw !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            height: 320px !important;
+            margin: 0 auto !important;
+            border-radius: 18px !important;
+            transform: none !important;
+
+            &::before {
+                inset: -6px !important;
+                border-radius: 24px !important;
+            }
+        }
+
+        .ar-content {
+            left: 20px !important;
+            bottom: 24px !important;
+            max-width: 88% !important;
+
+            .ar-title {
+                font-size: 22px !important;
+            }
+
+            .ar-sub {
+                font-size: 12px !important;
+            }
+        }
+    }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TIZIMLI TUZATISH — quyidagi 5 ta bo'limning barchasida (Category Chips,
+// How It Works, Featured Clinics, Trending Services, Popular Salons)
+// desktop uchun mo'ljallangan "min-width:1300px" konteyner qoidasi mobil
+// CSS'da hech qachon bekor qilinmagan edi — shuning uchun barchasi
+// chapga "tiqilib qolgan", o'ng tarafda katta bo'shliq (aslida — ekrandan
+// tashqarida yashiringan qism) hosil bo'lar edi.
+// ═══════════════════════════════════════════════════════════════════════
+#mobile-wrap {
+
+    .category-chips-section,
+    .how-it-works-section,
+    .featured-clinics-section,
+    .trending-services-section,
+    .popular-salons-section {
+        min-width: 0 !important;
+        width: 100% !important;
+    }
+
+    .chips-container,
+    .hiw-container,
+    .fc-container,
+    .ts-container,
+    .ps-container {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        padding: 0 16px !important;
+        box-sizing: border-box !important;
+    }
+}

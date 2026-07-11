@@ -1,308 +1,322 @@
 import React, { useState } from 'react';
-import { Stack, Box, Typography, IconButton, Divider, TextField, Button } from '@mui/material';
+import { Stack, Box, Typography, InputBase, IconButton } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send';
 import InstagramIcon from '@mui/icons-material/Instagram';
-import TwitterIcon from '@mui/icons-material/Twitter';
-import YouTubeIcon from '@mui/icons-material/YouTube';
+import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import AppleIcon from '@mui/icons-material/Apple';
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
+import RateReviewOutlinedIcon from '@mui/icons-material/RateReviewOutlined';
+import GppGoodOutlinedIcon from '@mui/icons-material/GppGoodOutlined';
+import SearchIcon from '@mui/icons-material/Search';
+import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import Link from 'next/link';
-import moment from 'moment';
+
+// Google Play uchburchak ikonkasi
+const GooglePlayIcon = () => (
+	<svg width="26" height="26" viewBox="0 0 24 24">
+		<path d="M3.6 1.8L13.7 12 3.6 22.2c-.4-.2-.6-.6-.6-1.1V2.9c0-.5.2-.9.6-1.1z" fill="#00D7FE" />
+		<path d="M17.2 8.5L13.7 12 3.6 1.8c.2-.1.5-.1.8.1l12.8 6.6z" fill="#00F076" />
+		<path d="M17.2 15.5L4.4 22.1c-.3.2-.6.2-.8.1L13.7 12l3.5 3.5z" fill="#F63448" />
+		<path d="M21.4 10.9c.8.4.8 1.8 0 2.2l-4.2 2.4-3.5-3.5 3.5-3.5 4.2 2.4z" fill="#FFC900" />
+	</svg>
+);
+
+const PETALS = [
+	{ top: '8%', left: '-6%', size: 34, blur: 3, opacity: 0.55, delay: 0 },
+	{ top: '55%', left: '-10%', size: 22, blur: 4, opacity: 0.5, delay: 1.4 },
+	{ top: '12%', right: '-8%', size: 42, blur: 4, opacity: 0.6, delay: 0.7 },
+	{ top: '70%', right: '-5%', size: 26, blur: 3, opacity: 0.5, delay: 2 },
+];
+
+const FEATURES = [
+	{ icon: <CalendarMonthOutlinedIcon />, title: 'Easy Booking', desc: 'In just a few taps' },
+	{ icon: <RateReviewOutlinedIcon />, title: 'Real Reviews', desc: 'From verified customers' },
+	{ icon: <GppGoodOutlinedIcon />, title: 'Secure Payment', desc: 'Safe & trusted' },
+];
 
 const Footer = () => {
 	const device = useDeviceDetect();
 	const { t } = useTranslation('common');
+	const router = useRouter();
 	const [email, setEmail] = useState('');
+	const [lang, setLang] = useState<string>('en');
 
-	const socialLinks = [
-		{ icon: <InstagramIcon />, href: 'https://instagram.com', label: 'Instagram' },
-		{ icon: <TwitterIcon />, href: 'https://twitter.com', label: 'Twitter' },
-		{ icon: <YouTubeIcon />, href: 'https://youtube.com', label: 'YouTube' },
-	];
+	// Hydration-safe: localStorage faqat mount dan keyin (clientda) o'qiladi
+	React.useEffect(() => {
+		const stored = localStorage.getItem('locale');
+		if (stored) setLang(stored);
+	}, []);
 
-	const footerLinks = {
-		company: [
-			{ label: 'About Us', href: '/about' },
-			{ label: 'Careers', href: '/careers' },
-			{ label: 'Blog', href: '/blog' },
-			{ label: 'Press', href: '/press' },
-		],
-		forCustomers: [
-			{ label: 'How It Works', href: '/how-it-works' },
-			{ label: 'Gallery', href: '/gallery' },
-			{ label: 'Help Center', href: '/cs' },
-			{ label: 'Terms & Conditions', href: '/terms' },
-		],
-		forPartners: [
-			{ label: 'Partner with Us', href: '/partner' },
-			{ label: 'Business Login', href: '/account/join' },
-			{ label: 'Resources', href: '/resources' },
-		],
+	/** HANDLERS **/
+	const langChoice = async (locale: string) => {
+		setLang(locale);
+		localStorage.setItem('locale', locale);
+		await router.push(router.asPath, router.asPath, { locale });
 	};
 
-	const LinkItem = ({ label, href }: { label: string; href: string }) => (
-		<Link href={href}>
-			<Typography
-				component="span"
-				sx={{
-					display: 'block',
-					fontSize: 13,
-					color: 'rgba(255,255,255,0.65)',
-					cursor: 'pointer',
-					mb: 0.75,
-					transition: 'all 0.2s',
-					'&:hover': {
-						color: '#FF85B3',
-						transform: 'translateX(4px)',
-					},
-				}}
-			>
-				{t(label)}
-			</Typography>
-		</Link>
-	);
+	const subscribeHandler = () => {
+		if (!email) return;
+		setEmail('');
+		// TODO: subscribe mutation
+	};
 
-	// ── MOBILE ──────────────────────────────────────────────────────────────────
+	const companyLinks = [
+		{ label: 'About Us', href: '/about' },
+		{ label: 'Careers', href: '/cs' },
+		{ label: 'Press', href: '/cs' },
+		{ label: 'Blog', href: '/community' },
+	];
+	const customerLinks = [
+		{ label: 'How It Works', href: '/about' },
+		{ label: 'Safety', href: '/cs' },
+		{ label: 'Help Center', href: '/cs' },
+		{ label: 'Terms & Conditions', href: '/cs' },
+	];
+	const partnerLinks = [
+		{ label: 'Partner with Us', href: '/cs' },
+		{ label: 'Business Login', href: '/account/join' },
+		{ label: 'Resources', href: '/cs' },
+	];
+
+	/** MOBILE **/
 	if (device === 'mobile') {
 		return (
-			<Stack
-				sx={{
-					background: 'linear-gradient(160deg, #1a0a12 0%, #2d1020 100%)',
-					pt: 4,
-					pb: 2,
-					px: 3,
-				}}
-			>
-				{/* Logo & desc */}
-				<Box component="div" sx={{ mb: 3 }}>
-					<img src="/img/logo/logoWhite.svg" alt="BeautyNear" height={32} />
-					<Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: 12, mt: 1, lineHeight: 1.6 }}>
-						{t('Your beauty journey starts here.')}
-					</Typography>
-				</Box>
-
-				{/* Social */}
-				<Stack direction="row" gap={1} sx={{ mb: 3 }}>
-					{socialLinks.map((s) => (
-						<IconButton
-							key={s.label}
-							component="a"
-							href={s.href}
-							target="_blank"
-							sx={{
-								color: 'rgba(255,255,255,0.6)',
-								border: '1px solid rgba(255,255,255,0.15)',
-								borderRadius: 2,
-								width: 36,
-								height: 36,
-								transition: 'all 0.25s',
-								'&:hover': {
-									color: '#FF4D8D',
-									borderColor: '#FF4D8D',
-									background: 'rgba(255,77,141,0.1)',
-									transform: 'translateY(-3px)',
-								},
-							}}
-						>
-							{s.icon}
-						</IconButton>
-					))}
+			<Stack className="footer-container mobile">
+				<Stack className="footer-brand">
+					<img src="/img/logo/logo.png" alt="BeautyNear" className="footer-logo" />
+					<Typography className="footer-tagline">{t('Your beauty journey starts here.')}</Typography>
+					<Stack direction="row" className="footer-socials">
+						<Box component="div" className="social-btn"><InstagramIcon /></Box>
+						<Box component="div" className="social-btn"><ChatBubbleIcon /></Box>
+						<Box component="div" className="social-btn"><MusicNoteIcon /></Box>
+					</Stack>
 				</Stack>
-
-				<Divider sx={{ borderColor: 'rgba(255,255,255,0.08)', mb: 2 }} />
-
-				<Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 11, textAlign: 'center' }}>
-					© {moment().year()} BeautyNear. {t('All rights reserved.')}
-				</Typography>
+				<Typography className="footer-copy">© 2025 BeautyNear. All rights reserved.</Typography>
 			</Stack>
 		);
 	}
 
-	// ── DESKTOP ─────────────────────────────────────────────────────────────────
+	/** PC **/
 	return (
-		<Stack
-			sx={{
-				background: 'linear-gradient(160deg, #1a0a12 0%, #2d1020 100%)',
-				pt: 6,
-				pb: 3,
-			}}
-		>
-			<Stack
-				sx={{
-					maxWidth: 1280,
-					mx: 'auto',
-					width: '100%',
-					px: 4,
-				}}
-			>
-				{/* Top row */}
-				<Stack direction="row" justifyContent="space-between" alignItems="flex-start" gap={4} sx={{ mb: 5 }}>
-					{/* Brand */}
-					<Box component="div" sx={{ maxWidth: 260 }}>
-						<Box
-							component="div"
-							sx={{
-								mb: 2,
-								transition: 'filter 0.25s',
-								'&:hover': { filter: 'drop-shadow(0 0 8px rgba(255,133,179,0.5))' },
-							}}
-						>
-							<img src="/img/logo/logoWhite.svg" alt="BeautyNear" height={36} />
-						</Box>
-						<Typography sx={{ color: 'rgba(255,255,255,0.55)', fontSize: 13, lineHeight: 1.7, mb: 2.5 }}>
-							{t('Your beauty journey starts here. Premium K-Beauty salons & clinics.')}
-						</Typography>
+		<Stack className="footer-wrap">
 
-						{/* Social icons */}
-						<Stack direction="row" gap={1}>
-							{socialLinks.map((s) => (
-								<IconButton
-									key={s.label}
-									component="a"
-									href={s.href}
-									target="_blank"
-									aria-label={s.label}
-									sx={{
-										color: 'rgba(255,255,255,0.6)',
-										border: '1px solid rgba(255,255,255,0.15)',
-										borderRadius: 2,
-										width: 38,
-										height: 38,
-										transition: 'all 0.25s',
-										'&:hover': {
-											color: '#FF4D8D',
-											borderColor: '#FF4D8D',
-											background: 'rgba(255,77,141,0.1)',
-											transform: 'translateY(-4px)',
-											boxShadow: '0 8px 16px rgba(255,77,141,0.2)',
-										},
-									}}
-								>
-									{s.icon}
-								</IconButton>
-							))}
+			{/* ═══ SECTION 1 — APP DOWNLOAD BANNER ═══ */}
+			<Stack className="app-banner" direction="row">
+				{PETALS.map((p, i) => (
+					<Box key={i} component="div" className="ab-petal" sx={{
+						top: p.top,
+						...(p.left ? { left: p.left } : {}),
+						...(p.right ? { right: p.right } : {}),
+						width: p.size, height: p.size,
+						opacity: p.opacity,
+						filter: `blur(${p.blur}px)`,
+						animationDelay: `${p.delay}s`,
+					}} />
+				))}
+
+				{/* LEFT — heading + store buttons */}
+				<Stack className="ab-left">
+					<Typography className="ab-title">{'Beauty in your pocket'}</Typography>
+					<Typography className="ab-desc">
+						{'Download the app and book your beauty'}
+						<br />
+						{'anytime, anywhere.'}
+					</Typography>
+					<Stack direction="row" className="store-btns">
+						<Box component="div" className="store-btn">
+							<AppleIcon className="store-icon" />
+							<Stack>
+								<Typography className="store-sub">Download on the</Typography>
+								<Typography className="store-name">App Store</Typography>
+							</Stack>
+						</Box>
+						<Box component="div" className="store-btn">
+							<Box component="div" className="store-icon-svg"><GooglePlayIcon /></Box>
+							<Stack>
+								<Typography className="store-sub">GET IT ON</Typography>
+								<Typography className="store-name">Google Play</Typography>
+							</Stack>
+						</Box>
+					</Stack>
+				</Stack>
+
+				{/* CENTER — floating phones */}
+				<Stack className="ab-phones" direction="row">
+					{/* Phone 1 — Home */}
+					<Box component="div" className="phone phone-left">
+						<Box component="div" className="phone-notch" />
+						<Stack className="phone-screen">
+							<Stack direction="row" justifyContent="space-between" alignItems="center">
+								<Typography className="ph-hello">Hello, Jessica 👋</Typography>
+							</Stack>
+							<Stack direction="row" alignItems="center" gap={0.5} className="ph-search">
+								<SearchIcon sx={{ fontSize: 10, color: '#FF4D8D' }} />
+								<Typography className="ph-search-text">Search services, salons...</Typography>
+							</Stack>
+							<Stack direction="row" justifyContent="space-between" className="ph-cats">
+								{['💅', '🧖‍♀️', '✂️', '🪷', '💉'].map((e, i) => (
+									<Stack key={i} alignItems="center" gap={0.25}>
+										<Box component="div" className="ph-cat-icon">{e}</Box>
+									</Stack>
+								))}
+							</Stack>
+							<Stack direction="row" justifyContent="space-between" alignItems="center">
+								<Typography className="ph-section">Nearby Salons</Typography>
+								<Typography className="ph-viewall">View all</Typography>
+							</Stack>
+							<Stack direction="row" gap={0.75}>
+								<Box component="div" className="ph-card g1" />
+								<Box component="div" className="ph-card g2" />
+							</Stack>
+							<Stack direction="row" justifyContent="space-between" alignItems="center">
+								<Typography className="ph-section">Popular Services</Typography>
+								<Typography className="ph-viewall">View all</Typography>
+							</Stack>
+							<Stack direction="row" gap={0.75}>
+								<Box component="div" className="ph-card g3" />
+								<Box component="div" className="ph-card g4" />
+							</Stack>
 						</Stack>
 					</Box>
 
-					{/* Links */}
-					<Stack direction="row" gap={6}>
-						<Box component="div">
-							<Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 13, mb: 2, letterSpacing: 0.5 }}>
-								{t('Company')}
-							</Typography>
-							{footerLinks.company.map((l) => <LinkItem key={l.label} {...l} />)}
-						</Box>
-						<Box component="div">
-							<Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 13, mb: 2, letterSpacing: 0.5 }}>
-								{t('For Customers')}
-							</Typography>
-							{footerLinks.forCustomers.map((l) => <LinkItem key={l.label} {...l} />)}
-						</Box>
-						<Box component="div">
-							<Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 13, mb: 2, letterSpacing: 0.5 }}>
-								{t('For Partners')}
-							</Typography>
-							{footerLinks.forPartners.map((l) => <LinkItem key={l.label} {...l} />)}
-						</Box>
-					</Stack>
-
-					{/* Newsletter */}
-					<Box component="div" sx={{ maxWidth: 260 }}>
-						<Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 13, mb: 1, letterSpacing: 0.5 }}>
-							{t('Stay Updated')}
-						</Typography>
-						<Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: 12, mb: 2 }}>
-							{t('Subscribe to beauty tips & offers')}
-						</Typography>
-						<Stack direction="row" gap={1}>
-							<TextField
-								size="small"
-								placeholder={t('Enter your email')}
-								value={email}
-								onChange={(e) => setEmail(e.target.value)}
-								sx={{
-									flex: 1,
-									'& .MuiOutlinedInput-root': {
-										borderRadius: 2,
-										background: 'rgba(255,255,255,0.08)',
-										color: '#fff',
-										fontSize: 12,
-										'& fieldset': { borderColor: 'rgba(255,255,255,0.15)' },
-										'&:hover fieldset': { borderColor: 'rgba(255,133,179,0.5)' },
-										'&.Mui-focused fieldset': { borderColor: '#FF4D8D' },
-									},
-									'& input::placeholder': { color: 'rgba(255,255,255,0.35)', fontSize: 12 },
-								}}
-							/>
-							<Button
-								variant="contained"
-								sx={{
-									borderRadius: 2,
-									background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
-									fontSize: 12,
-									px: 2,
-									minWidth: 'auto',
-									boxShadow: '0 4px 12px rgba(255,77,141,0.35)',
-									transition: 'all 0.25s',
-									'&:hover': {
-										transform: 'translateY(-2px)',
-										boxShadow: '0 8px 20px rgba(255,77,141,0.45)',
-									},
-								}}
-							>
-								→
-							</Button>
-						</Stack>
-
-						{/* Lang flags */}
-						<Stack direction="row" gap={1} sx={{ mt: 3 }}>
-							{[
-								{ code: 'kr', flag: 'langkr.png' },
-								{ code: 'en', flag: 'langen.png' },
-								{ code: 'ru', flag: 'langru.png' },
-							].map((l) => (
-								<Box
-									key={l.code}
-									component="div"
-									sx={{
-										cursor: 'pointer',
-										opacity: 0.6,
-										transition: 'all 0.2s',
-										'&:hover': { opacity: 1, transform: 'scale(1.15)' },
-									}}
-								>
-									<img src={`/img/flag/${l.flag}`} alt={l.code} width={24} height={16} style={{ borderRadius: 3 }} />
-								</Box>
-							))}
+					{/* Phone 2 — Bookings */}
+					<Box component="div" className="phone phone-right">
+						<Box component="div" className="phone-notch" />
+						<Stack className="phone-screen">
+							<Typography className="ph-hello">Bookings</Typography>
+							<Stack direction="row" gap={1} className="ph-tabs">
+								<Typography className="ph-tab active">Upcoming</Typography>
+								<Typography className="ph-tab">Completed</Typography>
+								<Typography className="ph-tab">Cancelled</Typography>
+							</Stack>
+							<Stack direction="row" gap={0.75} alignItems="center" className="ph-booking">
+								<Box component="div" className="ph-bk-avatar" />
+								<Stack flex={1}>
+									<Typography className="ph-bk-name">Glow Skin Clinic</Typography>
+									<Typography className="ph-bk-date">May 24, 2025 · 2:00 PM</Typography>
+								</Stack>
+								<Box component="div" className="ph-bk-btn">View</Box>
+							</Stack>
+							<Stack direction="row" justifyContent="space-between" alignItems="center">
+								<Typography className="ph-section">Recommended for you</Typography>
+							</Stack>
+							<Stack direction="row" gap={0.75}>
+								<Box component="div" className="ph-card g2" />
+								<Box component="div" className="ph-card g1" />
+							</Stack>
+							<Box component="div" className="ph-offer">
+								<Typography className="ph-offer-pct">20% OFF</Typography>
+								<Typography className="ph-offer-lbl">For New Customers</Typography>
+							</Box>
 						</Stack>
 					</Box>
 				</Stack>
 
-				<Divider sx={{ borderColor: 'rgba(255,255,255,0.08)', mb: 2.5 }} />
+				{/* RIGHT — feature cards */}
+				<Stack className="ab-features">
+					{FEATURES.map((f) => (
+						<Stack key={f.title} direction="row" alignItems="center" className="feature-card">
+							<Box component="div" className="feat-icon">{f.icon}</Box>
+							<Stack>
+								<Typography className="feat-title">{t(f.title)}</Typography>
+								<Typography className="feat-desc">{t(f.desc)}</Typography>
+							</Stack>
+						</Stack>
+					))}
+				</Stack>
+			</Stack>
 
-				{/* Bottom */}
-				<Stack direction="row" justifyContent="space-between" alignItems="center">
-					<Typography sx={{ color: 'rgba(255,255,255,0.35)', fontSize: 12 }}>
-						© {moment().year()} BeautyNear. {t('All rights reserved.')}
-					</Typography>
-					<Stack direction="row" gap={3}>
-						{['Privacy', 'Terms', 'Sitemap'].map((item) => (
-							<Link key={item} href={`/${item.toLowerCase()}`}>
-								<Typography
-									component="span"
-									sx={{
-										color: 'rgba(255,255,255,0.35)',
-										fontSize: 12,
-										cursor: 'pointer',
-										transition: 'color 0.2s',
-										'&:hover': { color: '#FF85B3' },
-									}}
-								>
-									{t(item)}
-								</Typography>
+			{/* ═══ SECTION 2 — MAIN FOOTER ═══ */}
+			<Stack className="footer-container">
+				<Stack className="footer-top" direction="row">
+					{/* Brand */}
+					<Stack className="footer-brand">
+						<img src="/img/logo/logo.png" alt="BeautyNear" className="footer-logo" />
+						<Typography className="footer-tagline">
+							{t('Your beauty journey starts here.')}
+							<br />
+							{t('Premium K-Beauty salons & clinics')}
+							<br />
+							{t('near you.')}
+						</Typography>
+						<Stack direction="row" className="footer-socials">
+							<Box component="div" className="social-btn"><InstagramIcon /></Box>
+							<Box component="div" className="social-btn kakao"><ChatBubbleIcon /><span className="kakao-txt">TALK</span></Box>
+							<Box component="div" className="social-btn"><MusicNoteIcon /></Box>
+						</Stack>
+					</Stack>
+
+					{/* Company */}
+					<Stack className="footer-col">
+						<Typography className="footer-col-title">{t('Company')}</Typography>
+						{companyLinks.map((link) => (
+							<Link key={link.label} href={link.href}>
+								<Typography className="footer-link">{t(link.label)}</Typography>
 							</Link>
 						))}
 					</Stack>
+
+					{/* For Customers */}
+					<Stack className="footer-col">
+						<Typography className="footer-col-title">{t('For Customers')}</Typography>
+						{customerLinks.map((link) => (
+							<Link key={link.label} href={link.href}>
+								<Typography className="footer-link">{t(link.label)}</Typography>
+							</Link>
+						))}
+					</Stack>
+
+					{/* For Partners */}
+					<Stack className="footer-col">
+						<Typography className="footer-col-title">{t('For Partners')}</Typography>
+						{partnerLinks.map((link) => (
+							<Link key={link.label} href={link.href}>
+								<Typography className="footer-link">{t(link.label)}</Typography>
+							</Link>
+						))}
+					</Stack>
+
+					{/* Lang + Newsletter */}
+					<Stack className="footer-right">
+						<Stack direction="row" className="footer-lang-row">
+							{[
+								{ id: 'kr', label: 'KR' },
+								{ id: 'en', label: 'EN' },
+								{ id: 'ru', label: 'RU' },
+							].map((item) => (
+								<Box
+									key={item.id}
+									component="div"
+									className={`footer-lang-btn ${lang === item.id ? 'active' : ''}`}
+									onClick={() => langChoice(item.id)}
+								>
+									{item.label}
+								</Box>
+							))}
+						</Stack>
+						<Typography className="footer-newsletter-text">
+							{t('Subscribe to our newsletter')}
+							<br />
+							{t('for beauty tips & offers')}
+						</Typography>
+						<Stack direction="row" className="footer-subscribe">
+							<InputBase
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								placeholder={t('Enter your email')}
+								className="subscribe-input"
+							/>
+							<IconButton className="subscribe-btn" onClick={subscribeHandler}>
+								<SendIcon />
+							</IconButton>
+						</Stack>
+					</Stack>
 				</Stack>
+
+				<Typography className="footer-copy">© 2025 BeautyNear. All rights reserved.</Typography>
 			</Stack>
 		</Stack>
 	);

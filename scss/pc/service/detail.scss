@@ -1,418 +1,546 @@
-@import '/scss/variables.scss';
+/* ═══════════════════════════════════════════════════════════════════════
+   SERVICE DETAIL PAGE (rasmga mos: chap kontent + o'ng sticky booking)
+   main.scss ga: @import '/scss/pc/service/detail';
+   #pc-wrap ichiga joylashtiriladi
+═══════════════════════════════════════════════════════════════════════ */
 
-#pc-wrap {
-    .service-detail-page {
-        width: 100%;
-        min-height: 100vh;
-        background: $bg-page;
+.service-detail-page {
+    padding: 96px 0 80px;
+    min-height: 100vh;
+    background: #FFF8FA;
 
-        .service-detail-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 24px 32px 48px;
+    .service-detail-inner {
+        width: calc(1300px + (100vw - 1300px) * 0.6);
+        min-width: 1300px;
+        max-width: 1760px;
+        margin: 0 auto;
+    }
+
+    .back-link {
+        cursor: pointer;
+        color: #777;
+        margin-bottom: 20px;
+        transition: color 0.2s;
+        width: fit-content;
+
+        &:hover {
+            color: #FF4D8D;
         }
+    }
 
-        .back-link {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            color: $primary;
-            font-family: $font;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            width: fit-content;
-            transition: $transition;
+    .detail-columns {
+        gap: 32px;
+        align-items: flex-start;
+    }
 
-            &:hover {
-                opacity: 0.75;
+    /* ══════════ CHAP BLOK ══════════ */
+    .service-detail-left {
+        flex: 1;
+        min-width: 0;
+
+        /* Katta rasm + Before/After toggle */
+        .main-img-wrap {
+            position: relative;
+            width: 100%;
+            height: 480px;
+            border-radius: 20px;
+            overflow: hidden;
+
+            .main-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
             }
-        }
 
-        .service-detail-left {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            min-width: 0;
-        }
+            .ba-toggle {
+                position: absolute;
+                top: 16px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(255, 255, 255, 0.85);
+                backdrop-filter: blur(10px);
+                border-radius: 999px;
+                padding: 4px;
+                gap: 2px;
 
-        .gallery-section {
-            background: $white;
-            border-radius: $radius-xl;
-            padding: 20px;
-            box-shadow: $shadow-card;
+                .ba-btn {
+                    padding: 7px 22px;
+                    border-radius: 999px;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #666;
+                    cursor: pointer;
+                    transition: all 0.2s;
 
-            .main-img-wrap {
-                position: relative;
-                border-radius: $radius-lg;
-                overflow: hidden;
-
-                .like-btn {
-                    position: absolute;
-                    top: 12px;
-                    right: 12px;
-                    width: 38px;
-                    height: 38px;
-                    background: rgba(255, 255, 255, 0.92);
-                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-                    transition: $transition;
-
-                    &:hover {
-                        background: $white;
-                        transform: scale(1.1);
-                    }
-
-                    &.liked {
-                        background: rgba(255, 77, 141, 0.1);
+                    &.active {
+                        background: #fff;
+                        color: #FF4D8D;
+                        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
                     }
                 }
             }
 
-            .thumb {
-                width: 80px;
-                height: 60px;
-                border-radius: 8px;
-                background-size: cover;
-                background-position: center;
-                cursor: pointer;
-                flex-shrink: 0;
-                border: 2px solid transparent;
-                transition: $transition;
+            .like-btn {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.92) !important;
+                color: #666 !important;
+                box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 
                 &:hover {
-                    border-color: $primary-light;
+                    background: #fff !important;
+                }
+            }
+        }
+
+        .thumbnails {
+            margin-top: 14px;
+
+            .thumb {
+                flex: 1 1 0;
+                min-width: 0;
+                height: 92px;
+                border-radius: 12px;
+                background-size: cover;
+                background-position: center;
+                background-color: #FFE8F0;
+                cursor: pointer;
+                border: 2px solid transparent;
+                transition: all 0.2s;
+
+                &:hover {
+                    opacity: 0.85;
                 }
 
                 &.active {
-                    border-color: $primary;
+                    border-color: #FF4D8D;
                 }
             }
         }
 
-        .service-info-section {
-            background: $white;
-            border-radius: $radius-lg;
-            padding: 24px;
-            box-shadow: $shadow-card;
+        /* Nom + info */
+        .svc-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 28px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+            letter-spacing: -0.3px !important;
+            margin-top: 24px !important;
+        }
 
-            .service-title {
-                font-family: $font;
-                font-size: 26px;
-                font-weight: 800;
-                color: $text-dark;
-                letter-spacing: -0.5px;
-            }
+        .info-rows {
+            margin-top: 14px;
 
-            .type-chip {
-                background: rgba(255, 77, 141, 0.08);
-                color: $primary;
-                font-family: $font;
-                font-size: 12px;
-                font-weight: 600;
-                border: 1px solid rgba(255, 77, 141, 0.2);
-                height: 24px;
-            }
+            .salon-link {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 14.5px !important;
+                font-weight: 600 !important;
+                color: #FF4D8D !important;
+                cursor: pointer;
 
-            .about-section {
-                margin-top: 20px;
-                padding-top: 20px;
-                border-top: 1px solid rgba(255, 77, 141, 0.08);
-            }
-
-            .section-title {
-                font-family: $font;
-                font-size: 17px;
-                font-weight: 700;
-                color: $text-dark;
-                margin-bottom: 12px;
+                &:hover {
+                    opacity: 0.8;
+                }
             }
         }
 
-        .reviews-section {
-            background: $white;
-            border-radius: $radius-lg;
-            padding: 24px;
-            box-shadow: $shadow-card;
+        .svc-price {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 28px !important;
+            font-weight: 800 !important;
+            color: #FF4D8D !important;
+            margin-top: 14px !important;
+        }
 
-            .section-title {
-                font-family: $font;
-                font-size: 17px;
-                font-weight: 700;
-                color: $text-dark;
-                margin-bottom: 20px;
+        .type-chip {
+            background: rgba(255, 77, 141, 0.08) !important;
+            color: #FF4D8D !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 600 !important;
+            border-radius: 8px !important;
+        }
+
+        .section-sub-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 19px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+
+        .about-section,
+        .included-section,
+        .ba-results-section {
+            margin-top: 30px;
+            padding-top: 26px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+            .section-sub-title {
+                margin-bottom: 10px !important;
+            }
+        }
+
+        /* Before / After solishtirish */
+        .ba-compare {
+            position: relative;
+            margin-top: 14px;
+            height: 340px;
+            border-radius: 16px;
+            overflow: hidden;
+
+            .ba-half {
+                flex: 1;
+                background-size: cover;
+                background-position: center;
+                background-color: #FFE8F0;
             }
 
-            .rating-summary {
-                margin-bottom: 24px;
-                padding-bottom: 24px;
-                border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+            .ba-divider {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background: rgba(0, 0, 0, 0.55);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(4px);
+            }
+        }
 
-                .big-rating {
-                    font-family: $font;
-                    font-size: 48px;
-                    font-weight: 900;
-                    color: $text-dark;
-                    line-height: 1;
-                    margin-bottom: 6px;
+        /* Reviews */
+        .reviews-section {
+            margin-top: 32px;
+            padding-top: 28px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+            .rating-summary {
+                margin-top: 18px;
+
+                .big-rating-box {
+                    background: #fff;
+                    border-radius: 18px;
+                    border: 1px solid rgba(255, 77, 141, 0.1);
+                    padding: 22px 34px;
+
+                    .big-rating {
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 44px !important;
+                        font-weight: 800 !important;
+                        color: #1a1a1a !important;
+                        line-height: 1 !important;
+                        margin-bottom: 6px !important;
+                    }
                 }
 
                 .rating-bar {
                     flex: 1;
-                    height: 6px;
-                    border-radius: 3px;
+                    height: 7px;
                     background: #f0f0f0;
+                    border-radius: 99px;
                     overflow: hidden;
 
                     .rating-fill {
                         height: 100%;
-                        border-radius: 3px;
-                        background: linear-gradient(135deg, $primary, $primary-light);
+                        background: linear-gradient(90deg, #FF6B9D, #FF4F86);
+                        border-radius: 99px;
                     }
                 }
             }
 
-            .review-list {
-                display: flex;
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .review-card {
-                padding: 16px;
-                border-radius: $radius-md;
-                border: 1px solid rgba(255, 77, 141, 0.08);
-                background: #fafafa;
-                transition: $transition;
+            .write-review-btn {
+                margin-top: 20px;
+                width: 100%;
+                height: 48px;
+                background: #fff;
+                color: #FF4D8D;
+                border: 1.5px solid rgba(255, 77, 141, 0.35);
+                border-radius: 12px;
+                font-family: 'Inter', sans-serif;
+                font-size: 14.5px;
+                font-weight: 700;
+                text-transform: none;
+                transition: all 0.2s;
 
                 &:hover {
-                    border-color: $primary-border;
+                    background: rgba(255, 77, 141, 0.04);
+                    border-color: #FF4D8D;
                 }
             }
 
-            .write-review-section {
-                margin-top: 24px;
-                padding-top: 24px;
-                border-top: 1px solid rgba(255, 77, 141, 0.08);
+            .write-review-box {
+                margin-top: 14px;
 
                 .review-textarea {
                     width: 100%;
                     min-height: 100px;
-                    padding: 12px 16px;
-                    border: 1.5px solid $primary-border;
-                    border-radius: 10px;
-                    font-family: $font;
+                    padding: 14px 16px;
+                    border: 1px solid rgba(255, 77, 141, 0.2);
+                    border-radius: 12px;
+                    font-family: 'Inter', sans-serif;
                     font-size: 14px;
-                    color: $text-dark;
+                    color: #333;
                     resize: vertical;
                     outline: none;
-                    margin-bottom: 12px;
                     box-sizing: border-box;
-                    transition: border-color 0.2s;
 
                     &:focus {
-                        border-color: $primary;
-                    }
-
-                    &::placeholder {
-                        color: $text-placeholder;
+                        border-color: #FF4D8D;
                     }
                 }
 
                 .submit-review-btn {
-                    padding: 10px 28px !important;
-                    background: linear-gradient(135deg, $primary, $primary-light) !important;
-                    color: $white !important;
-                    border-radius: 10px !important;
-                    font-family: $font !important;
-                    font-size: 14px !important;
-                    font-weight: 700 !important;
+                    margin-top: 10px;
+                    height: 42px;
+                    padding: 0 28px;
+                    background: linear-gradient(135deg, #FF6B9D, #FF4F86);
+                    color: #fff;
+                    border-radius: 10px;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 14px;
+                    font-weight: 700;
+                    text-transform: none;
 
                     &:disabled {
-                        background: #eee !important;
-                        color: #bbb !important;
+                        opacity: 0.5;
+                        color: #fff;
                     }
                 }
             }
-        }
 
-        .service-detail-right {
-            width: 340px;
-            flex-shrink: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            position: sticky;
-            top: 100px;
-            align-self: flex-start;
+            /* Review cardlar — 2 ustun */
+            .review-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 16px;
+                margin-top: 20px;
+            }
+
+            .review-grid .review-card {
+                flex: 0 0 calc((100% - 16px) / 2);
+                width: calc((100% - 16px) / 2);
+                max-width: calc((100% - 16px) / 2);
+                background: #fff;
+                border-radius: 16px;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+                padding: 18px 20px;
+                box-sizing: border-box;
+
+                gap: 8px;
+            }
         }
+    }
+
+    /* ══════════ O'NG BLOK (sticky) ══════════ */
+    .service-detail-right {
+        width: 380px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 96px;
+        gap: 20px;
 
         .booking-card {
-            background: $white;
-            border-radius: $radius-xl;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(255, 77, 141, 0.1);
+            background: #fff;
+            border-radius: 22px;
             border: 1px solid rgba(255, 77, 141, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            padding: 28px 26px;
 
-            .time-slot {
-                padding: 7px 14px;
-                border-radius: 20px;
-                border: 1.5px solid rgba(255, 77, 141, 0.2);
-                font-family: $font;
-                font-size: 13px;
-                font-weight: 500;
-                color: #555;
+            .bc-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 19px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                margin-bottom: 16px !important;
+            }
+
+            .bc-salon-info {
+                padding: 12px 14px;
+                background: #FFF5F8;
+                border-radius: 12px;
+                margin-bottom: 16px;
+
+                .bc-salon-icon {
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 10px;
+                    background: #fff;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+                }
+            }
+
+            .bc-label {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 700 !important;
+                color: #555 !important;
+                margin-bottom: 7px !important;
+            }
+
+            .time-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-bottom: 12px;
+
+                .time-slot {
+                    flex: 0 0 calc((100% - 16px) / 3);
+                    padding: 9px 0;
+                    text-align: center;
+                    border: 1px solid rgba(0, 0, 0, 0.1);
+                    border-radius: 10px;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #555;
+                    cursor: pointer;
+                    transition: all 0.18s;
+                    box-sizing: border-box;
+
+                    &:hover {
+                        border-color: #FF4D8D;
+                        color: #FF4D8D;
+                    }
+
+                    &.selected {
+                        background: #FF4D8D;
+                        border-color: #FF4D8D;
+                        color: #fff;
+                    }
+
+                    &.booked {
+                        background: #f5f5f5;
+                        color: #bbb;
+                        cursor: not-allowed;
+                        text-decoration: line-through;
+                    }
+                }
+            }
+
+            .more-times {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 600 !important;
+                color: #FF4D8D !important;
                 cursor: pointer;
-                transition: $transition;
 
-                &:hover:not(.booked) {
-                    border-color: $primary;
-                    color: $primary;
-                    transform: translateY(-1px);
-                }
-
-                &.selected {
-                    background: linear-gradient(135deg, $primary, $primary-light);
-                    color: $white;
-                    border-color: $primary;
-                    box-shadow: 0 4px 12px rgba(255, 77, 141, 0.3);
-                }
-
-                &.booked {
-                    background: #f5f5f5;
-                    color: #bbb;
-                    border-color: #eee;
-                    cursor: not-allowed;
-                    text-decoration: line-through;
+                &:hover {
+                    opacity: 0.8;
                 }
             }
 
             .book-now-btn {
-                width: 100%;
-                padding: 14px !important;
-                background: linear-gradient(135deg, $primary, $primary-light) !important;
-                color: $white !important;
-                border-radius: 12px !important;
-                font-family: $font !important;
-                font-size: 15px !important;
-                font-weight: 700 !important;
-                box-shadow: 0 6px 20px rgba(255, 77, 141, 0.35) !important;
-                transition: $transition !important;
+                height: 50px;
+                background: linear-gradient(135deg, #FF6B9D, #FF4F86);
+                color: #fff;
+                border-radius: 14px;
+                font-family: 'Inter', sans-serif;
+                font-size: 15px;
+                font-weight: 700;
+                text-transform: none;
+                box-shadow: 0 10px 28px rgba(255, 93, 146, 0.35);
+                transition: all 0.25s;
 
                 &:hover {
-                    transform: translateY(-2px) !important;
-                    box-shadow: 0 10px 28px rgba(255, 77, 141, 0.45) !important;
+                    transform: translateY(-2px);
+                    box-shadow: 0 14px 34px rgba(255, 93, 146, 0.45);
                 }
+            }
 
-                &:disabled {
-                    background: #eee !important;
-                    color: #bbb !important;
-                    box-shadow: none !important;
-                    transform: none !important;
-                }
+            .deposit-note {
+                margin-top: 14px;
+                padding: 12px 14px;
+                background: #FFF5F8;
+                border-radius: 12px;
             }
         }
 
         .specialist-card {
-            background: $white;
-            border-radius: $radius-xl;
-            padding: 24px;
-            box-shadow: $shadow-card;
-            border: 1px solid rgba(255, 77, 141, 0.08);
+            background: #fff;
+            border-radius: 22px;
+            border: 1px solid rgba(255, 77, 141, 0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.05);
+            padding: 26px 24px;
+
+            .sc-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 17px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                margin-bottom: 18px !important;
+            }
+
+            .verified-dot {
+                position: absolute;
+                bottom: 4px;
+                right: 4px;
+                width: 26px;
+                height: 26px;
+                border-radius: 50%;
+                background: #FF4D8D;
+                border: 2.5px solid #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
 
             .specialty-chip {
-                background: rgba(255, 77, 141, 0.08);
-                color: $primary;
-                font-family: $font;
-                font-size: 11px;
-                font-weight: 600;
-                border: 1px solid rgba(255, 77, 141, 0.15);
-                height: 22px;
+                background: rgba(255, 77, 141, 0.08) !important;
+                color: #FF4D8D !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11.5px !important;
+                font-weight: 600 !important;
+                border-radius: 8px !important;
             }
 
             .follow-btn {
-                border: 1.5px solid $primary !important;
-                color: $primary !important;
-                border-radius: 10px !important;
-                font-family: $font !important;
-                font-size: 13px !important;
-                font-weight: 700 !important;
-                transition: $transition !important;
+                flex: 1;
+                height: 42px;
+                background: linear-gradient(135deg, #FF6B9D, #FF4F86);
+                color: #fff !important;
+                border-radius: 11px;
+                font-family: 'Inter', sans-serif;
+                font-size: 13.5px;
+                font-weight: 700;
+                text-transform: none;
 
-                &:hover {
-                    background: rgba(255, 77, 141, 0.06) !important;
-                    transform: translateY(-1px) !important;
+                svg {
+                    color: #fff !important;
                 }
 
                 &.following {
-                    background: $primary !important;
-                    color: $white !important;
-                    border-color: $primary !important;
+                    background: #f5f5f5;
+                    color: #777 !important;
+
+                    svg {
+                        color: #777 !important;
+                    }
                 }
             }
 
             .view-profile-btn {
-                border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
-                color: #555 !important;
-                border-radius: 10px !important;
-                font-family: $font !important;
-                font-size: 13px !important;
-                font-weight: 600 !important;
-                transition: $transition !important;
+                height: 42px;
+                background: #fff;
+                color: #FF4D8D;
+                border: 1.5px solid rgba(255, 77, 141, 0.35);
+                border-radius: 11px;
+                font-family: 'Inter', sans-serif;
+                font-size: 13.5px;
+                font-weight: 700;
+                text-transform: none;
 
                 &:hover {
-                    background: #f5f5f5 !important;
-                    transform: translateY(-1px) !important;
-                }
-            }
-        }
-
-        .salon-mini-card {
-            background: $white;
-            border-radius: $radius-xl;
-            padding: 24px;
-            box-shadow: $shadow-card;
-            border: 1px solid rgba(255, 77, 141, 0.08);
-
-            .salon-mini-img {
-                height: 120px;
-                border-radius: $radius-md;
-                background-size: cover;
-                background-position: center;
-            }
-
-            .follow-btn {
-                border: 1.5px solid $primary !important;
-                color: $primary !important;
-                border-radius: 10px !important;
-                font-family: $font !important;
-                font-size: 13px !important;
-                font-weight: 700 !important;
-                transition: $transition !important;
-
-                &:hover {
-                    background: rgba(255, 77, 141, 0.06) !important;
-                }
-
-                &.following {
-                    background: $primary !important;
-                    color: $white !important;
-                    border-color: $primary !important;
-                }
-            }
-
-            .view-salon-btn {
-                border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
-                color: #555 !important;
-                border-radius: 10px !important;
-                font-family: $font !important;
-                font-size: 13px !important;
-                font-weight: 600 !important;
-                transition: $transition !important;
-
-                &:hover {
-                    background: #f5f5f5 !important;
+                    background: rgba(255, 77, 141, 0.04);
                 }
             }
         }

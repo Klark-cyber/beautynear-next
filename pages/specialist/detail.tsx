@@ -48,6 +48,22 @@ export const getServerSideProps = async ({ locale }: any) => ({
     props: { ...(await serverSideTranslations(locale, ['common'])) },
 });
 
+// ⚠️ Rasm URL'i to'liq (https://...) yoki nisbiy (uploads/...) bo'lishi mumkin —
+// ikkalasini ham to'g'ri boshqarish uchun umumiy helper
+const imgUrl = (raw?: string, fallback = ''): string => {
+    if (!raw) return fallback;
+    return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
+};
+
+// ⚠️ .toLocaleString() ISHLATMAYMIZ — server va brauzer turli locale bilan
+// formatlab, hydration mismatch xatosiga olib keladi (masalan server "10,000",
+// rus tilidagi brauzer "10 000" chiqaradi). Buning o'rniga har doim bir xil
+// natija beradigan sof regex-based helper ishlatamiz.
+const formatPrice = (n?: number): string => {
+    if (n === undefined || n === null) return '0';
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 const generateTimeSlots = (workHours: string): string[] => {
     try {
         const [start, end] = workHours.split('-');
@@ -79,7 +95,7 @@ const SpecialistDetail: NextPage = () => {
     const memberId = router.query.id as string;
 
     const [specialist, setSpecialist] = useState<Member | null>(null);
-    const [salon, setSalon] = useState<Salon | null>(null);
+    const [salons, setSalons] = useState<Salon[]>([]);
     const [services, setServices] = useState<Service[]>([]);
     const [comments, setComments] = useState<Comment[]>([]);
     const [commentTotal, setCommentTotal] = useState(0);
@@ -91,6 +107,16 @@ const SpecialistDetail: NextPage = () => {
     const [bookingLoading, setBookingLoading] = useState(false);
     const [activeTab, setActiveTab] = useState(0);
     const [showAllSlots, setShowAllSlots] = useState(false);
+
+    // Tanlangan xizmatning o'z salonId'si orqali, 'salons' ro'yxatidan
+    // to'liq salon ma'lumotini topamiz (ish vaqti, booking uchun kerak)
+    const selectedSalon: Salon | null = React.useMemo(() => {
+        const svc = services.find((s) => s._id === selectedService);
+        if (!svc) return null;
+        // ⚠️ String() bilan solishtirish — ObjectId/string turi mos
+        // kelmasligi tufayli "salonId not provided" xatosining oldini oladi
+        return salons.find((s) => String(s._id) === String(svc.salonId)) ?? null;
+    }, [selectedService, services, salons]);
 
     const [commentInquiry, setCommentInquiry] = useState<CommentsInquiry>({
         page: 1, limit: 5, sort: 'createdAt', direction: Direction.DESC,
@@ -130,9 +156,20 @@ const SpecialistDetail: NextPage = () => {
         },
     });
 
+    // Justin'ga tegishli BARCHA salonlar — "Salons" bo'limi uchun (to'liq
+    // salon ma'lumoti bilan — booking uchun ham shu ro'yxatdan foydalanamiz)
+    useQuery(GET_SALONS, {
+        fetchPolicy: 'network-only',
+        variables: { input: { page: 1, limit: 20, search: { memberId } } },
+        skip: !memberId,
+        onCompleted: (data: T) => setSalons(data?.getSalons?.list ?? []),
+    });
+
+    // Barcha salonlaridagi barcha xizmatlar — faqat booking dropdown'i uchun
+    // (alohida "Services offered" bo'limi sifatida ko'rsatilmaydi)
     useQuery(GET_SERVICES, {
         fetchPolicy: 'cache-and-network',
-        variables: { input: { page: 1, limit: 10, sort: 'createdAt', direction: Direction.DESC, search: {} } },
+        variables: { input: { page: 1, limit: 50, sort: 'createdAt', direction: Direction.DESC, search: { memberId } } },
         skip: !memberId,
         onCompleted: (data: T) => setServices(data?.getServices?.list ?? []),
     });
@@ -160,22 +197,26 @@ const SpecialistDetail: NextPage = () => {
     }, [commentInquiry]);
 
     useEffect(() => {
-        if (selectedDate && memberId && salon) {
+        if (selectedDate && memberId && selectedSalon) {
             const booked = myBookings
-                .filter((b) => b.salonId === salon._id &&
+                .filter((b) => b.salonId === selectedSalon._id &&
                     moment(b.bookingDate).format('YYYY-MM-DD') === selectedDate &&
                     b.bookingStatus !== BookingStatus.CANCELLED)
                 .map((b) => b.bookingTime);
             setBookedSlots(booked);
         }
-    }, [selectedDate, memberId, myBookings, salon]);
+    }, [selectedDate, memberId, myBookings, selectedSalon]);
 
     /** HANDLERS **/
     const likeHandler = useCallback(async () => {
         try {
             if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
             await likeTargetMember({ variables: { input: memberId } });
-            await memberRefetch({ input: memberId });
+            // ⚠️ TUZATILDI: onCompleted refetch()da ishonchli qayta ishga
+            // tushmasligi mumkin — refetch natijasidan to'g'ridan-to'g'ri
+            // state'ni yangilaymiz
+            const result = await memberRefetch({ input: memberId });
+            if (result?.data?.getMember) setSpecialist(result.data.getMember);
             await sweetTopSmallSuccessAlert('success', 800);
         } catch (err: any) {
             sweetMixinErrorAlert(err.message).then();
@@ -191,7 +232,8 @@ const SpecialistDetail: NextPage = () => {
             } else {
                 await subscribe({ variables: { input: { followingId: memberId } } });
             }
-            await memberRefetch({ input: memberId });
+            const result = await memberRefetch({ input: memberId });
+            if (result?.data?.getMember) setSpecialist(result.data.getMember);
             await sweetTopSmallSuccessAlert(isFollowing ? 'Unfollowed' : 'Following!', 800);
         } catch (err: any) {
             sweetMixinErrorAlert(err.message).then();
@@ -204,10 +246,11 @@ const SpecialistDetail: NextPage = () => {
             if (!selectedService) throw new Error(t('Please select a service'));
             if (!selectedDate) throw new Error(t('Please select a date'));
             if (!selectedTime) throw new Error(t('Please select a time'));
+            if (!selectedSalon?._id) throw new Error('Could not determine the salon for this service. Please re-select the service.');
             setBookingLoading(true);
             const paymentKey = `test_pay_${Date.now()}`;
             await createBooking({
-                variables: { input: { serviceId: selectedService, salonId: salon?._id, bookingDate: new Date(selectedDate), bookingTime: selectedTime, paymentKey } },
+                variables: { input: { serviceId: selectedService, salonId: selectedSalon?._id, bookingDate: new Date(selectedDate), bookingTime: selectedTime, paymentKey } },
             });
             await sweetTopSmallSuccessAlert(t('Booking confirmed!'), 1500);
             router.push('/mypage?category=myBookings');
@@ -216,7 +259,7 @@ const SpecialistDetail: NextPage = () => {
         } finally {
             setBookingLoading(false);
         }
-    }, [user, selectedService, selectedDate, selectedTime, salon]);
+    }, [user, selectedService, selectedDate, selectedTime, selectedSalon]);
 
     const createCommentHandler = useCallback(async () => {
         try {
@@ -235,11 +278,11 @@ const SpecialistDetail: NextPage = () => {
         </Stack>
     );
 
-    const profileImg = specialist.memberImage ? `${REACT_APP_API_URL}/${specialist.memberImage}` : '/img/profile/defaultUser.svg';
-    const coverImg = specialist.memberPortfolio?.[0] ? `${REACT_APP_API_URL}/${specialist.memberPortfolio[0]}` : profileImg;
+    const profileImg = imgUrl(specialist.memberImage, '/img/profile/defaultUser.svg');
+    const coverImg = specialist.memberPortfolio?.[0] ? imgUrl(specialist.memberPortfolio[0]) : profileImg;
     const liked = specialist.meLiked?.[0]?.myFavorite;
     const isFollowing = specialist.meFollowed?.[0]?.myFollowing;
-    const timeSlots = salon ? generateTimeSlots(salon.salonWorkHours) : ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00'];
+    const timeSlots = selectedSalon ? generateTimeSlots(selectedSalon.salonWorkHours) : ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00'];
     const displaySlots = showAllSlots ? timeSlots : timeSlots.slice(0, 6);
 
     // ── RIGHT SIDEBAR ────────────────────────────────────────────────────────
@@ -275,7 +318,7 @@ const SpecialistDetail: NextPage = () => {
                     sx={{ mb: 2, borderRadius: 2, '& fieldset': { borderColor: 'rgba(255,77,141,0.2)' } }}>
                     <MenuItem value="" disabled>{t('Choose a service')}</MenuItem>
                     {services.map((svc) => (
-                        <MenuItem key={svc._id} value={svc._id}>{svc.serviceTitle} — ₩{svc.servicePrice?.toLocaleString()}</MenuItem>
+                        <MenuItem key={svc._id} value={svc._id}>{svc.serviceTitle} — ₩{formatPrice(svc.servicePrice)}</MenuItem>
                     ))}
                 </Select>
 
@@ -317,28 +360,32 @@ const SpecialistDetail: NextPage = () => {
             </Stack>
 
             {/* Salon card */}
-            {salon && (
+            {salons.length > 0 && (
                 <Stack className="sp-salon-card">
-                    <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a', mb: 1.5 }}>{t('About the Salon')}</Typography>
-                    <Box component="div" className="sp-salon-img"
-                        style={{ backgroundImage: `url(${salon.salonImages?.[0] ? `${REACT_APP_API_URL}/${salon.salonImages[0]}` : '/img/banner/default.jpg'})` }} />
-                    <Box component="div" sx={{ mt: 1.5 }}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.5 }}>
-                            <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>{salon.salonTitle}</Typography>
-                            <RatingStars rating={4.9} size="small" showNumber />
-                        </Stack>
-                        <Typography sx={{ fontSize: 11, color: '#666', mb: 0.25 }}>
-                            <LocationOnOutlinedIcon sx={{ fontSize: 12, color: '#FF4D8D' }} /> {salon.salonAddress}
-                        </Typography>
-                        <Typography sx={{ fontSize: 11, fontWeight: 600, mb: 1.5, color: isSalonOpen(salon.salonWorkHours) ? '#4CAF50' : '#e53935' }}>
-                            <AccessTimeIcon sx={{ fontSize: 11 }} /> {t('Open')}: {salon.salonWorkHours}
-                        </Typography>
-                        <Stack direction="row" gap={1}>
-                            <Link href={`/salons/${salon._id}`}>
-                                <Button fullWidth size="small" className="sp-view-salon-btn">{t('View Salon →')}</Button>
+                    <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a', mb: 1.5 }}>
+                        {t('Salons')} ({salons.length})
+                    </Typography>
+                    <Stack gap={1.5}>
+                        {salons.map((s) => (
+                            <Link href={`/salons/${s._id}`} key={s._id} style={{ textDecoration: 'none' }}>
+                                <Stack direction="row" gap={1.25} alignItems="center" className="sp-salon-row">
+                                    <Box component="div" className="sp-salon-row-img"
+                                        style={{ backgroundImage: `url(${s.salonImages?.[0] ? imgUrl(s.salonImages[0]) : '/img/banner/default.jpg'})` }} />
+                                    <Box component="div" sx={{ flex: 1, minWidth: 0 }}>
+                                        <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            {s.salonTitle}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 11, color: '#666', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                            <LocationOnOutlinedIcon sx={{ fontSize: 11, color: '#FF4D8D' }} /> {s.salonAddress}
+                                        </Typography>
+                                        <Typography sx={{ fontSize: 10.5, fontWeight: 600, mt: 0.25, color: isSalonOpen(s.salonWorkHours) ? '#4CAF50' : '#e53935' }}>
+                                            <AccessTimeIcon sx={{ fontSize: 10 }} /> {isSalonOpen(s.salonWorkHours) ? t('Open') : t('Closed')}
+                                        </Typography>
+                                    </Box>
+                                </Stack>
                             </Link>
-                        </Stack>
-                    </Box>
+                        ))}
+                    </Stack>
                 </Stack>
             )}
         </>
@@ -423,7 +470,7 @@ const SpecialistDetail: NextPage = () => {
                 <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} centered
                     sx={{ borderBottom: '1px solid rgba(255,77,141,0.1)', mb: 0, '& .MuiTab-root': { fontSize: 12, fontWeight: 600, color: '#888', minWidth: 80 }, '& .Mui-selected': { color: '#FF4D8D' }, '& .MuiTabs-indicator': { background: '#FF4D8D' } }}>
                     <Tab label={t('Portfolio')} />
-                    <Tab label={t('Services')} />
+                    <Tab label={t('Salons')} />
                     <Tab label={t('Reviews')} />
                 </Tabs>
 
@@ -433,7 +480,7 @@ const SpecialistDetail: NextPage = () => {
                         <Box component="div" className="sp-portfolio-grid-mobile">
                             {specialist.memberPortfolio?.map((img, i) => (
                                 <Box key={i} component="div" className="sp-portfolio-item-mobile"
-                                    style={{ backgroundImage: `url(${REACT_APP_API_URL}/${img})` }} />
+                                    style={{ backgroundImage: `url(${imgUrl(img)})` }} />
                             )) ?? <Typography sx={{ fontSize: 13, color: '#888', textAlign: 'center', py: 4 }}>{t('No portfolio yet')}</Typography>}
                         </Box>
                     </Box>
@@ -442,18 +489,21 @@ const SpecialistDetail: NextPage = () => {
                 {/* Services tab */}
                 {activeTab === 1 && (
                     <Stack gap={1.5} sx={{ p: 2 }}>
-                        {services.length === 0 ? (
-                            <Typography sx={{ fontSize: 13, color: '#888', textAlign: 'center', py: 4 }}>{t('No services yet')}</Typography>
-                        ) : services.map((svc) => (
-                            <Stack key={svc._id} direction="row" gap={1.5} sx={{ background: '#fff', borderRadius: 2, overflow: 'hidden', border: '1px solid rgba(255,77,141,0.08)', p: 1.25 }}>
-                                <Box component="div" sx={{ width: 70, height: 60, borderRadius: 1.5, backgroundImage: `url(${REACT_APP_API_URL}/${svc.serviceImages?.[0]})`, backgroundSize: 'cover', flexShrink: 0, backgroundColor: '#f5f5f5' }} />
-                                <Box component="div" sx={{ flex: 1 }}>
-                                    <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>{svc.serviceTitle}</Typography>
-                                    <Typography sx={{ fontSize: 12, color: '#FF4D8D', fontWeight: 600 }}>₩{svc.servicePrice?.toLocaleString()}</Typography>
-                                    <Typography sx={{ fontSize: 11, color: '#888' }}>{svc.serviceDuration} min</Typography>
-                                </Box>
-                                <Button size="small" className="sp-book-btn-sm" onClick={() => setSelectedService(svc._id)}>{t('Book')}</Button>
-                            </Stack>
+                        {salons.length === 0 ? (
+                            <Typography sx={{ fontSize: 13, color: '#888', textAlign: 'center', py: 4 }}>{t('No salons yet')}</Typography>
+                        ) : salons.map((s) => (
+                            <Link href={`/salons/${s._id}`} key={s._id} style={{ textDecoration: 'none' }}>
+                                <Stack direction="row" gap={1.5} sx={{ background: '#fff', borderRadius: 2, overflow: 'hidden', border: '1px solid rgba(255,77,141,0.08)', p: 1.25 }}>
+                                    <Box component="div" sx={{ width: 70, height: 60, borderRadius: 1.5, backgroundImage: `url(${s.salonImages?.[0] ? imgUrl(s.salonImages[0]) : '/img/banner/default.jpg'})`, backgroundSize: 'cover', flexShrink: 0, backgroundColor: '#f5f5f5' }} />
+                                    <Box component="div" sx={{ flex: 1 }}>
+                                        <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>{s.salonTitle}</Typography>
+                                        <Typography sx={{ fontSize: 11, color: '#888' }}>{s.salonAddress}</Typography>
+                                        <Typography sx={{ fontSize: 10.5, fontWeight: 600, color: isSalonOpen(s.salonWorkHours) ? '#4CAF50' : '#e53935' }}>
+                                            {isSalonOpen(s.salonWorkHours) ? t('Open') : t('Closed')}
+                                        </Typography>
+                                    </Box>
+                                </Stack>
+                            </Link>
                         ))}
                     </Stack>
                 )}
@@ -467,7 +517,7 @@ const SpecialistDetail: NextPage = () => {
                             <Stack key={comment._id} sx={{ mb: 2, pb: 2, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.75 }}>
                                     <Stack direction="row" alignItems="center" gap={1}>
-                                        <Avatar src={comment.memberData?.memberImage ? `${REACT_APP_API_URL}/${comment.memberData.memberImage}` : '/img/profile/defaultUser.svg'} sx={{ width: 32, height: 32 }} />
+                                        <Avatar src={imgUrl(comment.memberData?.memberImage, '/img/profile/defaultUser.svg')} sx={{ width: 32, height: 32 }} />
                                         <Box component="div">
                                             <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{comment.memberData?.memberNick}</Typography>
                                             <Typography sx={{ fontSize: 11, color: '#bbb' }}>{moment(comment.createdAt).format('MMM DD, YYYY')}</Typography>
@@ -621,7 +671,7 @@ const SpecialistDetail: NextPage = () => {
                                     const heights = [160, 200, 180, 220, 170, 190];
                                     return (
                                         <Box key={i} component="div" className="sp-portfolio-item"
-                                            style={{ height: heights[i % heights.length], backgroundImage: `url(${REACT_APP_API_URL}/${img})` }}>
+                                            style={{ height: heights[i % heights.length], backgroundImage: `url(${imgUrl(img)})` }}>
                                             <Box component="div" className="sp-portfolio-overlay">
                                                 <Button size="small" className="sp-book-look-btn">
                                                     {t('Book this look')}
@@ -634,35 +684,8 @@ const SpecialistDetail: NextPage = () => {
                         </Stack>
                     )}
 
-                    {/* Services */}
-                    {services.length > 0 && (
-                        <Stack className="sp-detail-section">
-                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-                                <Typography className="sp-section-title">{t('Services offered')}</Typography>
-                                <Typography sx={{ fontSize: 12, color: '#FF4D8D', cursor: 'pointer' }}>{t('View all')}</Typography>
-                            </Stack>
-                            <Stack direction="row" gap={1.5} sx={{ overflowX: 'auto', pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
-                                {services.map((svc) => (
-                                    <Stack key={svc._id} className="sp-service-card">
-                                        <Box component="div" className="sp-service-img"
-                                            style={{ backgroundImage: `url(${REACT_APP_API_URL}/${svc.serviceImages?.[0] ?? ''})` }} />
-                                        <Box component="div" sx={{ p: 1.25 }}>
-                                            <Typography sx={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a', mb: 0.25 }}>{svc.serviceTitle}</Typography>
-                                            <Typography sx={{ fontSize: 12, color: '#FF4D8D', fontWeight: 600 }}>₩{svc.servicePrice?.toLocaleString()}</Typography>
-                                            <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 0.5 }}>
-                                                <Typography sx={{ fontSize: 11, color: '#888' }}>{svc.serviceDuration} min</Typography>
-                                                <RatingStars rating={svc.serviceRating || 4.9} size="small" showNumber={false} />
-                                            </Stack>
-                                            <Button fullWidth size="small" className="sp-book-btn-sm" sx={{ mt: 1 }}
-                                                onClick={() => setSelectedService(svc._id)}>
-                                                {t('Book')}
-                                            </Button>
-                                        </Box>
-                                    </Stack>
-                                ))}
-                            </Stack>
-                        </Stack>
-                    )}
+                    {/* ⚠️ "Services offered" bo'limi ataylab olib tashlandi —
+                        xizmatlar endi faqat booking dropdown'ida ko'rinadi */}
 
                     {/* Reviews */}
                     <Stack className="sp-detail-section">
@@ -695,7 +718,7 @@ const SpecialistDetail: NextPage = () => {
                                     <Stack key={comment._id} className="sp-review-card">
                                         <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                                             <Stack direction="row" gap={1.5} alignItems="center">
-                                                <Avatar src={comment.memberData?.memberImage ? `${REACT_APP_API_URL}/${comment.memberData.memberImage}` : '/img/profile/defaultUser.svg'} sx={{ width: 40, height: 40 }} />
+                                                <Avatar src={imgUrl(comment.memberData?.memberImage, '/img/profile/defaultUser.svg')} sx={{ width: 40, height: 40 }} />
                                                 <Box component="div">
                                                     <Typography sx={{ fontSize: 14, fontWeight: 600, color: '#1a1a1a' }}>{comment.memberData?.memberNick}</Typography>
                                                     <Typography sx={{ fontSize: 12, color: '#bbb' }}>{moment(comment.createdAt).format('MMM DD, YYYY')}</Typography>

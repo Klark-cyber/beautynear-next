@@ -24,4 +24,5 @@ export interface CustomJwtPayload extends JwtPayload {
 	memberBlocks: number;
 	memberLatitude?: number;
 	memberLongitude?: number;
+	agentRequestStatus?: string; // ⚠️ YANGI
 }

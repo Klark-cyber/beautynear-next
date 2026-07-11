@@ -1,227 +1,535 @@
-#pc-wrap {
-  .cs-page {
-    position: relative;
-    padding: 60px 0px 60px;
-    width: 100%;
-    height: auto;
-    .container {
-      display: flex;
-      flex-direction: column;
-      .cs-main-info {
-        display: flex;
-        flex-direction: column;
-        .info {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          span {
-            color: #000;
-            font-family: $font;
-            font-size: 35px;
-            font-style: normal;
-            font-weight: 700;
-            line-height: normal;
-            letter-spacing: 0.525px;
-          }
-          p {
-            color: #757575;
-            font-family: $font;
-            font-size: 16px;
-            font-style: normal;
-            font-weight: 400;
-            line-height: normal;
-          }
-        }
-        .btns {
-          margin-top: 50px;
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-          :first-child {
-            border-radius: 4px 0 0 4px;
-          }
-          :last-child {
-            border-radius: 0 4px 4px 0;
-          }
-          div {
-            width: 204px;
-            height: 46px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #EEE;
-            cursor: pointer;
-            color: #BDBDBD;
-            font-family: $font;
-            font-size: 14px;
-            font-style: normal;
-            font-weight: 700;
-            line-height: normal;
-            letter-spacing: 0.42px;
-            &.active {
-              border: 1px solid #725CE8;
-              background: #EB6753;
-              color: #FFF;
-            }
-          }
-        }
-      }
-      .cs-content {
-        margin-top: 25px;
-        display: flex;
-        flex-direction: column;
-        .title {
-          margin-bottom: 25px;
-          color: #000;
-          font-family: $font;
-          font-size: 27px;
-          font-style: normal;
-          font-weight: 700;
-          line-height: normal;
-          letter-spacing: 0.54px;
-        }
-        .pagination {
-          margin-top: 50px;
-          display: flex;
-          flex-direction: row;
-          justify-content: center;
-        }
-        .notice-content {
-          .main {
-            border: 1px solid #EEE;
-            .top {
-              padding: 25px 33px;
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              span {
-                color: #000;
-                font-family: $font;
-                font-size: 14px;
-                font-style: normal;
-                font-weight: 400;
-                line-height: normal;
-                text-transform: capitalize;
-              }
-            }
-            .bottom {
-              display: flex;
-              flex-direction: column;
-              .notice-card {
-                padding: 20px 14px 20px 30px;
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                border: 1px solid #EEE;
-                &.event {
-                  background: #F6D79A;
-                }
-                div {
-                  padding: 6px 9px;
-                  border-radius: 12px;
-                  border: 1px solid #EB6753;
-                  color: #EB6753;
-                  font-family: $font;
-                  font-size: 12px;
-                  font-style: normal;
-                  font-weight: 400;
-                }
-                .notice-number {
-                  margin-left: 18px;
-                  width: 39px;
-                  color: #BDBDBD;
-                  font-family: $font;
-                  font-size: 14px;
-                  font-style: normal;
-                  font-weight: 400;
-                  line-height: normal;
-                }
-                .notice-title {
-                  width: 1060px;
-                  color: #000;
-                  font-family: $font;
-                  font-size: 16px;
-                  font-style: normal;
-                  font-weight: 400;
-                  line-height: normal;
-                }
-                .notice-date {
-                  color: #BDBDBD;
-                  font-family: $font;
-                  font-size: 14px;
-                  font-style: normal;
-                  font-weight: 400;
-                  line-height: normal;
-                }
-              }
-            }
+/* ═══════════════════════════════════════════════════════════════════════
+   CS / HELP CENTER — mockup asosida 1:1 qayta qurilgan dizayn
+   main.scss ga: @import '/scss/pc/cs/cs';
+═══════════════════════════════════════════════════════════════════════ */
 
-          }
+#cs-page {
+	width: 100%;
+	background: #FFF8FA;
+	padding: 96px 0 80px;
 
-        }
-        .faq-content {
-          margin-top: 25px;
-          display: flex;
-          flex-direction: column;
-          .categories {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            div {
-              width: 14%;
-              height: 40px;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              color: #BDBDBD;
-              text-align: center;
-              font-family: $font;
-              font-size: 15px;
-              font-style: normal;
-              font-weight: 400;
-              line-height: normal;
-              letter-spacing: -0.225px;
-              cursor: pointer;
-              &.active {
-                border-bottom: 1px solid #EB6753;
-                color: #EB6753;
-              }
-            }
-          }
-          .wrap {
-            margin-top: 50px;
-            .MuiAccordionDetails-root {
-              padding: 30px 20px;
-              background: #FAFAFA;
-            }
-            .badge {
-              margin: 0 24px;
-              display: inline-block;
-              padding: 4px 10px;
-              border: 1px solid #725CE8;
-              border-radius: 7px;
-              color: #725CE8;
-            }
-            .question {
-              .badge {
-                background: #e92C28;
-                color: #fff;
-              }
-            }
-            .answer {
-              margin-left: 80px;
-              display: flex;
-              white-space: nowrap;
-              align-items: center;
-              flex-direction: row;
-              .badge {
-                color: #EB6753;
-                border: 1px solid #EB6753;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+	.container {
+		width: calc(1300px + (100vw - 1300px) * 0.6);
+		min-width: 1300px;
+		max-width: 1760px;
+		margin: 0 auto;
+	}
+
+	.cs-layout {
+		gap: 24px;
+		align-items: flex-start;
+	}
+
+	/* ═══════════════ CHAP SIDEBAR ═══════════════ */
+	.cs-sidebar {
+		width: 260px;
+		flex-shrink: 0;
+		background: #fff;
+		border-radius: 20px;
+		border: 1px solid rgba(255, 77, 141, 0.08);
+		box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+		padding: 24px 18px;
+		position: sticky;
+		top: 116px;
+
+		.cs-brand-box {
+			padding-bottom: 16px;
+			margin-bottom: 12px;
+			border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+			.cs-brand-title {
+				font-family: 'Playfair Display', serif !important;
+				font-size: 20px !important;
+				font-weight: 800 !important;
+				color: #FF4D8D !important;
+			}
+
+			.cs-brand-sub {
+				margin-top: 2px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 12px !important;
+				color: #999 !important;
+			}
+		}
+
+		.cs-nav {
+			gap: 4px;
+			margin-bottom: 20px;
+
+			.cs-nav-item {
+				padding: 11px 14px;
+				border-radius: 12px;
+				cursor: pointer;
+				color: #555;
+				font-family: 'Inter', sans-serif;
+				font-size: 14px;
+				font-weight: 600;
+				transition: all 0.2s;
+
+				p {
+					font-family: 'Inter', sans-serif;
+					font-size: 14px;
+					font-weight: 600;
+					color: inherit;
+				}
+
+				&:hover {
+					background: rgba(255, 77, 141, 0.05);
+				}
+
+				&.active {
+					background: linear-gradient(135deg, #FF4D8D, #FF6B9D);
+					color: #fff;
+					box-shadow: 0 4px 14px rgba(255, 77, 141, 0.25);
+
+					p {
+						color: #fff;
+					}
+				}
+			}
+		}
+
+		.cs-topics-label {
+			font-family: 'Inter', sans-serif !important;
+			font-size: 11px !important;
+			font-weight: 800 !important;
+			letter-spacing: 0.5px;
+			text-transform: uppercase;
+			color: #aaa !important;
+			padding: 0 14px;
+			margin-bottom: 8px !important;
+		}
+
+		.cs-category-list {
+			gap: 2px;
+			margin-bottom: 20px;
+
+			.cs-cat-item {
+				padding: 9px 14px;
+				border-radius: 10px;
+				cursor: pointer;
+				color: #666;
+				transition: all 0.2s;
+
+				svg {
+					font-size: 17px;
+					color: #999;
+				}
+
+				p {
+					font-family: 'Inter', sans-serif;
+					font-size: 13px;
+					font-weight: 500;
+					color: inherit;
+				}
+
+				&:hover {
+					background: rgba(255, 77, 141, 0.04);
+				}
+
+				&.active {
+					background: rgba(255, 77, 141, 0.08);
+					color: #FF4D8D;
+
+					svg {
+						color: #FF4D8D;
+					}
+
+					p {
+						color: #FF4D8D;
+						font-weight: 700;
+					}
+				}
+			}
+		}
+
+		.cs-help-card {
+			background: rgba(255, 77, 141, 0.05);
+			border-radius: 16px;
+			padding: 18px;
+			text-align: center;
+
+			.cs-help-title {
+				margin-top: 8px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 13.5px !important;
+				font-weight: 700 !important;
+				color: #1a1a1a !important;
+			}
+
+			.cs-help-sub {
+				margin-top: 2px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 11.5px !important;
+				color: #999 !important;
+			}
+
+			.cs-help-btn {
+				width: 100%;
+				height: 38px;
+				margin-top: 12px !important;
+				border-radius: 10px !important;
+				background: linear-gradient(135deg, #FF4D8D, #FF6B9D) !important;
+				color: #fff !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 12px !important;
+				font-weight: 700 !important;
+				text-transform: none !important;
+				box-shadow: 0 4px 12px rgba(255, 77, 141, 0.25) !important;
+			}
+		}
+	}
+
+	/* ═══════════════ O'NG KONTENT ═══════════════ */
+	.cs-main {
+		flex: 1;
+		min-width: 0;
+
+		.cs-hero {
+			position: relative;
+			overflow: hidden;
+			border-radius: 20px;
+			background: linear-gradient(135deg, #FF4D8D, #FF6B9D 60%, #FF85B3);
+			padding: 32px 36px;
+			margin-bottom: 24px;
+			gap: 32px;
+
+			.cs-hero-text-box {
+				min-width: 0;
+				flex-shrink: 1;
+			}
+
+			.cs-hero-title {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 28px !important;
+				font-weight: 800 !important;
+				color: #fff !important;
+				white-space: nowrap;
+			}
+
+			.cs-hero-sub {
+				margin-top: 4px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 13px !important;
+				color: rgba(255, 255, 255, 0.9) !important;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+			}
+
+			.cs-hero-search {
+				width: 300px;
+				flex-shrink: 0;
+				background: #fff;
+				border-radius: 14px;
+				z-index: 2;
+
+				.MuiOutlinedInput-root {
+					border-radius: 14px;
+					font-family: 'Inter', sans-serif;
+					font-size: 13px;
+					box-sizing: border-box;
+
+					fieldset {
+						border: none;
+					}
+
+					input {
+						box-sizing: border-box;
+						text-overflow: ellipsis;
+					}
+				}
+			}
+
+			.cs-hero-deco {
+				display: none;
+			}
+		}
+
+		.cs-content-frame {
+			width: 100%;
+		}
+
+		/* ── NOTICE grid ── */
+		.notice-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 18px;
+		}
+
+		.notice-card {
+			background: #fff;
+			border-radius: 16px;
+			border: 1px solid rgba(0, 0, 0, 0.06);
+			padding: 18px;
+			transition: all 0.25s;
+
+			&:hover {
+				box-shadow: 0 12px 30px rgba(255, 77, 141, 0.1);
+				transform: translateY(-3px);
+			}
+
+			.notice-date-top {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 11px !important;
+				color: #aaa !important;
+			}
+
+			.notice-title {
+				margin-top: 12px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 15px !important;
+				font-weight: 800 !important;
+				color: #1a1a1a !important;
+				line-height: 1.35 !important;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				min-height: 40px;
+			}
+
+			.notice-desc {
+				margin-top: 6px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 12.5px !important;
+				color: #888 !important;
+				line-height: 1.6 !important;
+				display: -webkit-box;
+				-webkit-line-clamp: 3;
+				line-clamp: 3;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				min-height: 58px;
+			}
+
+			.notice-readmore {
+				margin-top: 8px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 12.5px !important;
+				font-weight: 700 !important;
+				color: #FF4D8D !important;
+				cursor: pointer;
+			}
+
+			.notice-footer {
+				margin-top: 14px;
+				padding-top: 12px;
+				border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+				.notice-meta {
+					font-family: 'Inter', sans-serif !important;
+					font-size: 11.5px !important;
+					color: #999 !important;
+				}
+			}
+		}
+
+		/* ── FAQ grid ── */
+		.faq-grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 14px;
+			align-items: start;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.faq-item {
+			background: #fff;
+			border: 1px solid rgba(0, 0, 0, 0.07);
+			border-radius: 14px;
+			padding: 16px 18px;
+			cursor: pointer;
+			transition: all 0.2s;
+
+			&:hover {
+				border-color: rgba(255, 77, 141, 0.3);
+			}
+
+			&.open {
+				background: rgba(255, 77, 141, 0.04);
+				border-color: rgba(255, 77, 141, 0.25);
+				grid-column: span 1;
+			}
+
+			.faq-q-icon {
+				width: 28px;
+				height: 28px;
+				border-radius: 50%;
+				flex-shrink: 0;
+				background: rgba(255, 77, 141, 0.1);
+				color: #FF4D8D;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.faq-question {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 13.5px !important;
+				font-weight: 700 !important;
+				color: #1a1a1a !important;
+			}
+
+			.faq-answer {
+				margin-top: 12px !important;
+				padding-left: 40px;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 13px !important;
+				color: #777 !important;
+				line-height: 1.7 !important;
+			}
+		}
+
+		/* ── INQUIRY split ── */
+		.inquiry-split {
+			align-items: flex-start;
+		}
+
+		.inquiry-form-panel {
+			width: 380px;
+			flex-shrink: 0;
+			background: #fff;
+			border: 1px solid rgba(0, 0, 0, 0.07);
+			border-radius: 16px;
+			padding: 24px;
+			position: sticky;
+			top: 260px;
+
+			.inquiry-form-title {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 16px !important;
+				font-weight: 800 !important;
+				color: #1a1a1a !important;
+			}
+
+			.inquiry-form-sub {
+				margin-top: 2px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 12px !important;
+				color: #999 !important;
+				margin-bottom: 18px !important;
+			}
+
+			.inquiry-field-label {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 12px !important;
+				font-weight: 700 !important;
+				color: #444 !important;
+				margin: 14px 0 6px !important;
+			}
+
+			.inquiry-input {
+				width: 100%;
+
+				/* ⚠️ Global MUI mavzu barcha OutlinedInput'ga height:48px
+				   majburlaydi — bu multiline (Message) maydonini siqib,
+				   placeholder'ni quti tashqarisiga chiqarib yuboradi.
+				   Avvalgi MyProfile.tsx'dagi bilan bir xil xato — shu yerda
+				   ham override qilamiz. */
+				.MuiInputBase-multiline {
+					height: auto !important;
+					padding: 12px 14px !important;
+				}
+
+				.MuiOutlinedInput-root {
+					width: 100%;
+					box-sizing: border-box;
+					border-radius: 10px;
+					font-family: 'Inter', sans-serif;
+					font-size: 12.5px;
+
+					fieldset {
+						border-color: rgba(0, 0, 0, 0.12);
+					}
+
+					input,
+					textarea {
+						box-sizing: border-box;
+						font-size: 12.5px;
+					}
+
+					input::placeholder,
+					textarea::placeholder {
+						font-size: 12.5px;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+				}
+			}
+
+			.inquiry-submit-btn {
+				height: 44px;
+				margin-top: 20px !important;
+				border-radius: 12px !important;
+				background: linear-gradient(135deg, #FF4D8D, #FF6B9D) !important;
+				color: #fff !important;
+				font-family: 'Inter', sans-serif !important;
+				font-weight: 700 !important;
+				font-size: 13.5px !important;
+				text-transform: none !important;
+				box-shadow: 0 4px 14px rgba(255, 77, 141, 0.25) !important;
+			}
+		}
+
+		.inquiry-list-panel {
+			flex: 1;
+			min-width: 0;
+			background: #fff;
+			border: 1px solid rgba(0, 0, 0, 0.07);
+			border-radius: 16px;
+			padding: 22px;
+
+			.inquiry-list-title {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 15px !important;
+				font-weight: 800 !important;
+				color: #1a1a1a !important;
+				margin-bottom: 14px !important;
+			}
+
+			.inquiry-row {
+				padding: 14px;
+				border-radius: 12px;
+				border: 1px solid rgba(0, 0, 0, 0.05);
+				cursor: pointer;
+				transition: all 0.2s;
+
+				&:hover {
+					background: rgba(255, 77, 141, 0.03);
+				}
+
+				.inquiry-subject {
+					font-family: 'Inter', sans-serif !important;
+					font-size: 13.5px !important;
+					font-weight: 700 !important;
+					color: #1a1a1a !important;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					max-width: 280px;
+				}
+
+				.inquiry-row-date {
+					font-family: 'Inter', sans-serif !important;
+					font-size: 11px !important;
+					color: #aaa !important;
+					white-space: nowrap;
+				}
+
+				.inquiry-preview {
+					margin-top: 4px !important;
+					font-family: 'Inter', sans-serif !important;
+					font-size: 12px !important;
+					color: #999 !important;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+					max-width: 380px;
+				}
+			}
+		}
+	}
 }

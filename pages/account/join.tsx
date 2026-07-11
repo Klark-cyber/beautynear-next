@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
-import { Box, Button, Checkbox, FormControlLabel, Stack, Typography, Divider, IconButton, InputAdornment } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, Stack, Typography, Divider } from '@mui/material';
 import { useRouter } from 'next/router';
 import { logIn, signUp } from '../../libs/auth';
 import { sweetMixinErrorAlert } from '../../libs/sweetAlert';
@@ -35,6 +35,16 @@ const Join: NextPage = () => {
 		setInput((prev) => ({ ...prev, [name]: value }));
 	}, []);
 
+	// Nestar pattern — USER/AGENT roli tanlash
+	const checkUserTypeHandler = (e: any) => {
+		const checked = e.target.checked;
+		if (checked) {
+			handleInput('type', e.target.name);
+		} else {
+			handleInput('type', 'USER');
+		}
+	};
+
 	const doLogin = useCallback(async () => {
 		try {
 			setLoading(true);
@@ -42,6 +52,11 @@ const Join: NextPage = () => {
 			await router.push(`${router.query.referrer ?? '/'}`);
 		} catch (err: any) {
 			await sweetMixinErrorAlert(err.message);
+			// ⚠️ TUZATILDI: login ma'lumotlari xato bo'lsa (masalan
+			// hisob mavjud emas), foydalanuvchini avtomatik Sign Up
+			// rejimiga o'tkazamiz — parol/nomer allaqachon kiritilgan
+			// holda qoladi, faqat qo'shimcha maydonlarni to'ldirish kifoya.
+			setLoginView(false);
 		} finally {
 			setLoading(false);
 		}
@@ -66,134 +81,97 @@ const Join: NextPage = () => {
 	const isLoginDisabled = !input.nick || !input.password || loading;
 	const isSignupDisabled = !input.nick || !input.password || !input.phone || loading;
 
-	// ── INPUT FIELD COMPONENT ──────────────────────────────────────────────────
-	const InputField = ({
-		icon, label, name, type = 'text', placeholder, endAdornment
-	}: {
-		icon: React.ReactNode;
-		label: string;
-		name: string;
-		type?: string;
-		placeholder: string;
-		endAdornment?: React.ReactNode;
-	}) => (
-		<Box component="div" sx={{ mb: 2 }}>
-			<Typography sx={{ fontSize: 12, fontWeight: 600, color: '#555', mb: 0.75 }}>
-				{label}
-			</Typography>
-			<Stack
-				direction="row"
-				alignItems="center"
-				sx={{
-					border: '1.5px solid rgba(255,77,141,0.2)',
-					borderRadius: 2.5,
-					px: 1.5,
-					py: 1,
-					background: '#fff',
-					transition: 'all 0.2s',
-					'&:focus-within': {
-						borderColor: '#FF4D8D',
-						boxShadow: '0 0 0 3px rgba(255,77,141,0.08)',
-					},
-				}}
-			>
-				<Box component="div" sx={{ color: '#FF4D8D', display: 'flex', mr: 1, flexShrink: 0 }}>
-					{icon}
-				</Box>
-				<input
-					type={type}
-					placeholder={placeholder}
-					value={(input as any)[name]}
-					onChange={(e) => handleInput(name, e.target.value)}
-					onKeyDown={handleKeyDown}
-					style={{
-						flex: 1,
-						border: 'none',
-						outline: 'none',
-						fontSize: 14,
-						fontFamily: 'Poppins, sans-serif',
-						color: '#333',
-						background: 'transparent',
-					}}
-				/>
-				{endAdornment}
-			</Stack>
-		</Box>
-	);
-
-	// ── MOBILE ─────────────────────────────────────────────────────────────────
+	/** MOBILE **/
 	if (device === 'mobile') {
 		return (
-			<Stack sx={{ minHeight: '100vh', background: 'linear-gradient(160deg, #fff0f5, #fff)', px: 2.5, py: 4 }}>
-				{/* Logo */}
-				<Stack alignItems="center" sx={{ mb: 4 }}>
-					<img src="/img/logo/logo.svg" alt="BeautyNear" height={40} />
-					<Typography sx={{ fontSize: 22, fontWeight: 800, color: '#1a1a1a', mt: 1.5 }}>
-						{loginView ? t('Welcome Back') : t('Join BeautyNear')}
-					</Typography>
-					<Typography sx={{ fontSize: 13, color: '#888', mt: 0.5 }}>
-						{loginView ? t('Login to your account') : t('Create your free account')}
-					</Typography>
+			<Stack className="join-page mobile">
+				<Stack alignItems="center" className="join-logo-m">
+					<img src="/img/logo/logo.png" alt="BeautyNear" height={40} />
+					<Typography className="jl-title">{loginView ? t('Welcome Back') : t('Join BeautyNear')}</Typography>
+					<Typography className="jl-sub">{loginView ? t('Login to your account') : t('Create your free account')}</Typography>
 				</Stack>
 
-				{/* Form */}
-				<Box component="div" sx={{ background: '#fff', borderRadius: 4, p: 3, boxShadow: '0 4px 24px rgba(255,77,141,0.08)' }}>
-					<InputField
-						icon={<PersonOutlineIcon sx={{ fontSize: 18 }} />}
-						label={t('Nickname')}
-						name="nick"
-						placeholder={t('Enter nickname')}
-					/>
-					<InputField
-						icon={<LockOutlinedIcon sx={{ fontSize: 18 }} />}
-						label={t('Password')}
-						name="password"
-						type={showPassword ? 'text' : 'password'}
-						placeholder={t('Enter password')}
-						endAdornment={
-							<Box component="div" onClick={() => setShowPassword(!showPassword)} sx={{ cursor: 'pointer', color: '#bbb', display: 'flex' }}>
+				<Box component="div" className="join-form-m">
+					{/* Nickname */}
+					<Box component="div" className="field-block">
+						<Typography className="field-label">{t('Nickname')}</Typography>
+						<Stack direction="row" alignItems="center" className="field-input">
+							<Box component="div" className="fi-icon"><PersonOutlineIcon sx={{ fontSize: 18 }} /></Box>
+							<input
+								type="text"
+								placeholder={t('Enter nickname')}
+								value={input.nick}
+								onChange={(e) => handleInput('nick', e.target.value)}
+								onKeyDown={handleKeyDown}
+								className="fi-field"
+							/>
+						</Stack>
+					</Box>
+
+					{/* Password */}
+					<Box component="div" className="field-block">
+						<Typography className="field-label">{t('Password')}</Typography>
+						<Stack direction="row" alignItems="center" className="field-input">
+							<Box component="div" className="fi-icon"><LockOutlinedIcon sx={{ fontSize: 18 }} /></Box>
+							<input
+								type={showPassword ? 'text' : 'password'}
+								placeholder={t('Enter password')}
+								value={input.password}
+								onChange={(e) => handleInput('password', e.target.value)}
+								onKeyDown={handleKeyDown}
+								className="fi-field"
+							/>
+							<Box component="div" onClick={() => setShowPassword(!showPassword)} className="fi-toggle">
 								{showPassword ? <VisibilityOutlinedIcon sx={{ fontSize: 18 }} /> : <VisibilityOffOutlinedIcon sx={{ fontSize: 18 }} />}
 							</Box>
-						}
-					/>
+						</Stack>
+					</Box>
+
+					{/* Phone (signup only) */}
 					{!loginView && (
-						<InputField
-							icon={<PhoneOutlinedIcon sx={{ fontSize: 18 }} />}
-							label={t('Phone')}
-							name="phone"
-							placeholder={t('Enter phone number')}
-						/>
+						<Box component="div" className="field-block">
+							<Typography className="field-label">{t('Phone')}</Typography>
+							<Stack direction="row" alignItems="center" className="field-input">
+								<Box component="div" className="fi-icon"><PhoneOutlinedIcon sx={{ fontSize: 18 }} /></Box>
+								<input
+									type="text"
+									placeholder={t('Enter phone number')}
+									value={input.phone}
+									onChange={(e) => handleInput('phone', e.target.value)}
+									onKeyDown={handleKeyDown}
+									className="fi-field"
+								/>
+							</Stack>
+						</Box>
+					)}
+
+					{/* USER/AGENT type — signup only */}
+					{!loginView && (
+						<Box component="div" className="join-type">
+							<Typography className="jt-label">{t('I want to register as')}:</Typography>
+							<Stack direction="row" gap={1.5} className="jt-options">
+								<Box component="div" className={`jt-card ${input.type === 'USER' ? 'active' : ''}`} onClick={() => handleInput('type', 'USER')}>
+									<Typography className="jtc-title">{t('Customer')}</Typography>
+								</Box>
+								<Box component="div" className={`jt-card ${input.type === 'AGENT' ? 'active' : ''}`} onClick={() => handleInput('type', 'AGENT')}>
+									<Typography className="jtc-title">{t('Salon Owner')}</Typography>
+								</Box>
+							</Stack>
+						</Box>
 					)}
 
 					<Button
 						fullWidth
 						onClick={loginView ? doLogin : doSignUp}
 						disabled={loginView ? isLoginDisabled : isSignupDisabled}
-						sx={{
-							mt: 1,
-							py: 1.5,
-							background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
-							color: '#fff',
-							fontWeight: 700,
-							fontSize: 15,
-							borderRadius: 2.5,
-							boxShadow: '0 4px 16px rgba(255,77,141,0.35)',
-							transition: 'all 0.25s',
-							'&:hover': { transform: 'translateY(-2px)', boxShadow: '0 8px 24px rgba(255,77,141,0.45)' },
-							'&:disabled': { background: '#ddd', color: '#fff', boxShadow: 'none' },
-						}}
+						className="join-submit"
 					>
 						{loading ? '...' : loginView ? t('Login') : t('Sign Up')}
 					</Button>
 
-					<Stack direction="row" justifyContent="center" sx={{ mt: 2.5 }}>
-						<Typography sx={{ fontSize: 13, color: '#888' }}>
-							{loginView ? t("Don't have an account?") : t('Already have an account?')}
-						</Typography>
-						<Typography
-							onClick={() => setLoginView(!loginView)}
-							sx={{ fontSize: 13, fontWeight: 700, color: '#FF4D8D', ml: 0.75, cursor: 'pointer', '&:hover': { opacity: 0.8 } }}
-						>
+					<Stack direction="row" justifyContent="center" className="join-switch">
+						<Typography className="js-text">{loginView ? t("Don't have an account?") : t('Already have an account?')}</Typography>
+						<Typography onClick={() => setLoginView(!loginView)} className="js-link">
 							{loginView ? t('Sign Up') : t('Login')}
 						</Typography>
 					</Stack>
@@ -202,25 +180,20 @@ const Join: NextPage = () => {
 		);
 	}
 
-	// ── DESKTOP ────────────────────────────────────────────────────────────────
+	/** DESKTOP **/
 	return (
 		<Stack className="join-page">
-			<Stack className="container">
-				<Stack className="main">
+			<Stack className="join-container">
+				<Stack className="join-main">
 					{/* LEFT — Form */}
-					<Stack className="left">
-						{/* Logo */}
-						<Box component="div" className="logo">
-							<img src="/img/logo/logo.svg" alt="BeautyNear" />
-							<Typography sx={{ fontSize: 13, color: '#FF4D8D', fontWeight: 600, mt: 0.5 }}>BeautyNear</Typography>
+					<Stack className="join-left">
+						<Box component="div" className="join-logo">
+							<img src="/img/logo/logo.png" alt="BeautyNear" />
 						</Box>
 
-						{/* Title */}
-						<Box component="div" className="info">
-							<Typography variant="h5" sx={{ fontWeight: 800, color: '#1a1a1a', mb: 0.5 }}>
-								{loginView ? t('Welcome Back! 👋') : t('Join BeautyNear 💄')}
-							</Typography>
-							<Typography sx={{ fontSize: 14, color: '#888', lineHeight: 1.6 }}>
+						<Box component="div" className="join-info">
+							<Typography className="ji-title">{loginView ? t('Welcome Back! 👋') : t('Join BeautyNear 💄')}</Typography>
+							<Typography className="ji-sub">
 								{loginView
 									? t('Login to book your perfect beauty experience')
 									: t('Create your account and discover K-Beauty near you')}
@@ -228,39 +201,90 @@ const Join: NextPage = () => {
 						</Box>
 
 						{/* Inputs */}
-						<Box component="div" className="input-wrap">
-							<InputField
-								icon={<PersonOutlineIcon sx={{ fontSize: 18 }} />}
-								label={t('Nickname')}
-								name="nick"
-								placeholder={t('Enter your nickname')}
-							/>
-							<InputField
-								icon={<LockOutlinedIcon sx={{ fontSize: 18 }} />}
-								label={t('Password')}
-								name="password"
-								type={showPassword ? 'text' : 'password'}
-								placeholder={t('Enter your password')}
-								endAdornment={
-									<Box component="div" onClick={() => setShowPassword(!showPassword)} sx={{ cursor: 'pointer', color: '#bbb', display: 'flex' }}>
+						<Box component="div" className="join-inputs">
+							{/* Nickname */}
+							<Box component="div" className="field-block">
+								<Typography className="field-label">{t('Nickname')}</Typography>
+								<Stack direction="row" alignItems="center" className="field-input">
+									<Box component="div" className="fi-icon"><PersonOutlineIcon sx={{ fontSize: 18 }} /></Box>
+									<input
+										type="text"
+										placeholder={t('Enter your nickname')}
+										value={input.nick}
+										onChange={(e) => handleInput('nick', e.target.value)}
+										onKeyDown={handleKeyDown}
+										className="fi-field"
+									/>
+								</Stack>
+							</Box>
+
+							{/* Password */}
+							<Box component="div" className="field-block">
+								<Typography className="field-label">{t('Password')}</Typography>
+								<Stack direction="row" alignItems="center" className="field-input">
+									<Box component="div" className="fi-icon"><LockOutlinedIcon sx={{ fontSize: 18 }} /></Box>
+									<input
+										type={showPassword ? 'text' : 'password'}
+										placeholder={t('Enter your password')}
+										value={input.password}
+										onChange={(e) => handleInput('password', e.target.value)}
+										onKeyDown={handleKeyDown}
+										className="fi-field"
+									/>
+									<Box component="div" onClick={() => setShowPassword(!showPassword)} className="fi-toggle">
 										{showPassword ? <VisibilityOutlinedIcon sx={{ fontSize: 18 }} /> : <VisibilityOffOutlinedIcon sx={{ fontSize: 18 }} />}
 									</Box>
-								}
-							/>
+								</Stack>
+							</Box>
+
+							{/* Phone (signup only) */}
 							{!loginView && (
-								<InputField
-									icon={<PhoneOutlinedIcon sx={{ fontSize: 18 }} />}
-									label={t('Phone number')}
-									name="phone"
-									placeholder={t('Enter your phone number')}
-								/>
+								<Box component="div" className="field-block">
+									<Typography className="field-label">{t('Phone number')}</Typography>
+									<Stack direction="row" alignItems="center" className="field-input">
+										<Box component="div" className="fi-icon"><PhoneOutlinedIcon sx={{ fontSize: 18 }} /></Box>
+										<input
+											type="text"
+											placeholder={t('Enter your phone number')}
+											value={input.phone}
+											onChange={(e) => handleInput('phone', e.target.value)}
+											onKeyDown={handleKeyDown}
+											className="fi-field"
+										/>
+									</Stack>
+								</Box>
 							)}
 						</Box>
 
 						{/* Bottom options */}
-						<Box component="div" className="register">
+						<Box component="div" className="join-register">
+							{/* USER/AGENT type — signup only */}
+							{!loginView && (
+								<Box component="div" className="join-type">
+									<Typography className="jt-label">{t('I want to register as')}:</Typography>
+									<Stack direction="row" gap={1.5} className="jt-options">
+										<Box
+											component="div"
+											className={`jt-card ${input.type === 'USER' ? 'active' : ''}`}
+											onClick={() => handleInput('type', 'USER')}
+										>
+											<Typography className="jtc-title">{t('Customer')}</Typography>
+											<Typography className="jtc-desc">{t('Book beauty services')}</Typography>
+										</Box>
+										<Box
+											component="div"
+											className={`jt-card ${input.type === 'AGENT' ? 'active' : ''}`}
+											onClick={() => handleInput('type', 'AGENT')}
+										>
+											<Typography className="jtc-title">{t('Salon Owner')}</Typography>
+											<Typography className="jtc-desc">{t('List your salon')}</Typography>
+										</Box>
+									</Stack>
+								</Box>
+							)}
+
 							{loginView && (
-								<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+								<Stack direction="row" justifyContent="space-between" alignItems="center" className="join-remember">
 									<FormControlLabel
 										control={
 											<Checkbox
@@ -272,9 +296,7 @@ const Join: NextPage = () => {
 										}
 										label={<Typography sx={{ fontSize: 13, color: '#555' }}>{t('Remember me')}</Typography>}
 									/>
-									<Typography sx={{ fontSize: 13, color: '#FF4D8D', cursor: 'pointer', fontWeight: 500, '&:hover': { opacity: 0.8 } }}>
-										{t('Forgot password?')}
-									</Typography>
+									<Typography className="forgot-pw">{t('Forgot password?')}</Typography>
 								</Stack>
 							)}
 
@@ -282,141 +304,30 @@ const Join: NextPage = () => {
 								fullWidth
 								onClick={loginView ? doLogin : doSignUp}
 								disabled={loginView ? isLoginDisabled : isSignupDisabled}
-								sx={{
-									py: 1.5,
-									background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
-									color: '#fff',
-									fontWeight: 700,
-									fontSize: 15,
-									borderRadius: 2.5,
-									boxShadow: '0 4px 16px rgba(255,77,141,0.35)',
-									transition: 'all 0.25s',
-									'&:hover': { transform: 'translateY(-2px)', boxShadow: '0 8px 24px rgba(255,77,141,0.45)', background: 'linear-gradient(135deg, #e53578, #FF4D8D)' },
-									'&:active': { transform: 'translateY(0)' },
-									'&:disabled': { background: '#eee', color: '#bbb', boxShadow: 'none', transform: 'none' },
-								}}
+								className="join-submit"
 							>
 								{loading ? '...' : loginView ? t('Login') : t('Create Account')}
 							</Button>
 
-							{/* Divider */}
-							<Stack direction="row" alignItems="center" gap={1.5} sx={{ my: 2.5 }}>
+							<Stack direction="row" alignItems="center" gap={1.5} className="join-divider">
 								<Divider sx={{ flex: 1, borderColor: 'rgba(255,77,141,0.15)' }} />
-								<Typography sx={{ fontSize: 12, color: '#bbb', fontWeight: 500 }}>{t('or')}</Typography>
+								<Typography className="jd-text">{t('or')}</Typography>
 								<Divider sx={{ flex: 1, borderColor: 'rgba(255,77,141,0.15)' }} />
 							</Stack>
 
-							{/* Kakao / Naver social buttons */}
 							<Stack direction="row" gap={1.5}>
-								<Button
-									fullWidth
-									sx={{
-										py: 1.25,
-										background: '#FEE500',
-										color: '#3C1E1E',
-										fontWeight: 600,
-										fontSize: 13,
-										borderRadius: 2.5,
-										transition: 'all 0.2s',
-										'&:hover': { background: '#f0d800', transform: 'translateY(-1px)' },
-									}}
-								>
-									💬 {t('Kakao')}
-								</Button>
-								<Button
-									fullWidth
-									sx={{
-										py: 1.25,
-										background: '#03C75A',
-										color: '#fff',
-										fontWeight: 600,
-										fontSize: 13,
-										borderRadius: 2.5,
-										transition: 'all 0.2s',
-										'&:hover': { background: '#02b050', transform: 'translateY(-1px)' },
-									}}
-								>
-									N {t('Naver')}
-								</Button>
+								<Button fullWidth className="social-btn kakao">💬 {t('Kakao')}</Button>
+								<Button fullWidth className="social-btn naver">N {t('Naver')}</Button>
 							</Stack>
 						</Box>
 
-						{/* Switch login/signup */}
-						<Box component="div" className="ask-info">
+						<Box component="div" className="join-ask">
 							<Stack direction="row" justifyContent="center" alignItems="center" gap={0.75}>
-								<Typography sx={{ fontSize: 14, color: '#888' }}>
-									{loginView ? t("Don't have an account?") : t('Already have an account?')}
-								</Typography>
-								<Typography
-									onClick={() => setLoginView(!loginView)}
-									sx={{ fontSize: 14, fontWeight: 700, color: '#FF4D8D', cursor: 'pointer', transition: 'opacity 0.2s', '&:hover': { opacity: 0.8 } }}
-								>
+								<Typography className="ja-text">{loginView ? t("Don't have an account?") : t('Already have an account?')}</Typography>
+								<Typography onClick={() => setLoginView(!loginView)} className="ja-link">
 									{loginView ? t('Sign Up') : t('Login')}
 								</Typography>
 							</Stack>
-						</Box>
-					</Stack>
-
-					{/* RIGHT — Decorative */}
-					<Stack className="right">
-						<Box
-							component="div"
-							sx={{
-								width: '100%',
-								height: '100%',
-								background: 'linear-gradient(135deg, #FF4D8D 0%, #FF85B3 50%, #ffb3d0 100%)',
-								borderRadius: '0 24px 24px 0',
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'center',
-								justifyContent: 'center',
-								gap: 3,
-								p: 4,
-								position: 'relative',
-								overflow: 'hidden',
-							}}
-						>
-							{/* Decorative circles */}
-							{[
-								{ size: 300, top: -100, right: -100, op: 0.1 },
-								{ size: 200, bottom: -60, left: -60, op: 0.08 },
-							].map((c, i) => (
-								<Box key={i} component="div" sx={{
-									position: 'absolute',
-									width: c.size, height: c.size,
-									top: (c as any).top, right: (c as any).right,
-									bottom: (c as any).bottom, left: (c as any).left,
-									borderRadius: '50%',
-									background: `rgba(255,255,255,${c.op})`,
-									pointerEvents: 'none',
-								}} />
-							))}
-
-							<Typography sx={{ fontSize: 28, fontWeight: 900, color: '#fff', textAlign: 'center', lineHeight: 1.3, position: 'relative', zIndex: 1 }}>
-								{loginView ? t('Your Beauty Journey Starts Here') : t('Discover K-Beauty Near You')}
-							</Typography>
-
-							<Typography sx={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', textAlign: 'center', lineHeight: 1.7, maxWidth: 300, position: 'relative', zIndex: 1 }}>
-								{loginView
-									? t('Access thousands of K-Beauty salons and clinics near you')
-									: t('Join 10K+ customers enjoying premium Korean beauty services')}
-							</Typography>
-
-							{/* Stats */}
-							<Stack direction="row" gap={3} sx={{ position: 'relative', zIndex: 1 }}>
-								{[
-									{ value: '10K+', label: t('Happy Customers') },
-									{ value: '500+', label: t('Verified Salons') },
-									{ value: '4.9', label: t('Average Rating') },
-								].map((s) => (
-									<Stack key={s.value} alignItems="center">
-										<Typography sx={{ fontSize: 22, fontWeight: 900, color: '#fff' }}>{s.value}</Typography>
-										<Typography sx={{ fontSize: 11, color: 'rgba(255,255,255,0.8)' }}>{s.label}</Typography>
-									</Stack>
-								))}
-							</Stack>
-
-							<Box component="div" sx={{ fontSize: 80, position: 'relative', zIndex: 1 }}>💄</Box>
 						</Box>
 					</Stack>
 				</Stack>

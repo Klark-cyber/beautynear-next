@@ -1,238 +1,159 @@
 import React from 'react';
-import Link from 'next/link';
-import {
-	Box,
-	Button,
-	Fade,
-	Menu,
-	MenuItem,
-	Table,
-	TableBody,
-	TableCell,
-	TableContainer,
-	TableHead,
-	TableRow,
-	Tooltip,
-} from '@mui/material';
-import IconButton from '@mui/material/IconButton';
-import Avatar from '@mui/material/Avatar';
-import Stack from '@mui/material/Stack';
-import OpenInBrowserRoundedIcon from '@mui/icons-material/OpenInBrowserRounded';
-import Moment from 'react-moment';
+import { Menu, MenuItem, Chip, IconButton, Stack, Typography, Box } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import { BoardArticle } from '../../../types/board-article/board-article';
 import { REACT_APP_API_URL } from '../../../config';
-import DeleteIcon from '@mui/icons-material/Delete';
-import Typography from '@mui/material/Typography';
 import { BoardArticleStatus } from '../../../enums/board-article.enum';
-
-interface Data {
-	category: string;
-	title: string;
-	writer: string;
-	register: string;
-	view: number;
-	like: number;
-	status: string;
-	article_id: string;
-}
-
-interface HeadCell {
-	disablePadding: boolean;
-	id: keyof Data;
-	label: string;
-	numeric: boolean;
-}
-
-const headCells: readonly HeadCell[] = [
-	{
-		id: 'article_id',
-		numeric: true,
-		disablePadding: false,
-		label: 'ARTICLE ID',
-	},
-	{
-		id: 'title',
-		numeric: true,
-		disablePadding: false,
-		label: 'TITLE',
-	},
-	{
-		id: 'category',
-		numeric: true,
-		disablePadding: false,
-		label: 'CATEGORY',
-	},
-	{
-		id: 'writer',
-		numeric: true,
-		disablePadding: false,
-		label: 'WRITER',
-	},
-	{
-		id: 'view',
-		numeric: false,
-		disablePadding: false,
-		label: 'VIEW',
-	},
-	{
-		id: 'like',
-		numeric: false,
-		disablePadding: false,
-		label: 'LIKE',
-	},
-	{
-		id: 'register',
-		numeric: true,
-		disablePadding: false,
-		label: 'REGISTER DATE',
-	},
-	{
-		id: 'status',
-		numeric: false,
-		disablePadding: false,
-		label: 'STATUS',
-	},
-];
-
-interface EnhancedTableProps {
-	numSelected: number;
-	onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-	onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	rowCount: number;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-	return (
-		<TableHead>
-			<TableRow>
-				{headCells.map((headCell) => (
-					<TableCell
-						key={headCell.id}
-						align={headCell.numeric ? 'left' : 'center'}
-						padding={headCell.disablePadding ? 'none' : 'normal'}
-					>
-						{headCell.label}
-					</TableCell>
-				))}
-			</TableRow>
-		</TableHead>
-	);
-}
 
 interface CommunityArticleListProps {
 	articles: BoardArticle[];
-	anchorEl: any;
-	menuIconClickHandler: any;
-	menuIconCloseHandler: any;
-	updateArticleHandler: any;
-	removeArticleHandler: any;
+	anchorEl: any[];
+	menuIconClickHandler: (e: any, index: number) => void;
+	menuIconCloseHandler: () => void;
+	updateArticleHandler: (data: { _id: string; articleStatus: BoardArticleStatus }) => void;
+	removeArticleHandler: (id: string) => void;
 }
 
+const CATEGORY_COLOR: Record<string, string> = {
+	FREE: 'active',
+	RECOMMEND: 'agent',
+	NEWS: 'user',
+	HUMOR: 'paused',
+};
+
+const STATUS_COLOR: Record<string, string> = {
+	ACTIVE: 'active',
+	DELETE: 'deleted',
+};
+
+const imgUrl = (raw?: string): string => {
+	if (!raw) return '/img/community/articleImg.png';
+	return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
+};
+
+// HTML teglarni tozalash (TUI Editor HTML saqlaydi)
+const stripHtml = (html?: string): string => {
+	if (!html) return '';
+	return html.replace(/<img[^>]*>/gi, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+};
+
 const CommunityArticleList = (props: CommunityArticleListProps) => {
-	const { articles, anchorEl, menuIconClickHandler, menuIconCloseHandler, updateArticleHandler, removeArticleHandler } =
-		props;
+	const { articles, anchorEl, menuIconClickHandler, menuIconCloseHandler, updateArticleHandler, removeArticleHandler } = props;
 
 	return (
-		<Stack>
-			<TableContainer>
-				<Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={'medium'}>
-					{/*@ts-ignore*/}
-					<EnhancedTableHead />
-					<TableBody>
-						{articles.length === 0 && (
-							<TableRow>
-								<TableCell align="center" colSpan={8}>
-									<span className={'no-data'}>data not found!</span>
-								</TableCell>
-							</TableRow>
+		<Stack className="admin-member-table">
+			{/* Sarlavha qatori */}
+			<Stack direction="row" alignItems="center" className="admin-table-head">
+				<Typography className="th" sx={{ flex: '0 0 320px' }}>Article</Typography>
+				<Typography className="th" sx={{ flex: '0 0 160px' }}>Author</Typography>
+				<Typography className="th" sx={{ flex: '0 0 110px' }}>Category</Typography>
+				<Typography className="th" sx={{ flex: '0 0 90px' }} align="center">Views</Typography>
+				<Typography className="th" sx={{ flex: '0 0 90px' }} align="center">Likes</Typography>
+				<Typography className="th" sx={{ flex: '0 0 120px' }} align="center">Status</Typography>
+				<Typography className="th" sx={{ flex: '0 0 60px' }} align="center">-</Typography>
+			</Stack>
+
+			{articles.length === 0 && (
+				<Stack alignItems="center" className="admin-no-data">
+					<Typography>No articles found</Typography>
+				</Stack>
+			)}
+
+			{articles.map((article, index) => (
+				<Stack key={article._id} direction="row" alignItems="center" className="admin-table-row">
+					{/* Article */}
+					<Stack direction="row" alignItems="center" gap={1.5} sx={{ flex: '0 0 320px', minWidth: 0, overflow: 'hidden' }}>
+						<Box
+							component="div"
+							sx={{
+								width: 46, height: 46, borderRadius: 2, flexShrink: 0,
+								backgroundImage: `url(${imgUrl(article.articleImage)})`,
+								backgroundSize: 'cover', backgroundPosition: 'center',
+							}}
+						/>
+						<Box component="div" sx={{ minWidth: 0 }}>
+							<Typography className="member-nick" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+								{article.articleTitle}
+							</Typography>
+							<Typography className="member-fullname" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+								{stripHtml(article.articleContent)}
+							</Typography>
+						</Box>
+					</Stack>
+
+					{/* Author */}
+					<Stack direction="row" alignItems="center" gap={1} sx={{ flex: '0 0 160px', minWidth: 0, overflow: 'hidden' }}>
+						<Box
+							component="div"
+							sx={{
+								width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+								backgroundImage: `url(${!article.memberData?.memberImage
+										? '/img/profile/defaultUser.svg'
+										: article.memberData.memberImage.startsWith('http')
+											? article.memberData.memberImage
+											: `${REACT_APP_API_URL}/${article.memberData.memberImage}`
+									})`,
+								backgroundSize: 'cover', backgroundPosition: 'center',
+							}}
+						/>
+						<Typography className="td" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+							{article.memberData?.memberNick ?? '-'}
+						</Typography>
+					</Stack>
+
+					{/* Category */}
+					<Box sx={{ flex: '0 0 110px' }}>
+						<Chip label={article.articleCategory} size="small" className={`admin-chip type-${CATEGORY_COLOR[article.articleCategory]}`} />
+					</Box>
+
+					{/* Views */}
+					<Stack direction="row" alignItems="center" justifyContent="center" gap={0.4} sx={{ flex: '0 0 90px' }}>
+						<RemoveRedEyeIcon sx={{ fontSize: 14, color: '#999' }} />
+						<Typography className="td">{article.articleViews ?? 0}</Typography>
+					</Stack>
+
+					{/* Likes */}
+					<Stack direction="row" alignItems="center" justifyContent="center" gap={0.4} sx={{ flex: '0 0 90px' }}>
+						<FavoriteIcon sx={{ fontSize: 13, color: '#FF4D8D' }} />
+						<Typography className="td">{article.articleLikes ?? 0}</Typography>
+					</Stack>
+
+					{/* Status */}
+					<Box sx={{ flex: '0 0 120px', textAlign: 'center' }}>
+						<Chip
+							label={article.articleStatus}
+							size="small"
+							className={`admin-chip status-${STATUS_COLOR[article.articleStatus]}`}
+							onClick={(e) => menuIconClickHandler(e, index)}
+						/>
+						<Menu
+							anchorEl={anchorEl[index]}
+							open={Boolean(anchorEl[index])}
+							onClose={menuIconCloseHandler}
+							PaperProps={{ sx: { borderRadius: 2, mt: 0.5 } }}
+						>
+							{Object.values(BoardArticleStatus)
+								.filter((v) => v !== article.articleStatus)
+								.map((status) => (
+									<MenuItem key={status} onClick={() => updateArticleHandler({ _id: article._id, articleStatus: status })}>
+										{status}
+									</MenuItem>
+								))}
+						</Menu>
+					</Box>
+
+					{/* Delete — faqat DELETE holatidagilar uchun butunlay ochirish */}
+					<Box sx={{ flex: '0 0 60px', textAlign: 'center' }}>
+						{article.articleStatus === BoardArticleStatus.DELETE && (
+							<IconButton size="small" onClick={() => removeArticleHandler(article._id)}>
+								<DeleteOutlineIcon sx={{ fontSize: 18, color: '#FF4D6A' }} />
+							</IconButton>
 						)}
-
-						{articles.length !== 0 &&
-							articles.map((article: BoardArticle, index: number) => (
-								<TableRow hover key={article._id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-									<TableCell align="left">{article._id}</TableCell>
-									<TableCell align="left">
-										<Box component={'div'}>
-											{article.articleTitle}
-											<Link
-												href={`/community/detail?articleCategory=${article.articleCategory}&id=${article._id}`}
-												className={'img_box'}
-											>
-												<IconButton className="btn_window">
-													<Tooltip title={'Open window'}>
-														<OpenInBrowserRoundedIcon />
-													</Tooltip>
-												</IconButton>
-											</Link>
-										</Box>
-									</TableCell>
-									<TableCell align="left">{article.articleCategory}</TableCell>
-									<TableCell align="left" className={'name'}>
-										<Link href={`/member?memberId=${article?.memberData?._id}`}>
-											<Avatar
-												alt="Remy Sharp"
-												src={
-													article?.memberData?.memberImage
-														? `${REACT_APP_API_URL}/${article?.memberData?.memberImage}`
-														: `/img/profile/defaultUser.svg`
-												}
-												sx={{ ml: '2px', mr: '10px' }}
-											/>
-											{article?.memberData?.memberNick}
-										</Link>
-									</TableCell>
-									<TableCell align="center">{article?.articleViews}</TableCell>
-									<TableCell align="center">{article?.articleLikes}</TableCell>
-									<TableCell align="left">
-										<Moment format={'DD.MM.YY HH:mm'}>{article?.createdAt}</Moment>
-									</TableCell>
-									<TableCell align="center">
-										{article.articleStatus === 'DELETE' ? (
-											<Button
-												variant="outlined"
-												sx={{ p: '3px', border: 'none', ':hover': { border: '1px solid #000000' } }}
-												onClick={() => removeArticleHandler(article._id)}
-											>
-												<DeleteIcon fontSize="small" />
-											</Button>
-										) : (
-											<>
-												<Button onClick={(e: any) => menuIconClickHandler(e, index)} className={'badge success'}>
-													{article.articleStatus}
-												</Button>
-
-												<Menu
-													className={'menu-modal'}
-													MenuListProps={{
-														'aria-labelledby': 'fade-button',
-													}}
-													anchorEl={anchorEl[index]}
-													open={Boolean(anchorEl[index])}
-													onClose={menuIconCloseHandler}
-													TransitionComponent={Fade}
-													sx={{ p: 1 }}
-												>
-													{Object.values(BoardArticleStatus)
-														.filter((ele) => ele !== article.articleStatus)
-														.map((status: string) => (
-															<MenuItem
-																onClick={() => updateArticleHandler({ _id: article._id, articleStatus: status })}
-																key={status}
-															>
-																<Typography variant={'subtitle1'} component={'span'}>
-																	{status}
-																</Typography>
-															</MenuItem>
-														))}
-												</Menu>
-											</>
-										)}
-									</TableCell>
-								</TableRow>
-							))}
-					</TableBody>
-				</Table>
-			</TableContainer>
+					</Box>
+				</Stack>
+			))}
 		</Stack>
 	);
 };

@@ -49,7 +49,7 @@
 
             .sp-cover-info {
                 position: absolute;
-                bottom: 24px;
+                bottom: 56px;
                 left: 28px;
                 z-index: 2;
             }
@@ -436,6 +436,26 @@
                 border-radius: $radius-md;
                 background-size: cover;
                 background-position: center;
+            }
+
+            .sp-salon-row {
+                padding: 10px;
+                border-radius: $radius-md;
+                cursor: pointer;
+                transition: $transition;
+
+                &:hover {
+                    background: rgba(255, 77, 141, 0.04);
+                }
+
+                .sp-salon-row-img {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 10px;
+                    background-size: cover;
+                    background-position: center;
+                    flex-shrink: 0;
+                }
             }
 
             .sp-view-salon-btn {

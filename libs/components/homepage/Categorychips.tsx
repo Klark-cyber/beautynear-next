@@ -1,103 +1,120 @@
-import React, { useState } from 'react';
-import { Stack, Box, Typography } from '@mui/material';
+import React, { useCallback, useRef, useState } from 'react';
+import { Stack, Box, Typography, IconButton } from '@mui/material';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-import { ServiceType } from '../../enums/service.enum';
+import { SalonType } from '../../enums/salon.enum';
 
-const CATEGORIES = [
-    { type: ServiceType.NAIL, label: 'Nails', emoji: '💅' },
-    { type: ServiceType.SKIN, label: 'Facial', emoji: '🧖‍♀️' },
-    { type: ServiceType.HAIR, label: 'Hair', emoji: '💇‍♀️' },
-    { type: null, label: 'Lash & Brow', emoji: '👁️' },
-    { type: ServiceType.CLINIC, label: 'Skin Clinic', emoji: '🧴' },
-    { type: ServiceType.CLINIC, label: 'Botox', emoji: '💉' },
-    { type: ServiceType.MASSAGE, label: 'Spa', emoji: '🪷' },
+interface CategoryItem {
+    value: SalonType | null;
+    label: string;
+    emoji: string;
+}
+
+// Backend SalonType enumiga mos kategoriyalar
+const CATEGORIES: CategoryItem[] = [
+    { value: null, label: 'All', emoji: '' },
+    { value: SalonType.NAIL, label: 'Nail Art', emoji: '💅' },
+    { value: SalonType.SKIN, label: 'Facial', emoji: '🧖‍♀️' },
+    { value: SalonType.HAIR, label: 'Hair', emoji: '💇‍♀️' },
+    { value: SalonType.CLINIC, label: 'Skin Clinic', emoji: '🧴' },
+    { value: SalonType.MASSAGE, label: 'Massage & Spa', emoji: '🪷' },
 ];
 
 const CategoryChips = () => {
     const { t } = useTranslation('common');
     const router = useRouter();
     const device = useDeviceDetect();
-    const [active, setActive] = useState<string | null>(null);
+    const [active, setActive] = useState<SalonType | null>(null);
+    const scrollRef = useRef<HTMLDivElement>(null);
 
-    const clickHandler = (label: string, type: ServiceType | null) => {
-        setActive(label);
-        const query: any = { page: 1, limit: 9 };
-        if (type) query.serviceType = type;
-        router.push({ pathname: '/services', query });
-    };
+    /** HANDLERS **/
+    const chipHandler = useCallback(
+        async (value: SalonType | null) => {
+            try {
+                setActive(value);
+                const input: any = {
+                    page: 1,
+                    limit: 9,
+                    sort: 'createdAt',
+                    direction: 'DESC',
+                    search: {},
+                };
+                if (value) input.search.typeList = [value];
 
-    const chipSx = (label: string) => ({
-        display: 'flex',
-        flexDirection: 'column' as const,
-        alignItems: 'center',
-        gap: 0.5,
-        px: device === 'mobile' ? 1.5 : 2,
-        py: device === 'mobile' ? 1 : 1.25,
-        borderRadius: 3,
-        cursor: 'pointer',
-        border: '1.5px solid',
-        borderColor: active === label ? '#FF4D8D' : 'rgba(255,77,141,0.15)',
-        background: active === label ? 'rgba(255,77,141,0.08)' : '#fff',
-        transition: 'all 0.2s ease',
-        flexShrink: 0,
-        '&:hover': {
-            borderColor: '#FF4D8D',
-            background: 'rgba(255,77,141,0.06)',
-            transform: 'translateY(-3px)',
-            boxShadow: '0 6px 20px rgba(255,77,141,0.15)',
+                await router.push(`/salons?input=${JSON.stringify(input)}`, `/salons?input=${JSON.stringify(input)}`);
+            } catch (err: any) {
+                console.log('ERROR, chipHandler:', err);
+            }
         },
-        '&:active': { transform: 'translateY(-1px)' },
-    });
+        [router],
+    );
 
-    return (
-        <Stack
-			sx= {{
-        py: device === 'mobile' ? 1.5 : 2.5,
-            px: device === 'mobile' ? 2 : 4,
-                background: '#fff',
-                    borderBottom: '1px solid rgba(255,77,141,0.08)',
-                        overflowX: 'auto',
-                            '&::-webkit-scrollbar': { display: 'none' },
+    const scrollNextHandler = useCallback(() => {
+        scrollRef.current?.scrollBy({ left: 300, behavior: 'smooth' });
+    }, []);
+
+    /** MOBILE **/
+    if (device === 'mobile') {
+        return (
+            <Stack className="category-chips-section mobile">
+                <Box component="div" className="chips-wrap" ref={scrollRef}>
+                    {CATEGORIES.map((cat) => (
+                        <Box
+                            key={cat.label}
+                            component="div"
+                            className={`cat-chip ${cat.value === null ? 'all-chip' : ''} ${active === cat.value ? 'active' : ''}`}
+                            onClick={() => chipHandler(cat.value)}
+                        >
+                            {cat.emoji && <Box component="div" className="chip-icon">{cat.emoji}</Box>}
+                            <Typography className="chip-label">{t(cat.label)}</Typography>
+                        </Box>
+                    ))}
+                </Box>
+            </Stack>
+        );
     }
-}
-		>
-    <Stack
-				direction="row"
-gap = { device === 'mobile' ? 1 : 1.5}
-sx = {{
-    maxWidth: 1280,
-        mx: 'auto',
-            width: '100%',
-                justifyContent: device === 'mobile' ? 'flex-start' : 'center',
-				}}
-			>
-{
-    CATEGORIES.map((cat) => (
-        <Box
-						key= { cat.label }
-						component = "div"
-						onClick = {() => clickHandler(cat.label, cat.type)}
-sx = { chipSx(cat.label) }
-    >
-    <Typography sx={ { fontSize: device === 'mobile' ? 20 : 24 } }> { cat.emoji } </Typography>
-        < Typography
-sx = {{
-    fontSize: device === 'mobile' ? 10 : 12,
-        fontWeight: active === cat.label ? 700 : 500,
-            color: active === cat.label ? '#FF4D8D' : '#555',
-                whiteSpace: 'nowrap',
-                    transition: 'color 0.2s',
-							}}
-						>
-    { t(cat.label) }
-    </Typography>
-    </Box>
-				))}
-</Stack>
-    </Stack>
-	);
+
+    /** PC **/
+    return (
+        <Stack className="category-chips-section">
+            <Stack className="chips-container" direction="row" alignItems="center">
+                {/* Scrollable chips */}
+                <Box component="div" className="chips-wrap" ref={scrollRef}>
+                    {CATEGORIES.map((cat) =>
+                        cat.value === null ? (
+                            /* ALL — gradient doira */
+                            <Box
+                                key="all"
+                                component="div"
+                                className={`all-chip ${active === null ? 'active' : ''}`}
+                                onClick={() => chipHandler(null)}
+                            >
+                                {t('All')}
+                            </Box>
+                        ) : (
+                            /* Oddiy pill chip */
+                            <Box
+                                key={cat.label}
+                                component="div"
+                                className={`cat-chip ${active === cat.value ? 'active' : ''}`}
+                                onClick={() => chipHandler(cat.value)}
+                            >
+                                <Box component="div" className="chip-icon">{cat.emoji}</Box>
+                                <Typography className="chip-label">{t(cat.label)}</Typography>
+                            </Box>
+                        ),
+                    )}
+                </Box>
+
+                {/* Next arrow */}
+                <IconButton className="chips-next" onClick={scrollNextHandler}>
+                    <ChevronRightIcon />
+                </IconButton>
+            </Stack>
+        </Stack>
+    );
 };
 
 export default CategoryChips;

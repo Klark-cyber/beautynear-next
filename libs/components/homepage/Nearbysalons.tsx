@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack, Box, Typography, Button, IconButton, Chip } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper';
+import SwiperCore, { Autoplay, Navigation } from 'swiper';
+
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -23,6 +24,17 @@ import { userVar } from '../../../apollo/store';
 import { isSalonOpen } from '../../utils';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 
+// ⚠️ TUZATILDI: v8'da modullar ROOT paketdan import qilinadi va
+// SwiperCore.use() orqali ROYXATDAN OTKAZILISHI SHART (v7dan oldingi API)
+SwiperCore.use([Autoplay, Navigation]);
+
+// ⚠️ .toLocaleString() ISHLATMAYMIZ — server va brauzer turli locale bilan
+// formatlab, hydration mismatch xatosiga olib keladi.
+const formatPrice = (n?: number): string => {
+    if (n === undefined || n === null) return '0';
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 const NearbySalons = () => {
     const { t } = useTranslation('common');
     const router = useRouter();
@@ -30,8 +42,24 @@ const NearbySalons = () => {
     const user = useReactiveVar(userVar);
     const [salons, setSalons] = useState<Salon[]>([]);
 
-    const userLat = typeof window !== 'undefined' ? parseFloat(localStorage.getItem('userLat') || '37.5665') : 37.5665;
-    const userLng = typeof window !== 'undefined' ? parseFloat(localStorage.getItem('userLng') || '126.9780') : 126.9780;
+    // ⚠️ TUZATILDI: avval userLat/userLng har render'da localStorage'dan
+    // o'qilar edi, lekin Herolocationfinder geolokatsiyani KEYINROQ
+    // (asinxron) saqlaganida, bu komponent qayta render bo'lmagani uchun
+    // YANGI koordinatalarni hech qachon olmas edi — doim Seoul (yoki eski)
+    // koordinata bilan qolib ketardi. Endi reactive state + hodisa orqali
+    // sinxronlanadi.
+    const [userLat, setUserLat] = useState<number>(37.5665);
+    const [userLng, setUserLng] = useState<number>(126.978);
+
+    useEffect(() => {
+        const readLocation = () => {
+            setUserLat(parseFloat(localStorage.getItem('userLat') || '37.5665'));
+            setUserLng(parseFloat(localStorage.getItem('userLng') || '126.978'));
+        };
+        readLocation();
+        window.addEventListener('userLocationUpdated', readLocation);
+        return () => window.removeEventListener('userLocationUpdated', readLocation);
+    }, []);
 
     const [likeTargetSalon] = useMutation(LIKE_TARGET_SALON);
 
@@ -84,7 +112,9 @@ const NearbySalons = () => {
                 {/* Cards grid */}
                 <Stack direction="row" flexWrap="wrap" gap={2.5}>
                     {salons.map((salon) => {
-                        const img = salon.salonImages?.[0] ? `${REACT_APP_API_URL}/${salon.salonImages[0]}` : '/img/banner/default.jpg';
+                        const img = salon.salonImages?.[0]
+                            ? (salon.salonImages[0].startsWith('http') ? salon.salonImages[0] : `${REACT_APP_API_URL}/${salon.salonImages[0]}`)
+                            : '/img/banner/default.jpg';
                         const isOpen = isSalonOpen(salon.salonWorkHours);
                         const isTop = salon.salonRank >= topSalonRank;
                         const liked = salon.meLiked?.[0]?.myFavorite;
@@ -186,7 +216,7 @@ const NearbySalons = () => {
                                     <Stack direction="row" alignItems="center" gap={0.5} sx={{ mt: 1, pt: 1, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
                                         <ShieldOutlinedIcon sx={{ fontSize: 13, color: '#FF85B3' }} />
                                         <Typography sx={{ fontSize: 11, color: '#999' }}>
-                                            {t('Deposit')}: ₩{salon.depositAmount?.toLocaleString()}
+                                            {t('Deposit')}: ₩{formatPrice(salon.depositAmount)}
                                         </Typography>
                                     </Stack>
                                 </Box>

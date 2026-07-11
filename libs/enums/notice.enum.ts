@@ -1,11 +1,10 @@
-export enum NoticeCategory {
-	FAQ = 'FAQ',
-	TERMS = 'TERMS',
-	INQUIRY = 'INQUIRY',
+export enum NoticeType {
+	EVENT = 'EVENT',
+	NOTICE = 'NOTICE',
+	WARNING = 'WARNING',
 }
 
 export enum NoticeStatus {
-	HOLD = 'HOLD',
 	ACTIVE = 'ACTIVE',
 	DELETE = 'DELETE',
 }

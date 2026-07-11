@@ -1,0 +1,201 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   FOLLOWERS + FOLLOWINGS (bitta umumiy fayl — Nestar'da ham
+   memberFollows.scss ikkalasi uchun bitta fayl bo'lgan, chunki
+   Followers.tsx va Followings.tsx bir xil .member-card dizaynidan
+   foydalanadi)
+   main.scss ga: @import '/scss/pc/mypage/myFollows';
+═══════════════════════════════════════════════════════════════════════ */
+
+.mypage-page {
+    .mypage-main {
+        .mypage-content {
+
+            /* Hamma cardlarni o'rab turuvchi umumiy fon-karta */
+            .follow-page-frame {
+                margin-top: 22px;
+                background: #fff;
+                border-radius: 24px;
+                border: 1px solid rgba(255, 77, 141, 0.08);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+                padding: 32px;
+            }
+
+            /* Member card grid — 4 ustun, kartalar haddan tashqari kengayib ketmasligi uchun */
+            .member-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+
+            .member-card {
+                background: #fff;
+                border-radius: 18px;
+                border: 1px solid rgba(255, 77, 141, 0.08);
+                box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+                padding: 26px 18px 22px;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 14px 36px rgba(255, 77, 141, 0.1);
+                    border-color: rgba(255, 77, 141, 0.2);
+                }
+
+                .mc-avatar-wrap {
+                    cursor: pointer;
+                    padding: 3px;
+                    border-radius: 50%;
+                    border: 2px solid #FFB8D2;
+
+                    .mc-avatar {
+                        width: 72px;
+                        height: 72px;
+                        border: 3px solid #fff;
+                    }
+                }
+
+                .mc-name-row {
+                    margin-top: 14px;
+
+                    .mc-name {
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 15.5px !important;
+                        font-weight: 700 !important;
+                        color: #1a1a1a !important;
+                        cursor: pointer;
+                        max-width: 110px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+
+                        &:hover {
+                            color: #FF4D8D !important;
+                        }
+                    }
+
+                    .mc-badge {
+                        padding: 3px 9px;
+                        background: rgba(255, 77, 141, 0.1);
+                        border-radius: 7px;
+                        font-family: 'Inter', sans-serif;
+                        font-size: 10.5px;
+                        font-weight: 700;
+                        color: #FF4D8D;
+                        white-space: nowrap;
+                    }
+                }
+
+                /* Followers / Following / Likes — orasida | chiziq bilan */
+                .mc-stats {
+                    margin-top: 16px;
+                    width: 100%;
+                    padding-bottom: 16px;
+                    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+                    .mc-stat-group {
+                        flex: 1;
+                    }
+
+                    .mc-stat-divider {
+                        width: 1px;
+                        align-self: stretch;
+                        background: rgba(0, 0, 0, 0.08);
+                        margin: 2px 0;
+                    }
+
+                    .mc-stat-num {
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 14px !important;
+                        font-weight: 700 !important;
+                        color: #333 !important;
+                    }
+
+                    .mc-stat-label {
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 10.5px !important;
+                        color: #999 !important;
+                        margin-top: 2px !important;
+                    }
+
+                    .mc-like {
+                        cursor: pointer;
+                    }
+                }
+
+                .mc-btn {
+                    margin-top: 16px;
+                    height: 42px;
+                    border-radius: 12px !important;
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 13px !important;
+                    font-weight: 700 !important;
+                    text-transform: none !important;
+                    transition: all 0.25s !important;
+
+                    /* "Follow" / "Follow Back" — to'liq pushti */
+                    &.follow {
+                        background: linear-gradient(135deg, #FF4D8D, #FF6B9D) !important;
+                        color: #fff !important;
+                        box-shadow: 0 4px 14px rgba(255, 77, 141, 0.25) !important;
+                        border: none !important;
+
+                        &:hover {
+                            transform: scale(1.02);
+                        }
+                    }
+
+                    /* "Following" (Followers sahifasida) — oq fon, kulrang border, ✓ belgi */
+                    &.following {
+                        background: #fff !important;
+                        color: #444 !important;
+                        border: 1px solid rgba(0, 0, 0, 0.14) !important;
+                        box-shadow: none !important;
+
+                        &:hover {
+                            background: rgba(255, 59, 59, 0.05) !important;
+                            border-color: rgba(255, 59, 59, 0.3) !important;
+                            color: #FF3B3B !important;
+                        }
+                    }
+
+                    /* "Unfollow" (Followings sahifasida) — pushti/qizil outline */
+                    &.unfollow {
+                        background: #fff !important;
+                        color: #FF4D6A !important;
+                        border: 1px solid rgba(255, 77, 106, 0.35) !important;
+                        box-shadow: none !important;
+
+                        &:hover {
+                            background: rgba(255, 77, 106, 0.06) !important;
+                            border-color: #FF4D6A !important;
+                        }
+                    }
+                }
+            }
+
+            /* Follow sahifalari uchun maslahat banneri (faqat Followers'da ishlatiladi) */
+            .follow-tip-banner {
+                margin-top: 28px;
+                padding: 18px 22px;
+                background: rgba(255, 77, 141, 0.06);
+                border: 1px solid rgba(255, 77, 141, 0.15);
+                border-radius: 14px;
+
+                .tip-emoji {
+                    font-size: 18px;
+                }
+
+                .tip-text {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 13.5px !important;
+                    color: #444 !important;
+
+                    b {
+                        color: #FF4D8D;
+                        font-weight: 700;
+                    }
+                }
+            }
+        }
+    }
+}

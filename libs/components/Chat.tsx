@@ -13,6 +13,8 @@ import { REACT_APP_API_URL } from '../config';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import ScrollableFeed from 'react-scrollable-feed';
+import moment from 'moment';
+import { getJwtToken } from '../auth';
 
 interface Message {
 	id: string;
@@ -23,6 +25,11 @@ interface Message {
 	nick?: string;
 }
 
+// ⚠️ TUZATILDI: Apollo'ning GraphQL subscription WebSocket'i bilan
+// to'qnashmasligi uchun chat alohida, mustaqil portga (3008) ulanadi
+// — backend'dagi socket.gateway.ts'dagi CHAT_PORT bilan bir xil bo'lishi shart.
+const CHAT_WS_URL = REACT_APP_API_URL.replace(/^http/, 'ws').replace(/:\d+$/, ':3008');
+
 const Chat = () => {
 	const { t } = useTranslation('common');
 	const user = useReactiveVar(userVar);
@@ -30,18 +37,12 @@ const Chat = () => {
 	const [open, setOpen] = useState(false);
 	const [showButton, setShowButton] = useState(false);
 	const [message, setMessage] = useState('');
-	const [messages, setMessages] = useState<Message[]>([
-		{
-			id: '1',
-			text: t('Welcome to BeautyNear Live Chat! How can we help you today? 💄'),
-			type: 'received',
-			time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-			nick: 'BeautyNear',
-		},
-	]);
-	const [onlineCount] = useState(12);
+	const [messages, setMessages] = useState<Message[]>([]);
+	const [onlineCount, setOnlineCount] = useState(1);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const wsRef = useRef<WebSocket | null>(null);
 
+	/** LIFECYCLES **/
 	useEffect(() => {
 		const timer = setTimeout(() => setShowButton(true), 800);
 		return () => clearTimeout(timer);
@@ -53,33 +54,64 @@ const Chat = () => {
 		return () => clearTimeout(timer);
 	}, [router.pathname]);
 
+	// ⚠️ TUZATILDI: avval Chat.tsx hech qanday haqiqiy WebSocket ulanishiga
+	// ega emas edi — barcha xabarlar faqat lokal (soxta) edi. Endi
+	// backend'dagi Nestar-uslubidagi jonli chat gateway'iga ulanadi.
+	useEffect(() => {
+		const token = getJwtToken();
+		const ws = new WebSocket(`${CHAT_WS_URL}?token=${token}`);
+		wsRef.current = ws;
+
+		ws.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+
+				if (data.event === 'info') {
+					setOnlineCount(data.totalClients ?? 1);
+				}
+
+				if (data.event === 'getMessages' && Array.isArray(data.list)) {
+					const history: Message[] = data.list.map((m: any, idx: number) => ({
+						id: `history-${idx}-${Date.now()}`,
+						text: m.text,
+						type: m.memberData?._id === user?._id ? 'sent' : 'received',
+						time: '',
+						nick: m.memberData?.memberNick ?? 'Guest',
+					}));
+					setMessages((prev) => [...prev, ...history]);
+				}
+
+				if (data.event === 'message') {
+					const incoming: Message = {
+						id: Date.now().toString() + Math.random(),
+						text: data.text,
+						type: data.memberData?._id === user?._id ? 'sent' : 'received',
+						time: moment().format('hh:mm A'),
+						nick: data.memberData?.memberNick ?? 'Guest',
+					};
+					setMessages((prev) => [...prev, incoming]);
+				}
+			} catch (err) {
+				console.log('Chat message parse error:', err);
+			}
+		};
+
+		ws.onerror = (err) => console.log('Chat WebSocket error:', err);
+
+		return () => ws.close();
+	}, [user?._id]);
+
+	/** HANDLERS **/
 	const sendMessage = useCallback(() => {
 		if (!message.trim()) return;
-		const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-		setMessages((prev) => [
-			...prev,
-			{
-				id: Date.now().toString(),
-				text: message.trim(),
-				type: 'sent',
-				time: now,
-			},
-		]);
+		if (wsRef.current?.readyState !== WebSocket.OPEN) return;
+
+		// ⚠️ Lokal ravishda darhol qo'shmaymiz — server o'z xabarimizni ham
+		// hamma bilan bir qatorda bizga qaytarib yuboradi (emitMessage
+		// barcha clientlarga, jumladan yuboruvchining o'ziga ham yuboradi)
+		wsRef.current.send(JSON.stringify({ event: 'message', data: message.trim() }));
 		setMessage('');
-		// Simulate reply
-		setTimeout(() => {
-			setMessages((prev) => [
-				...prev,
-				{
-					id: (Date.now() + 1).toString(),
-					text: t('Thank you for your message! Our team will respond shortly. 🌸'),
-					type: 'received',
-					time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-					nick: 'BeautyNear',
-				},
-			]);
-		}, 1200);
-	}, [message, t]);
+	}, [message]);
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -87,6 +119,7 @@ const Chat = () => {
 			sendMessage();
 		}
 	};
+
 
 	return (
 		<Stack className="chatting">
@@ -283,9 +316,11 @@ const Chat = () => {
 										>
 											{msg.text}
 										</Box>
-										<Typography sx={{ fontSize: 10, color: '#bbb', mt: 0.25, mx: 0.5 }}>
-											{msg.time}
-										</Typography>
+										{msg.time && (
+											<Typography sx={{ fontSize: 10, color: '#bbb', mt: 0.25, mx: 0.5 }}>
+												{msg.time}
+											</Typography>
+										)}
 									</Stack>
 								</Stack>
 							))}

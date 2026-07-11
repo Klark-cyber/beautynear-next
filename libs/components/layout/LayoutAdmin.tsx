@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { ComponentType } from 'react';
 import {
-	Box, Stack, AppBar, Toolbar, Drawer, Avatar, IconButton,
+	Box, AppBar, Toolbar, Avatar, IconButton,
 	Menu, MenuItem, Divider, Typography, Tooltip, Badge,
 } from '@mui/material';
 import MenuList from '../admin/AdminMenuList';
@@ -39,52 +39,34 @@ const withAdminLayout = (Component: ComponentType) => {
 		if (!user || user?.memberType !== MemberType.ADMIN) return null;
 
 		return (
-			<Box component="main" id="pc-wrap" className="admin" sx={{ display: 'flex', minHeight: '100vh', background: '#F8F9FC' }}>
+			// ⚠️ SODDA, ISHONCHLI NAQSH: Sidebar "position: fixed" — sahifa
+			// kontentidan MUSTAQIL, har doim to'liq 100vh. Kontent esa oddiy
+			// "margin-left: 260px" bilan sidebar'dan keyin boshlanadi va
+			// sahifa NORMAL holda scroll qiladi (bu murakkab flex-balandlik
+			// hisob-kitobidan ko'ra ancha barqaror — sanoatda standart naqsh).
+			<Box component="main" id="pc-wrap" className="admin" sx={{ background: '#FFF8FA', minHeight: '100vh' }}>
 
-				{/* Sidebar Drawer */}
-				<Drawer
-					variant="permanent"
-					anchor="left"
-					className="aside"
+				{/* Sidebar — fixed, sahifa scroll qilsa ham joyidan qimirlamaydi */}
+				<Box
+					component="aside"
+					className="admin-sidebar"
 					sx={{
+						position: 'fixed',
+						top: 0,
+						left: 0,
 						width: DRAWER_WIDTH,
-						flexShrink: 0,
-						'& .MuiDrawer-paper': {
-							width: DRAWER_WIDTH,
-							boxSizing: 'border-box',
-							background: 'linear-gradient(160deg, #1a0a12 0%, #2d1020 100%)',
-							border: 'none',
-							boxShadow: '4px 0 20px rgba(0,0,0,0.15)',
-						},
+						height: '100vh',
+						background: '#fff',
+						borderRight: '1px solid rgba(255,77,141,0.12)',
+						boxShadow: '2px 0 12px rgba(0,0,0,0.03)',
+						overflowY: 'auto',
+						zIndex: 1200,
 					}}
 				>
 					{/* Logo */}
-					<Box
-						component="div"
-						sx={{
-							px: 3,
-							py: 3,
-							borderBottom: '1px solid rgba(255,255,255,0.08)',
-						}}
-					>
-						<Box
-							component="div"
-							sx={{
-								transition: 'filter 0.25s',
-								'&:hover': { filter: 'drop-shadow(0 0 8px rgba(255,133,179,0.5))' },
-							}}
-						>
-							<img src="/img/logo/logoWhite.svg" alt="BeautyNear" height={30} />
-						</Box>
-						<Typography
-							sx={{
-								color: 'rgba(255,255,255,0.4)',
-								fontSize: 11,
-								mt: 0.5,
-								letterSpacing: 1,
-								textTransform: 'uppercase',
-							}}
-						>
+					<Box component="div" sx={{ px: 3, py: 3, borderBottom: '1px solid rgba(255,77,141,0.1)' }}>
+						<img src="/img/logo/logo.png" alt="BeautyNear" height={30} />
+						<Typography sx={{ color: '#FF4D8D', fontSize: 11, mt: 0.5, letterSpacing: 1, fontWeight: 700, textTransform: 'uppercase' }}>
 							Admin Panel
 						</Typography>
 					</Box>
@@ -93,107 +75,64 @@ const withAdminLayout = (Component: ComponentType) => {
 					<Box
 						component="div"
 						sx={{
-							px: 3,
-							py: 2,
-							mx: 2,
-							my: 1.5,
-							borderRadius: 2,
-							background: 'rgba(255,77,141,0.12)',
-							border: '1px solid rgba(255,77,141,0.2)',
-							display: 'flex',
-							alignItems: 'center',
-							gap: 1.5,
+							px: 2, py: 2, mx: 2, my: 1.5,
+							borderRadius: 2.5,
+							background: '#FFF0F5',
+							border: '1px solid rgba(255,77,141,0.18)',
+							display: 'flex', alignItems: 'center', gap: 1.5,
 						}}
 					>
 						<Avatar
-							src={user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'}
-							sx={{
-								width: 36,
-								height: 36,
-								border: '2px solid #FF4D8D',
-								transition: 'transform 0.2s',
-								'&:hover': { transform: 'scale(1.1)' },
-							}}
+							src={!user?.memberImage ? '/img/profile/defaultUser.svg' : user.memberImage.startsWith('http') ? user.memberImage : `${REACT_APP_API_URL}/${user.memberImage}`}
+							sx={{ width: 36, height: 36, border: '2px solid #FF4D8D' }}
 						/>
 						<Box component="div">
-							<Typography sx={{ color: '#fff', fontSize: 13, fontWeight: 600 }}>
-								{user?.memberNick}
-							</Typography>
-							<Typography sx={{ color: 'rgba(255,255,255,0.45)', fontSize: 11 }}>
-								Administrator
-							</Typography>
+							<Typography sx={{ color: '#1a1a1a', fontSize: 13, fontWeight: 700 }}>{user?.memberNick}</Typography>
+							<Typography sx={{ color: '#999', fontSize: 11 }}>Administrator</Typography>
 						</Box>
 					</Box>
 
 					<MenuList />
-				</Drawer>
+				</Box>
 
-				{/* Main content */}
-				<Box component="div" sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+				{/* Main content — sidebar kengligiga teng margin-left bilan */}
+				<Box component="div" sx={{ marginLeft: `${DRAWER_WIDTH}px` }}>
 
-					{/* Top AppBar */}
+					{/* Top AppBar — kontent ustida sticky, sidebar bilan aloqasi yo'q */}
 					<AppBar
 						position="sticky"
 						sx={{
-							background: 'rgba(255,255,255,0.95)',
-							backdropFilter: 'blur(12px)',
-							boxShadow: '0 1px 12px rgba(0,0,0,0.06)',
+							background: '#fff',
+							boxShadow: 'none',
 							borderBottom: '1px solid rgba(255,77,141,0.08)',
 							color: '#333',
 						}}
 					>
-						<Toolbar sx={{ justifyContent: 'flex-end', gap: 1.5, minHeight: '60px !important' }}>
-							{/* Notification */}
+						<Toolbar sx={{ justifyContent: 'flex-end', gap: 1.5, minHeight: '80px !important' }}>
 							<IconButton
-								sx={{
-									color: '#666',
-									transition: 'all 0.2s',
-									'&:hover': {
-										color: '#FF4D8D',
-										background: 'rgba(255,77,141,0.08)',
-										'& svg': { animation: 'bellShake 0.4s ease' },
-									},
-									'@keyframes bellShake': {
-										'0%,100%': { transform: 'rotate(0deg)' },
-										'25%': { transform: 'rotate(-15deg)' },
-										'75%': { transform: 'rotate(15deg)' },
-									},
-								}}
+								sx={{ color: '#666', '&:hover': { color: '#FF4D8D', background: 'rgba(255,77,141,0.08)' } }}
 							>
 								<Badge badgeContent={2} color="error" sx={{ '& .MuiBadge-badge': { fontSize: 10 } }}>
 									<NotificationsOutlined />
 								</Badge>
 							</IconButton>
 
-							{/* User avatar */}
 							<Tooltip title={t('Account settings')}>
 								<Box
 									component="div"
 									onClick={(e: any) => setAnchorUser(e.currentTarget)}
 									sx={{
-										display: 'flex',
-										alignItems: 'center',
-										gap: 1,
-										cursor: 'pointer',
-										px: 1.5,
-										py: 0.75,
-										borderRadius: 3,
+										display: 'flex', alignItems: 'center', gap: 1, cursor: 'pointer',
+										px: 1.5, py: 0.75, borderRadius: 3,
 										border: '1px solid rgba(255,77,141,0.2)',
-										transition: 'all 0.25s',
-										'&:hover': {
-											background: 'rgba(255,77,141,0.06)',
-											borderColor: '#FF4D8D',
-											boxShadow: '0 2px 12px rgba(255,77,141,0.15)',
-										},
+										'&:hover': { background: 'rgba(255,77,141,0.06)', borderColor: '#FF4D8D' },
 									}}
 								>
 									<Avatar
-										src={user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'}
+										src={!user?.memberImage ? '/img/profile/defaultUser.svg' : user.memberImage.startsWith('http') ? user.memberImage : `${REACT_APP_API_URL}/${user.memberImage}`}
 										sx={{ width: 28, height: 28, border: '2px solid #FF85B3' }}
 									/>
-									<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#333' }}>
-										{user?.memberNick}
-									</Typography>
+									<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#333' }}>{user?.memberNick}</Typography>
 								</Box>
 							</Tooltip>
 
@@ -201,15 +140,7 @@ const withAdminLayout = (Component: ComponentType) => {
 								anchorEl={anchorUser}
 								open={Boolean(anchorUser)}
 								onClose={() => setAnchorUser(null)}
-								PaperProps={{
-									sx: {
-										mt: 1,
-										borderRadius: 3,
-										boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-										minWidth: 200,
-										overflow: 'hidden',
-									},
-								}}
+								PaperProps={{ sx: { mt: 1, borderRadius: 3, boxShadow: '0 8px 32px rgba(0,0,0,0.12)', minWidth: 200, overflow: 'hidden' } }}
 							>
 								<Box component="div" sx={{ px: 2, py: 1.5, background: 'linear-gradient(135deg, #FFF0F5, #FFF)' }}>
 									<Typography variant="subtitle2" fontWeight={700}>{user?.memberNick}</Typography>
@@ -228,17 +159,11 @@ const withAdminLayout = (Component: ComponentType) => {
 					</AppBar>
 
 					{/* Page content */}
-					<Box
-						component="div"
-						id="bunker"
-						sx={{
-							flex: 1,
-							p: 3,
-							overflow: 'auto',
-						}}
-					>
-						{/* @ts-ignore */}
-						<Component {...props} />
+					<Box component="div" id="bunker" sx={{ p: 4 }}>
+						<Box component="div" sx={{ maxWidth: 1500, mx: 'auto' }}>
+							{/* @ts-ignore */}
+							<Component {...props} />
+						</Box>
 					</Box>
 				</Box>
 			</Box>

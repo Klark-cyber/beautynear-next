@@ -6,6 +6,7 @@ export interface Member {
 	_id: string;
 	memberType: MemberType;
 	memberStatus: MemberStatus;
+	agentRequestStatus?: string; // ⚠️ YANGI
 	memberAuthType: MemberAuthType;
 	memberPhone: string;
 	memberNick: string;

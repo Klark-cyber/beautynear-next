@@ -33,9 +33,10 @@ interface SalonFilterProps {
 	searchFilter: SalonsInquiry;
 	setSearchFilter: (v: SalonsInquiry) => void;
 	initialInput: SalonsInquiry;
+	onReset?: () => void;
 }
 
-// ── Collapsible section ────────────────────────────────────────────────────────
+// Collapsible section — alohida karta
 const FilterSection = ({ title, icon, children }: { title: string; icon?: string; children: React.ReactNode }) => {
 	const [open, setOpen] = useState(true);
 	return (
@@ -46,10 +47,7 @@ const FilterSection = ({ title, icon, children }: { title: string; icon?: string
 					{icon && <span style={{ marginRight: 6 }}>{icon}</span>}
 					{title}
 				</Typography>
-				{open
-					? <ExpandLessIcon sx={{ fontSize: 16, color: '#888' }} />
-					: <ExpandMoreIcon sx={{ fontSize: 16, color: '#888' }} />
-				}
+				{open ? <ExpandLessIcon sx={{ fontSize: 16, color: '#888' }} /> : <ExpandMoreIcon sx={{ fontSize: 16, color: '#888' }} />}
 			</Stack>
 			<Collapse in={open}>
 				<Box component="div" className="filter-section-body">{children}</Box>
@@ -58,7 +56,14 @@ const FilterSection = ({ title, icon, children }: { title: string; icon?: string
 	);
 };
 
-const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilterProps) => {
+// ⚠️ .toLocaleString() ISHLATMAYMIZ — server va brauzer turli locale bilan
+// formatlab, hydration mismatch xatosiga olib keladi.
+const formatPrice = (n?: number): string => {
+	if (n === undefined || n === null) return '0';
+	return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
+const SalonFilter = ({ searchFilter, setSearchFilter, initialInput, onReset }: SalonFilterProps) => {
 	const { t } = useTranslation('common');
 	const router = useRouter();
 	const [specialistText, setSpecialistText] = useState('');
@@ -66,199 +71,122 @@ const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilte
 	const [openNow, setOpenNow] = useState(false);
 	const [minRating, setMinRating] = useState<number | null>(null);
 
-	/** LIFECYCLES — Nestar mantig'i: bo'sh listlarni o'chirish **/
+	/** LIFECYCLES — Nestar: bo'sh listlarni o'chirish (page default ga qaytadi) **/
 	useEffect(() => {
 		if (searchFilter?.search?.locationList?.length === 0) {
-			const updated = { ...searchFilter };
+			const updated = { ...searchFilter, search: { ...searchFilter.search } };
 			delete updated.search.locationList;
 			setSearchFilter(updated);
-			router.push(
-				`/salons?input=${JSON.stringify(updated)}`,
-				`/salons?input=${JSON.stringify(updated)}`,
-				{ scroll: false },
-			).then();
+			router.push(`/salons?input=${JSON.stringify(updated)}`, `/salons?input=${JSON.stringify(updated)}`, { scroll: false }).then();
 		}
-
 		if (searchFilter?.search?.typeList?.length === 0) {
-			const updated = { ...searchFilter };
+			const updated = { ...searchFilter, search: { ...searchFilter.search } };
 			delete updated.search.typeList;
 			setSearchFilter(updated);
-			router.push(
-				`/salons?input=${JSON.stringify(updated)}`,
-				`/salons?input=${JSON.stringify(updated)}`,
-				{ scroll: false },
-			).then();
+			router.push(`/salons?input=${JSON.stringify(updated)}`, `/salons?input=${JSON.stringify(updated)}`, { scroll: false }).then();
 		}
 	}, [searchFilter]);
 
 	/** HANDLERS **/
 
-	// Location — radio, bitta tanlanadi
-	const locationHandler = useCallback(
-		async (location: SalonLocation) => {
-			try {
-				let updated: SalonsInquiry;
-				if (location === SalonLocation.ALL) {
-					const { locationList, ...restSearch } = searchFilter.search;
-					updated = { ...searchFilter, search: restSearch };
-				} else {
-					updated = {
-						...searchFilter,
-						search: { ...searchFilter.search, locationList: [location] },
-						page: 1,
-					};
-				}
-				setSearchFilter(updated);
-				await router.push(
-					`/salons?input=${JSON.stringify(updated)}`,
-					`/salons?input=${JSON.stringify(updated)}`,
-					{ scroll: false },
-				);
-			} catch (err: any) {
-				console.log('ERROR, locationHandler:', err);
+	// Location — radio (bitta tanlanadi)
+	const locationHandler = useCallback(async (location: SalonLocation) => {
+		try {
+			let updated: SalonsInquiry;
+			if (location === SalonLocation.ALL) {
+				const { locationList, ...restSearch } = searchFilter.search;
+				updated = { ...searchFilter, search: restSearch, page: 1 };
+			} else {
+				updated = { ...searchFilter, search: { ...searchFilter.search, locationList: [location] }, page: 1 };
 			}
-		},
-		[searchFilter],
-	);
+			setSearchFilter(updated);
+			await router.push(`/salons?input=${JSON.stringify(updated)}`, `/salons?input=${JSON.stringify(updated)}`, { scroll: false });
+		} catch (err: any) {
+			console.log('ERROR, locationHandler:', err);
+		}
+	}, [searchFilter]);
 
-	// Type — checkbox, bir nechtasi tanlanadi
-	const typeHandler = useCallback(
-		async (e: React.ChangeEvent<HTMLInputElement>) => {
-			try {
-				const isChecked = e.target.checked;
-				const value = e.target.value as SalonType;
-				const current = searchFilter.search.typeList ?? [];
+	// Type — checkbox (qo'shish/o'chirish). O'chirilganda bo'sh bo'lsa typeList delete → default
+	const typeHandler = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+		try {
+			const isChecked = e.target.checked;
+			const value = e.target.value as SalonType;
+			const current = searchFilter.search.typeList ?? [];
+			const typeList = isChecked ? [...current, value] : current.filter((tt) => tt !== value);
 
-				const typeList = isChecked
-					? [...current, value]
-					: current.filter((t) => t !== value);
-
-				const updated: SalonsInquiry = {
-					...searchFilter,
-					search: typeList.length
-						? { ...searchFilter.search, typeList }
-						: (() => { const { typeList: _, ...rest } = searchFilter.search; return rest; })(),
-					page: 1,
-				};
-				setSearchFilter(updated);
-				await router.push(
-					`/salons?input=${JSON.stringify(updated)}`,
-					`/salons?input=${JSON.stringify(updated)}`,
-					{ scroll: false },
-				);
-			} catch (err: any) {
-				console.log('ERROR, typeHandler:', err);
+			let updated: SalonsInquiry;
+			if (typeList.length) {
+				updated = { ...searchFilter, search: { ...searchFilter.search, typeList }, page: 1 };
+			} else {
+				// Bo'sh → o'chirish → default page
+				const { typeList: _omit, ...restSearch } = searchFilter.search;
+				updated = { ...searchFilter, search: restSearch, page: 1 };
 			}
-		},
-		[searchFilter],
-	);
+			setSearchFilter(updated);
+			await router.push(`/salons?input=${JSON.stringify(updated)}`, `/salons?input=${JSON.stringify(updated)}`, { scroll: false });
+		} catch (err: any) {
+			console.log('ERROR, typeHandler:', err);
+		}
+	}, [searchFilter]);
 
-	// Price range — slider qo'yib bo'lgach apply bosganda ishlaydi
-	const priceHandler = useCallback(
-		async (values: number[]) => {
-			try {
-				const updated: SalonsInquiry = {
-					...searchFilter,
-					search: {
-						...searchFilter.search,
-						priceMin: values[0],
-						priceMax: values[1],
-					},
-					page: 1,
-				};
-				setSearchFilter(updated);
-				await router.push(
-					`/salons?input=${JSON.stringify(updated)}`,
-					`/salons?input=${JSON.stringify(updated)}`,
-					{ scroll: false },
-				);
-			} catch (err: any) {
-				console.log('ERROR, priceHandler:', err);
-			}
-		},
-		[searchFilter],
-	);
+	// Price range — backend SISearch da price field YO'Q,
+	// shuning uchun faqat vizual (state) — backendga yuborilmaydi
+	const priceHandler = useCallback((values: number[]) => {
+		setPriceRange(values);
+	}, []);
 
 	// Rating
-	const ratingHandler = useCallback(
-		async (rating: number) => {
-			try {
-				const newRating = minRating === rating ? null : rating;
-				setMinRating(newRating);
-				const updated: SalonsInquiry = {
-					...searchFilter,
-					page: 1,
-				};
-				setSearchFilter(updated);
-				await router.push(
-					`/salons?input=${JSON.stringify(updated)}`,
-					`/salons?input=${JSON.stringify(updated)}`,
-					{ scroll: false },
-				);
-			} catch (err: any) {
-				console.log('ERROR, ratingHandler:', err);
-			}
-		},
-		[searchFilter, minRating],
-	);
+	const ratingHandler = useCallback(async (rating: number) => {
+		try {
+			const newRating = minRating === rating ? null : rating;
+			setMinRating(newRating);
+			const updated: SalonsInquiry = { ...searchFilter, page: 1 };
+			setSearchFilter(updated);
+			await router.push(`/salons?input=${JSON.stringify(updated)}`, `/salons?input=${JSON.stringify(updated)}`, { scroll: false });
+		} catch (err: any) {
+			console.log('ERROR, ratingHandler:', err);
+		}
+	}, [searchFilter, minRating]);
 
-	// Open Now toggle
-	const openNowHandler = useCallback(
-		async (checked: boolean) => {
-			try {
-				setOpenNow(checked);
-				// openNow frontend da isSalonOpen() bilan ishlaydi
-				// backend filter emas — faqat state saqlanadi
-				console.log('openNow:', checked);
-			} catch (err: any) {
-				console.log('ERROR, openNowHandler:', err);
-			}
-		},
-		[],
-	);
+	// Open Now
+	const openNowHandler = useCallback(async (checked: boolean) => {
+		setOpenNow(checked);
+		console.log('openNow:', checked);
+	}, []);
 
-	// Specialist name search
-	const specialistHandler = useCallback(
-		async () => {
-			try {
-				const updated: SalonsInquiry = {
-					...searchFilter,
-					search: { ...searchFilter.search, text: specialistText },
-					page: 1,
-				};
-				setSearchFilter(updated);
-				await router.push(
-					`/salons?input=${JSON.stringify(updated)}`,
-					`/salons?input=${JSON.stringify(updated)}`,
-					{ scroll: false },
-				);
-			} catch (err: any) {
-				console.log('ERROR, specialistHandler:', err);
-			}
-		},
-		[searchFilter, specialistText],
-	);
+	// Specialist name
+	const specialistHandler = useCallback(async () => {
+		try {
+			const updated: SalonsInquiry = {
+				...searchFilter,
+				search: { ...searchFilter.search, text: specialistText },
+				page: 1,
+			};
+			setSearchFilter(updated);
+			await router.push(`/salons?input=${JSON.stringify(updated)}`, `/salons?input=${JSON.stringify(updated)}`, { scroll: false });
+		} catch (err: any) {
+			console.log('ERROR, specialistHandler:', err);
+		}
+	}, [searchFilter, specialistText]);
 
-	// Reset — Nestar mantig'i
-	const refreshHandler = useCallback(
-		async () => {
-			try {
-				setSpecialistText('');
-				setPriceRange([10000, 500000]);
-				setOpenNow(false);
-				setMinRating(null);
+	// Reset — filter lokal state + parent (top) state'larni tozalaydi
+	const refreshHandler = useCallback(async () => {
+		try {
+			setSpecialistText('');
+			setPriceRange([10000, 500000]);
+			setOpenNow(false);
+			setMinRating(null);
+			if (onReset) {
+				// Parent (salons-index) top state'larni ham tozalaydi va refetch qiladi
+				onReset();
+			} else {
 				setSearchFilter(initialInput);
-				await router.push(
-					`/salons?input=${JSON.stringify(initialInput)}`,
-					`/salons?input=${JSON.stringify(initialInput)}`,
-					{ scroll: false },
-				);
-			} catch (err: any) {
-				console.log('ERROR, refreshHandler:', err);
+				await router.push(`/salons?input=${JSON.stringify(initialInput)}`, `/salons?input=${JSON.stringify(initialInput)}`, { scroll: false });
 			}
-		},
-		[initialInput],
-	);
+		} catch (err: any) {
+			console.log('ERROR, refreshHandler:', err);
+		}
+	}, [initialInput, onReset]);
 
 	const activeLocation = searchFilter.search.locationList?.[0] ?? SalonLocation.ALL;
 
@@ -280,22 +208,9 @@ const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilte
 							key={loc}
 							value={loc}
 							onClick={() => locationHandler(loc)}
-							control={
-								<Radio
-									size="small"
-									sx={{
-										color: 'rgba(255,77,141,0.4)',
-										'&.Mui-checked': { color: '#FF4D8D' },
-										py: 0.5,
-									}}
-								/>
-							}
+							control={<Radio size="small" sx={{ color: 'rgba(255,77,141,0.4)', '&.Mui-checked': { color: '#FF4D8D' }, py: 0.5 }} />}
 							label={
-								<Typography sx={{
-									fontSize: 13,
-									color: activeLocation === loc ? '#FF4D8D' : '#333',
-									fontWeight: activeLocation === loc ? 600 : 400,
-								}}>
+								<Typography sx={{ fontSize: 13, color: activeLocation === loc ? '#FF4D8D' : '#333', fontWeight: activeLocation === loc ? 600 : 400 }}>
 									{loc === SalonLocation.ALL ? `🇰🇷 ${t('All Korea')}` : loc}
 								</Typography>
 							}
@@ -313,15 +228,9 @@ const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilte
 							value={type}
 							checked={(searchFilter.search.typeList ?? []).includes(type)}
 							onChange={typeHandler}
-							sx={{
-								color: 'rgba(255,77,141,0.4)',
-								'&.Mui-checked': { color: '#FF4D8D' },
-								py: 0.5,
-							}}
+							sx={{ color: 'rgba(255,77,141,0.4)', '&.Mui-checked': { color: '#FF4D8D' }, py: 0.5 }}
 						/>
-						<Typography sx={{ fontSize: 13, color: '#333' }}>
-							{TYPE_EMOJI[type]} {t(type)}
-						</Typography>
+						<Typography sx={{ fontSize: 13, color: '#333' }}>{TYPE_EMOJI[type]} {t(type)}</Typography>
 					</Stack>
 				))}
 			</FilterSection>
@@ -329,26 +238,16 @@ const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilte
 			{/* Price Range */}
 			<FilterSection title={t('Price Range')} icon="💰">
 				<Stack direction="row" justifyContent="space-between" sx={{ mb: 1 }}>
-					<Typography sx={{ fontSize: 11, color: '#888' }}>
-						₩{priceRange[0].toLocaleString()}
-					</Typography>
-					<Typography sx={{ fontSize: 11, color: '#888' }}>
-						₩{priceRange[1].toLocaleString()}+
-					</Typography>
+					<Typography sx={{ fontSize: 11, color: '#888' }}>₩{formatPrice(priceRange[0])}</Typography>
+					<Typography sx={{ fontSize: 11, color: '#888' }}>₩{formatPrice(priceRange[1])}+</Typography>
 				</Stack>
 				<Slider
 					value={priceRange}
 					onChange={(_, val) => setPriceRange(val as number[])}
-					onChangeCommitted={(_, val) => priceHandler(val as number[])}
-					min={10000}
-					max={500000}
-					step={10000}
+					min={10000} max={500000} step={10000}
 					sx={{
 						color: '#FF4D8D',
-						'& .MuiSlider-thumb': {
-							width: 16, height: 16,
-							'&:hover': { boxShadow: '0 0 0 8px rgba(255,77,141,0.1)' },
-						},
+						'& .MuiSlider-thumb': { width: 16, height: 16, '&:hover': { boxShadow: '0 0 0 8px rgba(255,77,141,0.1)' } },
 						'& .MuiSlider-track': { height: 4 },
 						'& .MuiSlider-rail': { height: 4, opacity: 0.3 },
 					}}
@@ -363,16 +262,7 @@ const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilte
 							key={r.value}
 							value={r.value}
 							onClick={() => ratingHandler(r.value)}
-							control={
-								<Radio
-									size="small"
-									sx={{
-										color: 'rgba(255,77,141,0.4)',
-										'&.Mui-checked': { color: '#FF4D8D' },
-										py: 0.5,
-									}}
-								/>
-							}
+							control={<Radio size="small" sx={{ color: 'rgba(255,77,141,0.4)', '&.Mui-checked': { color: '#FF4D8D' }, py: 0.5 }} />}
 							label={
 								<Stack direction="row" alignItems="center" gap={0.5}>
 									{[1, 2, 3, 4, 5].map((s) => (
@@ -389,22 +279,17 @@ const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilte
 			{/* Open Now */}
 			<FilterSection title={t('Open Now')} icon="🕐">
 				<Stack direction="row" justifyContent="space-between" alignItems="center">
-					<Typography sx={{ fontSize: 13, color: '#555' }}>
-						{t('Show only open salons')}
-					</Typography>
+					<Typography sx={{ fontSize: 13, color: '#555' }}>{t('Show only open salons')}</Typography>
 					<Switch
 						checked={openNow}
 						onChange={(e) => openNowHandler(e.target.checked)}
-						sx={{
-							'& .MuiSwitch-switchBase.Mui-checked': { color: '#FF4D8D' },
-							'& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#FF4D8D' },
-						}}
+						sx={{ '& .MuiSwitch-switchBase.Mui-checked': { color: '#FF4D8D' }, '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': { backgroundColor: '#FF4D8D' } }}
 					/>
 				</Stack>
 			</FilterSection>
 
 			{/* Specialist Name */}
-			<FilterSection title={t('Specialist Name')} icon="👤">
+			<FilterSection title={t('Salon Name')} icon="👤">
 				<Stack direction="row" alignItems="center" gap={1} className="specialist-search">
 					<OutlinedInput
 						size="small"
@@ -413,39 +298,21 @@ const SalonFilter = ({ searchFilter, setSearchFilter, initialInput }: SalonFilte
 						placeholder={t('Search by name...')}
 						onKeyDown={(e) => e.key === 'Enter' && specialistHandler()}
 						sx={{
-							flex: 1,
-							fontSize: 13,
-							borderRadius: 2,
+							flex: 1, fontSize: 13, borderRadius: 2,
 							'& fieldset': { borderColor: 'rgba(255,77,141,0.2)' },
 							'&:hover fieldset': { borderColor: '#FF4D8D !important' },
 							'&.Mui-focused fieldset': { borderColor: '#FF4D8D !important' },
 						}}
 					/>
-					<IconButton
-						onClick={specialistHandler}
-						sx={{
-							width: 36, height: 36,
-							background: '#FF4D8D',
-							color: '#fff',
-							borderRadius: 1.5,
-							'&:hover': { background: '#e53578' },
-						}}
-					>
+					<IconButton onClick={specialistHandler} sx={{ width: 36, height: 36, background: '#FF4D8D', color: '#fff', borderRadius: 1.5, '&:hover': { background: '#e53578' } }}>
 						<SearchIcon sx={{ fontSize: 18 }} />
 					</IconButton>
 				</Stack>
 			</FilterSection>
 
 			{/* Reset */}
-			<Box component="div" sx={{ p: '16px 20px' }}>
-				<Button
-					fullWidth
-					onClick={refreshHandler}
-					className="reset-btn"
-					startIcon={<RefreshIcon />}
-				>
-					{t('Reset')}
-				</Button>
+			<Box component="div" className="filter-reset-wrap">
+				<Button fullWidth onClick={refreshHandler} className="reset-btn" startIcon={<RefreshIcon />}>{t('Reset')}</Button>
 			</Box>
 		</Stack>
 	);

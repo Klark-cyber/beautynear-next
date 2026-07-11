@@ -1,221 +1,325 @@
-#pc-wrap {
-	#my-page {
-		#my-favorites-page {
-			width: 100%;
-			height: auto;
-			display: flex;
-			flex-direction: column;
-			gap: 57px;
-			.main-title-box {
-				width: auto;
-				height: auto;
-				flex-direction: row;
-				justify-content: space-between;
-				.right-box {
-					width: 315px;
-					.main-title {
-						color: #181a20;
-						font-family: $font;
-						font-size: 30px;
-						font-style: normal;
-						font-weight: 600;
-						line-height: normal;
-						letter-spacing: 0.6px;
-						text-transform: capitalize;
-					}
-					.sub-title {
-						color: #181a20;
-						font-family: $font;
-						font-size: 14px;
-						font-style: normal;
-						font-weight: 400;
-						line-height: 26px;
+/* ═══════════════════════════════════════════════════════════════════════
+   MY FAVORITES (Salons / Services tab)
+   main.scss ga: @import '/scss/pc/mypage/myFavorites';
+═══════════════════════════════════════════════════════════════════════ */
+
+.mypage-page {
+	.mypage-main {
+		.mypage-content {
+
+			/* Favorites grid (Salons/Services 3 ustun) */
+			.favorites-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 20px;
+			}
+
+			/* ── SALON CARD (Saloncard.tsx komponenti uchun to'liq stil) ──
+			   ⚠️ Bu blok scss/pc/salon/salon.scss dagi .salons-page .salon-card
+			   bilan AYNAN BIR XIL — chunki Saloncard.tsx u yerda ishlatilgan
+			   klass nomlarini kutadi (.salon-name, .book-btn, .price-stats va h.k.),
+			   general.scss dagi global .salon-card esa eski/nomuvofiq versiya edi. */
+			.salon-card {
+				background: #fff;
+				border-radius: 18px;
+				overflow: hidden;
+				border: 1px solid rgba(255, 77, 141, 0.08);
+				box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+				transition: all 0.3s ease;
+
+				&:hover {
+					transform: translateY(-6px);
+					box-shadow: 0 18px 44px rgba(255, 77, 141, 0.14);
+					border-color: rgba(255, 77, 141, 0.2);
+
+					.salon-card-img {
+						transform: scale(1.05);
 					}
 				}
-			}
-			.favorites-list-box {
-				width: 100%;
-				height: auto;
-				flex-wrap: wrap;
-				flex-direction: row;
-				gap: 22px;
-				.card-config {
-					width: 296px;
-					height: 413px;
-					margin-bottom: 7px;
-					border-radius: 12px;
-					background: #fff;
-					box-shadow: 0px 1px 4px 0px rgba(24, 26, 32, 0.07);
-					.top {
-						position: relative;
-						width: 100%;
-						height: 240px;
-						a {
-							height: 100%;
+
+				.salon-card-img {
+					position: relative;
+					height: 175px;
+					background-size: cover;
+					background-position: center;
+					background-color: #FFE8F0;
+					cursor: pointer;
+					transition: transform 0.5s ease;
+
+					.open-badge {
+						position: absolute;
+						top: 12px;
+						left: 12px;
+						display: inline-flex;
+						align-items: center;
+						height: 24px;
+						padding: 0 11px;
+						border-radius: 8px;
+						font-family: 'Inter', sans-serif;
+						font-size: 10px;
+						font-weight: 700;
+						line-height: 1;
+						letter-spacing: 0.3px;
+						color: #fff;
+						width: auto;
+
+						&.open {
+							background: #4CAF50;
 						}
-						img {
-							width: 100%;
-							height: 100%;
-							object-fit: cover;
-							border-radius: 12px 12px 0 0;
+
+						&.closed {
+							background: #e53935;
 						}
-						.top-badge {
-							position: absolute;
-							top: 20px;
-							left: 16px;
-							display: flex;
-							width: 80px;
-							height: 30px;
-							justify-content: center;
-							align-items: center;
-							border-radius: 6px;
-							padding: 6px 20px;
-							background: #eb6753;
-							color: #fff;
-							text-align: center;
-							text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-							font-family: $font;
-							font-size: 12px;
-							font-style: normal;
-							font-weight: 600;
-							line-height: normal;
-							img {
-								height: 16px;
-							}
-						}
-						.price-box {
-							position: absolute;
-							bottom: 20px;
-							left: 20px;
-							padding: 8px 15px;
-							align-items: center;
-							border-radius: 6px;
-							border: 1px solid rgba(255, 255, 255, 0.5);
+					}
+
+					.top-badge {
+						position: absolute;
+						top: 12px;
+						left: 70px;
+						display: inline-flex;
+						align-items: center;
+						gap: 2px;
+						height: 24px;
+						padding: 0 9px;
+						border-radius: 8px;
+						background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+						font-family: 'Inter', sans-serif;
+						font-size: 10px;
+						font-weight: 800;
+						line-height: 1;
+						letter-spacing: 0.3px;
+						color: #fff;
+						white-space: nowrap;
+						width: auto;
+					}
+
+					.like-btn {
+						position: absolute;
+						top: 8px;
+						right: 8px;
+						width: 34px;
+						height: 34px;
+						background: rgba(255, 255, 255, 0.92);
+						transition: all 0.2s;
+
+						&:hover {
 							background: #fff;
-							p {
-								color: #181a20;
-								font-family: $font;
-								font-size: 15px;
-								font-style: normal;
-								font-weight: 600;
-								line-height: normal;
-							}
+							transform: scale(1.1);
 						}
 					}
-					.bottom {
+				}
+
+				.salon-card-info {
+					padding: 16px 18px 18px;
+
+					.name-rating {
+						margin-bottom: 8px;
+
+						.salon-name {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 17px !important;
+							font-weight: 700 !important;
+							color: #1a1a1a !important;
+							cursor: pointer;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							white-space: nowrap;
+
+							&:hover {
+								color: #FF4D8D !important;
+							}
+						}
+
+						.rating-num {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 13px !important;
+							font-weight: 600 !important;
+							color: #333 !important;
+						}
+					}
+
+					.address-row {
+						margin-bottom: 6px;
+
+						.address-text {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 13px !important;
+							color: #555 !important;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							white-space: nowrap;
+						}
+					}
+
+					.specialist-row {
+						margin-bottom: 10px;
+
+						.specialist-text {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 13px !important;
+							color: #555 !important;
+						}
+					}
+
+					.type-tags {
+						margin-bottom: 12px;
+
+						.type-chip-tag {
+							background: rgba(255, 77, 141, 0.08) !important;
+							color: #FF4D8D !important;
+							font-family: 'Inter', sans-serif !important;
+							font-size: 11px !important;
+							font-weight: 600 !important;
+							height: 24px !important;
+						}
+					}
+
+					.price-stats {
+						margin-bottom: 12px;
+
+						.price {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 17px !important;
+							font-weight: 700 !important;
+							color: #FF4D8D !important;
+						}
+
+						.stat-num {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 12px !important;
+							color: #666 !important;
+						}
+					}
+
+					.deposit-row {
+						padding: 10px 0;
+						margin-bottom: 12px;
+						border-top: 1px solid rgba(0, 0, 0, 0.05);
+
+						.deposit-text {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 12px !important;
+							color: #666 !important;
+						}
+					}
+
+					.book-btn {
 						width: 100%;
-						height: 173px;
-						padding: 20px 16px 10px 16px;
-						.name-address {
-							width: 100%;
-							height: 48px;
-							gap: 5px;
-							margin-bottom: 20px;
-							.name {
-								width: 100%;
-								height: 23px;
-								overflow: hidden;
-								p {
-									color: #181a20;
-									font-family: $font;
-									font-size: 15px;
-									font-style: normal;
-									font-weight: 600;
-									line-height: normal;
-									text-transform: capitalize;
-								}
-							}
-							.address {
-								width: 100%;
-								overflow: hidden;
-								p {
-									color: #717171;
-									font-family: $font;
-									font-size: 13px;
-									font-style: normal;
-									font-weight: 400;
-									line-height: normal;
-								}
-							}
-						}
-						.options {
-							flex-direction: row;
-							width: 100%;
-							height: 20px;
-							gap: 20px;
-							margin-bottom: 10px;
-							.option {
-								flex-direction: row;
-								gap: 5px;
-								align-items: center;
-								p {
-									color: #181a20;
-									font-family: $font;
-									font-size: 13px;
-									font-style: normal;
-									font-weight: 400;
-									line-height: normal;
-								}
-							}
-						}
-						.divider {
-							width: 100%;
-							height: 1px;
-							background: #ddd;
-							margin-bottom: 17px;
-						}
-						.type-buttons {
-							flex-direction: row;
-							width: 100%;
-							justify-content: space-between;
-							align-items: center;
-							.type {
-								flex-direction: row;
-								align-items: center;
-								gap: 7px;
-								p {
-									color: #181a20;
-									font-family: $font;
-									font-style: normal;
-									line-height: normal;
-								}
-								.disabled-type {
-									color: rgba(143, 143, 143, 0.54);
-									font-family: $font;
-									font-style: normal;
-									line-height: normal;
-								}
-							}
-							.buttons {
-								flex-direction: row;
-								width: auto;
-								gap: 12px;
-								justify-content: center;
-								align-items: center;
-								padding-right: 10px;
-								svg {
-									cursor: pointer;
-								}
-							}
+						padding: 11px 0 !important;
+						background: linear-gradient(135deg, #FF4D8D, #FF85B3) !important;
+						color: #fff !important;
+						border-radius: 12px !important;
+						font-family: 'Inter', sans-serif !important;
+						font-weight: 700 !important;
+						font-size: 14px !important;
+						box-shadow: 0 3px 12px rgba(255, 77, 141, 0.3) !important;
+						transition: all 0.25s !important;
+
+						&:hover {
+							transform: scale(1.02) !important;
+							box-shadow: 0 6px 20px rgba(255, 77, 141, 0.4) !important;
 						}
 					}
 				}
 			}
-			.pagination-config {
-				width: 100%;
-				height: auto;
-				justify-content: center;
-				align-items: center;
-				margin-top: 30px;
-				.total-result {
-					p {
-						color: #181a20;
-						text-align: center;
-						font-family: $font;
-						font-size: 14px;
-						font-style: normal;
-						font-weight: 400;
-						line-height: 26px;
+
+			/* Service card (Favorites → Services tab) */
+			.fav-service-card {
+				background: #fff;
+				border-radius: 18px;
+				overflow: hidden;
+				border: 1px solid rgba(255, 77, 141, 0.08);
+				box-shadow: 0 2px 14px rgba(0, 0, 0, 0.05);
+				cursor: pointer;
+				transition: all 0.3s ease;
+
+				&:hover {
+					transform: translateY(-6px);
+					box-shadow: 0 18px 44px rgba(255, 77, 141, 0.14);
+					border-color: rgba(255, 77, 141, 0.2);
+
+					.fsc-img {
+						transform: scale(1.05);
+					}
+				}
+
+				.fsc-img {
+					position: relative;
+					height: 175px;
+					background-size: cover;
+					background-position: center;
+					background-color: #FFE8F0;
+					transition: transform 0.3s;
+
+					.fsc-like-btn {
+						position: absolute;
+						top: 12px;
+						right: 12px;
+						width: 32px;
+						height: 32px;
+						background: #fff !important;
+						box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+
+						&:hover {
+							background: #fff !important;
+						}
+					}
+				}
+
+				.fsc-body {
+					padding: 16px 18px 18px;
+
+					.fsc-name {
+						font-family: 'Inter', sans-serif !important;
+						font-size: 16.5px !important;
+						font-weight: 700 !important;
+						color: #1a1a1a !important;
+					}
+
+					.fsc-salon {
+						font-family: 'Inter', sans-serif !important;
+						font-size: 13.5px !important;
+						font-weight: 600 !important;
+						color: #FF4D8D !important;
+					}
+
+					.fsc-type-chip {
+						display: inline-block;
+						margin-top: 10px;
+						padding: 4px 12px;
+						background: rgba(255, 77, 141, 0.08);
+						border-radius: 8px;
+						font-family: 'Inter', sans-serif;
+						font-size: 12px;
+						font-weight: 600;
+						color: #FF4D8D;
+					}
+
+					.fsc-price-row {
+						margin-top: 14px;
+						padding-top: 12px;
+						border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+						.fsc-price {
+							font-family: 'Inter', sans-serif !important;
+							font-size: 18px !important;
+							font-weight: 800 !important;
+							color: #FF4D8D !important;
+						}
+					}
+
+					.fsc-book-btn {
+						margin-top: 14px;
+						width: 100%;
+						height: 42px;
+						border-radius: 12px !important;
+						background: linear-gradient(135deg, #FF4D8D, #FF6B9D) !important;
+						color: #fff !important;
+						font-family: 'Inter', sans-serif !important;
+						font-size: 13.5px !important;
+						font-weight: 700 !important;
+						text-transform: none !important;
+						box-shadow: 0 4px 14px rgba(255, 77, 141, 0.25) !important;
 					}
 				}
 			}

@@ -68,3 +68,67 @@ body::-webkit-scrollbar {
 /** ACCOUNT **/
 @import '/scss/mobile/account/join';
 @import '/scss/mobile/salon/detail';
+
+// ═══════════════════════════════════════════════════════════════════════
+// FOOTER (mobil) — avval hech qanday maxsus CSS yoq edi, shuning uchun
+// desktop padding'lari (56px) meros qilib olinar, kontent siqilib qolardi
+// ═══════════════════════════════════════════════════════════════════════
+#mobile-wrap {
+  .footer-container.mobile {
+    width: 100%;
+    background: #fff;
+    border-radius: 24px 24px 0 0;
+    padding: 32px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    .footer-brand {
+      align-items: center;
+      width: 100%;
+
+      .footer-logo {
+        height: 28px;
+        margin-bottom: 10px;
+      }
+
+      .footer-tagline {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 12.5px !important;
+        color: #888 !important;
+        margin-bottom: 16px !important;
+      }
+
+      .footer-socials {
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+
+        .social-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: rgba(255, 77, 141, 0.08);
+          color: #FF4D8D;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          svg {
+            font-size: 17px;
+          }
+        }
+      }
+    }
+
+    .footer-copy {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 11px !important;
+      color: #aaa !important;
+      padding-top: 16px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      width: 100%;
+    }
+  }
+}

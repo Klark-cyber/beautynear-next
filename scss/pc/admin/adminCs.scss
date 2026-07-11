@@ -1,0 +1,135 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ADMIN CS (FAQ / Notice / Inquiry) — qoshimcha stillar
+   main.scss ga: @import '/scss/pc/admin/adminCs';
+   (mavjud admin.scss dagi admin-content/admin-table-frame/admin-chip
+   klasslari qayta ishlatiladi, bu yerda faqat YANGI klasslar)
+═══════════════════════════════════════════════════════════════════════ */
+
+#bunker {
+	.admin-content {
+
+		.admin-search-row {
+			margin-bottom: 20px;
+
+			.admin-search-input {
+				height: 44px;
+				min-width: 280px;
+				border-radius: 12px !important;
+				background: #fff;
+				font-family: 'Inter', sans-serif;
+				font-size: 13.5px;
+
+				fieldset { border-color: rgba(0,0,0,0.1) !important; }
+			}
+		}
+
+		.admin-add-btn {
+			height: 44px;
+			padding: 0 20px !important;
+			border-radius: 12px !important;
+			background: linear-gradient(135deg, #FF4D8D, #FF6B9D) !important;
+			color: #fff !important;
+			font-family: 'Inter', sans-serif !important;
+			font-size: 13.5px !important;
+			font-weight: 700 !important;
+			text-transform: none !important;
+			box-shadow: 0 4px 14px rgba(255,77,141,0.25) !important;
+			white-space: nowrap;
+		}
+
+		/* Type chip (kategoriya/tur uchun umumiy rang) */
+		.admin-chip.type-agent {
+			background: rgba(255,77,141,0.1);
+			color: #FF4D8D;
+			font-family: 'Inter', sans-serif;
+			font-size: 11px;
+			font-weight: 700;
+			padding: 4px 10px;
+			border-radius: 7px;
+			display: inline-block;
+		}
+		.admin-chip.status-active { background: rgba(62,160,67,0.1); color: #3EA043; font-family:'Inter',sans-serif; font-size:11px; font-weight:700; padding:4px 10px; border-radius:7px; display:inline-block; }
+		.admin-chip.status-paused { background: rgba(245,124,0,0.1); color: #F57C00; font-family:'Inter',sans-serif; font-size:11px; font-weight:700; padding:4px 10px; border-radius:7px; display:inline-block; }
+		.admin-chip.status-deleted { background: rgba(158,158,158,0.15); color: #757575; font-family:'Inter',sans-serif; font-size:11px; font-weight:700; padding:4px 10px; border-radius:7px; display:inline-block; }
+
+		/* O'ng tomondagi Add/Edit forma paneli */
+		.admin-side-form {
+			width: 360px;
+			flex-shrink: 0;
+			background: #fff;
+			border-radius: 20px;
+			border: 1px solid rgba(255,77,141,0.08);
+			box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+			padding: 24px;
+			height: fit-content;
+			position: sticky;
+			top: 20px;
+
+			.form-title {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 16px !important;
+				font-weight: 800 !important;
+				color: #1a1a1a !important;
+				margin-bottom: 16px !important;
+			}
+
+			.form-label {
+				font-family: 'Inter', sans-serif !important;
+				font-size: 12.5px !important;
+				font-weight: 700 !important;
+				color: #444 !important;
+				margin: 14px 0 6px !important;
+			}
+
+			.form-select {
+				border-radius: 10px !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 13.5px !important;
+
+				fieldset { border-color: rgba(0,0,0,0.12) !important; }
+			}
+
+			.form-textarea {
+				width: 100%;
+				min-height: 70px;
+				padding: 10px 12px;
+				border-radius: 10px;
+				border: 1px solid rgba(0,0,0,0.12);
+				outline: none;
+				resize: vertical;
+				box-sizing: border-box;
+				font-family: 'Inter', sans-serif;
+				font-size: 13.5px;
+				line-height: 1.5;
+
+				&.tall { min-height: 120px; }
+				&:focus { border-color: #FF4D8D; }
+				&::placeholder { color: #aaa; }
+			}
+
+			.form-cancel-btn {
+				height: 40px;
+				padding: 0 18px !important;
+				border-radius: 10px !important;
+				border: 1px solid rgba(0,0,0,0.12) !important;
+				color: #666 !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 13px !important;
+				font-weight: 700 !important;
+				text-transform: none !important;
+			}
+
+			.form-save-btn {
+				height: 40px;
+				padding: 0 20px !important;
+				border-radius: 10px !important;
+				background: linear-gradient(135deg, #FF4D8D, #FF6B9D) !important;
+				color: #fff !important;
+				font-family: 'Inter', sans-serif !important;
+				font-size: 13px !important;
+				font-weight: 700 !important;
+				text-transform: none !important;
+			}
+		}
+	}
+}

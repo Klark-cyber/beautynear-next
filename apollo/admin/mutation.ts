@@ -216,3 +216,114 @@ export const REMOVE_COMMENT_BY_ADMIN = gql`
 		}
 	}
 `;
+/**************************
+ *           FAQ          *
+ *************************/
+
+export const CREATE_FAQ_BY_ADMIN = gql`
+	mutation CreateFaqByAdmin($input: FaqInput!) {
+		createFaqByAdmin(input: $input) {
+			_id
+			faqCategory
+			faqStatus
+			faqQuestion
+			faqAnswer
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const UPDATE_FAQ_BY_ADMIN = gql`
+	mutation UpdateFaqByAdmin($input: FaqUpdate!) {
+		updateFaqByAdmin(input: $input) {
+			_id
+			faqCategory
+			faqStatus
+			faqQuestion
+			faqAnswer
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const REMOVE_FAQ_BY_ADMIN = gql`
+	mutation RemoveFaqByAdmin($input: String!) {
+		removeFaqByAdmin(faqId: $input) {
+			_id
+		}
+	}
+`;
+
+/**************************
+ *         NOTICE         *
+ *************************/
+
+export const CREATE_NOTICE_BY_ADMIN = gql`
+	mutation CreateNoticeByAdmin($input: NoticeInput!) {
+		createNoticeByAdmin(input: $input) {
+			_id
+			noticeType
+			noticeStatus
+			noticeTitle
+			noticeContent
+			noticeViews
+			noticePinned
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const UPDATE_NOTICE_BY_ADMIN = gql`
+	mutation UpdateNoticeByAdmin($input: NoticeUpdate!) {
+		updateNoticeByAdmin(input: $input) {
+			_id
+			noticeType
+			noticeStatus
+			noticeTitle
+			noticeContent
+			noticeViews
+			noticePinned
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const REMOVE_NOTICE_BY_ADMIN = gql`
+	mutation RemoveNoticeByAdmin($input: String!) {
+		removeNoticeByAdmin(noticeId: $input) {
+			_id
+		}
+	}
+`;
+
+/**************************
+ *         INQUIRY        *
+ *************************/
+
+export const UPDATE_INQUIRY_BY_ADMIN = gql`
+	mutation UpdateInquiryByAdmin($input: InquiryUpdate!) {
+		updateInquiryByAdmin(input: $input) {
+			_id
+			inquiryStatus
+			inquirySubject
+			inquiryMessage
+			inquiryReply
+			memberId
+			createdAt
+			updatedAt
+		}
+	}
+`;
+export const PROCESS_AGENT_REQUEST = gql`
+	mutation ProcessAgentRequest($memberId: String!, $approve: Boolean!) {
+		processAgentRequest(memberId: $memberId, approve: $approve) {
+			_id
+			memberType
+			agentRequestStatus
+		}
+	}
+`;

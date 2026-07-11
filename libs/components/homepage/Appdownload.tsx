@@ -1,6 +1,11 @@
 import React from 'react';
 import { Stack, Box, Typography } from '@mui/material';
 import { useTranslation } from 'next-i18next';
+import { useQuery } from '@apollo/client';
+import moment from 'moment';
+import { GET_NOTICES } from '../../../apollo/user/query';
+import { Notice } from '../../types/notice/notice';
+import { T } from '../../types/common';
 
 const FEATURES = [
     { emoji: '📱', title: 'Easy Booking', desc: 'Book in a few taps' },
@@ -10,6 +15,13 @@ const FEATURES = [
 
 const AppDownload = () => {
     const { t } = useTranslation('common');
+    const [events, setEvents] = React.useState<Notice[]>([]);
+
+    useQuery(GET_NOTICES, {
+        fetchPolicy: 'cache-and-network',
+        variables: { input: { page: 1, limit: 3, search: { noticeType: 'EVENT' } } },
+        onCompleted: (data: T) => setEvents(data?.getNotices?.list ?? []),
+    });
 
     return (
         <Stack
@@ -86,33 +98,49 @@ const AppDownload = () => {
                     </Stack>
                 </Stack>
 
-                {/* Right — phone mockup placeholder */}
-                <Stack sx={{ flexShrink: 0, alignItems: 'center', gap: 2 }}>
-                    <Box
-                        component="div"
-                        sx={{
-                            width: 280,
-                            height: 420,
-                            borderRadius: 6,
-                            background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 20px 60px rgba(255,77,141,0.25)',
-                            position: 'relative',
-                            overflow: 'hidden',
-                        }}
-                    >
-                        <img
-                            src="/img/app/mockup.png"
-                            alt="BeautyNear App"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 24 }}
-                            onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none';
+                {/* O'ng — telefon mockup o'rniga real Event/E'lon kartalari */}
+                <Stack sx={{ flexShrink: 0, width: 320, gap: 1.5 }}>
+                    <Typography sx={{ fontSize: 12, fontWeight: 800, color: '#FF4D8D', letterSpacing: 0.5, textTransform: 'uppercase' }}>
+                        🎉 {t('Upcoming Events')}
+                    </Typography>
+
+                    {events.length === 0 ? (
+                        <Box
+                            component="div"
+                            sx={{
+                                borderRadius: 4, p: 4, textAlign: 'center',
+                                background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
+                                color: '#fff', boxShadow: '0 20px 60px rgba(255,77,141,0.25)',
                             }}
-                        />
-                        <Typography sx={{ position: 'absolute', fontSize: 48, opacity: 0.3 }}>💄</Typography>
-                    </Box>
+                        >
+                            <Typography sx={{ fontSize: 40, mb: 1 }}>💄</Typography>
+                            <Typography sx={{ fontSize: 14, fontWeight: 700 }}>{t('Beauty in your pocket')}</Typography>
+                        </Box>
+                    ) : (
+                        events.map((ev) => (
+                            <Box
+                                key={ev._id}
+                                component="div"
+                                sx={{
+                                    borderRadius: 3, p: 2.25, background: '#fff',
+                                    border: '1px solid rgba(255,77,141,0.1)',
+                                    boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+                                    cursor: 'pointer', transition: 'all 0.2s',
+                                    '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 12px 28px rgba(255,77,141,0.12)' },
+                                }}
+                            >
+                                <Typography sx={{ fontSize: 10, fontWeight: 700, color: '#FF4D8D', mb: 0.5 }}>
+                                    {moment(ev.createdAt).format('MMM DD, YYYY')}
+                                </Typography>
+                                <Typography sx={{ fontSize: 14, fontWeight: 800, color: '#1a1a1a', mb: 0.5, lineHeight: 1.3 }}>
+                                    {ev.noticeTitle}
+                                </Typography>
+                                <Typography sx={{ fontSize: 12, color: '#888', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    {ev.noticeContent}
+                                </Typography>
+                            </Box>
+                        ))
+                    )}
                 </Stack>
             </Stack>
         </Stack>

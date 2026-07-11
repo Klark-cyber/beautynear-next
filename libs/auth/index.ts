@@ -161,7 +161,13 @@ export const updateUserInfo = (jwtToken: any) => {
 export const logOut = () => {
 	deleteStorage();
 	deleteUserInfo();
-	window.location.reload();
+	// ⚠️ TUZATILDI: avval til tanlovi (locale) logout'dan keyin ham
+	// saqlanib qolar edi — keyingi (yangi) foydalanuvchi ham oldingi
+	// foydalanuvchi tanlagan tilni ko'rar edi. Endi standart (en) tilga
+	// qaytariladi.
+	localStorage.removeItem('locale');
+	document.cookie = 'NEXT_LOCALE=en; path=/; max-age=0';
+	window.location.href = '/';
 };
 
 const deleteStorage = () => {

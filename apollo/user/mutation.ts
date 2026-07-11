@@ -75,6 +75,7 @@ export const UPDATE_MEMBER = gql`
 	mutation UpdateMember($input: MemberUpdate!) {
 		updateMember(input: $input) {
 			_id
+			accessToken
 			memberType
 			memberStatus
 			memberAuthType
@@ -497,5 +498,32 @@ export const IMAGE_UPLOADER = gql`
 export const IMAGES_UPLOADER = gql`
 	mutation ImagesUploader($files: [Upload!]!, $target: String!) {
 		imagesUploader(files: $files, target: $target)
+	}
+`;
+/**************************
+ *         INQUIRY        *
+ *************************/
+
+export const CREATE_INQUIRY = gql`
+	mutation CreateInquiry($input: InquiryInput!) {
+		createInquiry(input: $input) {
+			_id
+			inquiryStatus
+			inquirySubject
+			inquiryMessage
+			createdAt
+		}
+	}
+`;
+/**************************
+ *      AGENT REQUEST     *
+ *************************/
+
+export const REQUEST_AGENT_ROLE = gql`
+	mutation RequestAgentRole {
+		requestAgentRole {
+			_id
+			agentRequestStatus
+		}
 	}
 `;

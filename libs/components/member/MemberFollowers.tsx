@@ -13,37 +13,50 @@ import { T } from '../../types/common';
 import { GET_MEMBER_FOLLOWERS } from '../../../apollo/user/query';
 
 interface MemberFollowsProps {
-	initialInput: FollowInquiry;
+	initialInput?: FollowInquiry;
 	subscribeHandler: any;
 	unsubscribeHandler: any;
 	redirectToMemberPageHandler: any;
 	likeMemberHandler: any;
 }
 
+const DEFAULT_INITIAL_INPUT: FollowInquiry = {
+	page: 1,
+	limit: 5,
+	search: {
+		followingId: '',
+	},
+};
+
 const MemberFollowers = (props: MemberFollowsProps) => {
-	const { initialInput, subscribeHandler, unsubscribeHandler, redirectToMemberPageHandler, likeMemberHandler } = props;
+	// destructuring default — defaultProps'ga tayanmaymiz (avvalgi
+	// Followings.tsx'dagi "Cannot read properties of undefined" xatosi
+	// aynan shu sabab bilan yuzaga kelgan edi)
+	const {
+		initialInput = DEFAULT_INITIAL_INPUT,
+		subscribeHandler,
+		unsubscribeHandler,
+		redirectToMemberPageHandler,
+		likeMemberHandler,
+	} = props;
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const [total, setTotal] = useState<number>(0);
-	const category: any = router.query?.category ?? 'properties';
+	// 'properties' -> 'salons' (property->salon migratsiyasi)
+	const category: any = router.query?.category ?? 'salons';
 	const [followInquiry, setFollowInquiry] = useState<FollowInquiry>(initialInput);
 	const [memberFollowers, setMemberFollowers] = useState<Follower[]>([]);
 	const user = useReactiveVar(userVar);
 
 	/** APOLLO REQUESTS **/
-	const {
-		loading: getMemberFollowersLoading,
-		data: getMemberFollowersData,
-		error: getMemberFollowersError,
-		refetch: getMemberFollowersRefetch,
-	} = useQuery(GET_MEMBER_FOLLOWERS, {
+	const { refetch: getMemberFollowersRefetch } = useQuery(GET_MEMBER_FOLLOWERS, {
 		fetchPolicy: 'network-only',
 		variables: { input: followInquiry },
-		skip: !((followInquiry?.search?.followingId?.length ?? 0) > 0),//followingId yuq bulsa → surov yuborma degani
+		skip: !((followInquiry?.search?.followingId?.length ?? 0) > 0),
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setMemberFollowers(data?.getMemberFollowers?.list);
-			setTotal(data?.getMemberFollowers?.metaCounter[0]?.total);
+			setMemberFollowers(data?.getMemberFollowers?.list ?? []);
+			setTotal(data?.getMemberFollowers?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
@@ -84,14 +97,16 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 					</Stack>
 					{memberFollowers?.length === 0 && (
 						<div className={'no-data'}>
-							<img src="/img/icons/icoAlert.svg" alt="" />
+							<Box component="div" className="no-data-emoji">👥</Box>
 							<p>No Followers yet!</p>
 						</div>
 					)}
 					{memberFollowers.map((follower: Follower) => {
-						const imagePath: string = follower?.followerData?.memberImage
-							? `${REACT_APP_API_URL}/${follower?.followerData?.memberImage}`
-							: '/img/profile/defaultUser.svg';
+						const imagePath: string = !follower?.followerData?.memberImage
+							? '/img/profile/defaultUser.svg'
+							: follower.followerData.memberImage.startsWith('http')
+								? follower.followerData.memberImage
+								: `${REACT_APP_API_URL}/${follower.followerData.memberImage}`;
 						return (
 							<Stack className="follows-card-box" key={follower._id}>
 								<Stack className={'info'} onClick={() => redirectToMemberPageHandler(follower?.followerData?._id)}>
@@ -114,13 +129,14 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 									<Box className={'info-box'} component={'div'}>
 										{follower?.meLiked && follower?.meLiked[0]?.myFavorite ? (
 											<FavoriteIcon
-												color="primary"
+												sx={{ color: '#FF4D8D' }}
 												onClick={() =>
 													likeMemberHandler(follower?.followerData?._id, getMemberFollowersRefetch, followInquiry)
 												}
 											/>
 										) : (
 											<FavoriteBorderIcon
+												sx={{ color: '#999' }}
 												onClick={() =>
 													likeMemberHandler(follower?.followerData?._id, getMemberFollowersRefetch, followInquiry)
 												}
@@ -133,10 +149,9 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 									<Stack className="action-box">
 										{follower.meFollowed && follower.meFollowed[0]?.myFollowing ? (
 											<>
-												<Typography>Following</Typography>
+												<Typography className="following-label">Following</Typography>
 												<Button
-													variant="outlined"
-													sx={{ background: '#ed5858', ':hover': { background: '#ee7171' } }}
+													className="unfollow-btn"
 													onClick={() =>
 														unsubscribeHandler(follower?.followerData?._id, getMemberFollowersRefetch, followInquiry)
 													}
@@ -146,8 +161,7 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 											</>
 										) : (
 											<Button
-												variant="contained"
-												sx={{ background: '#60eb60d4', ':hover': { background: '#60eb60d4' } }}
+												className="follow-btn"
 												onClick={() =>
 													subscribeHandler(follower?.followerData?._id, getMemberFollowersRefetch, followInquiry)
 												}
@@ -169,7 +183,7 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 								count={Math.ceil(total / followInquiry.limit)}
 								onChange={paginationHandler}
 								shape="circular"
-								color="primary"
+								sx={{ '& .MuiPaginationItem-root.Mui-selected': { background: '#FF4D8D', color: '#fff' } }}
 							/>
 						</Stack>
 						<Stack className="total-result">
@@ -183,13 +197,7 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 };
 
 MemberFollowers.defaultProps = {
-	initialInput: {
-		page: 1,
-		limit: 5,
-		search: {
-			followingId: '',
-		},
-	},
+	initialInput: DEFAULT_INITIAL_INPUT,
 };
 
 export default MemberFollowers;

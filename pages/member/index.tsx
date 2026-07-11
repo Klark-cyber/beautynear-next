@@ -4,7 +4,7 @@ import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { Stack } from '@mui/material';
 import MemberMenu from '../../libs/components/member/MemberMenu';
-import MemberProperties from '../../libs/components/member/MemberProperties';
+import MemberSalons from '../../libs/components/member/MemberSalons';
 import { useRouter } from 'next/router';
 import MemberFollowers from '../../libs/components/member/MemberFollowers';
 import MemberArticles from '../../libs/components/member/MemberArticles';
@@ -40,7 +40,8 @@ const MemberPage: NextPage = () => {
 			router.replace(
 				{
 					pathname: router.pathname,
-					query: { ...router.query, category: 'properties' },
+					// ⚠️ 'properties' -> 'salons' (property→salon migratsiyasi)
+					query: { ...router.query, category: 'salons' },
 				},
 				undefined,
 				{ shallow: true },
@@ -49,20 +50,20 @@ const MemberPage: NextPage = () => {
 	}, [category, router]);
 
 	/** HANDLERS **/
+	// ⚠️ FollowToggleInput — OBYEKT turi ({ followingId }), oddiy string emas!
+	// (MyPage'dagi Followers.tsx/Followings.tsx'da topilgan xuddi shu xato)
 	const subscribeHandler = async (id: string, refetch: any, query: any) => {
 		try {
-			console.log('id: ', id);
 			if (!id) throw new Error(Messages.error1);
 			if (!user?._id) throw new Error(Messages.error2);
 
 			await subscribe({
 				variables: {
-					input: id,
+					input: { followingId: id },
 				},
 			});
 			await sweetTopSmallSuccessAlert('Subscribed!', 800);
-			await refetch({ input: query }); //datani refetch qilamiz
-
+			await refetch({ input: query });
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
@@ -75,7 +76,7 @@ const MemberPage: NextPage = () => {
 
 			await unsubscribe({
 				variables: {
-					input: id,
+					input: { followingId: id },
 				},
 			});
 			await sweetTopSmallSuccessAlert('Unsubscribed!', 800);
@@ -84,14 +85,16 @@ const MemberPage: NextPage = () => {
 			sweetErrorHandling(err).then();
 		}
 	};
+
 	const redirectToMemberPageHandler = async (memberId: string) => {
 		try {
-			if (memberId === user?._id) await router.push(`/mypage?memberId=${memberId}`);
+			if (memberId === user?._id) await router.push(`/mypage`);
 			else await router.push(`/member?memberId=${memberId}`);
 		} catch (error) {
 			await sweetErrorHandling(error);
 		}
 	};
+
 	const likeMemberHandler = async (id: string, refetch: any, query: any) => {
 		try {
 			if (!id) return;
@@ -124,7 +127,7 @@ const MemberPage: NextPage = () => {
 							</Stack>
 							<Stack className="main-config" mb={'76px'}>
 								<Stack className={'list-config'}>
-									{category === 'properties' && <MemberProperties />}
+									{category === 'salons' && <MemberSalons />}
 									{category === 'followers' && (
 										<MemberFollowers
 											subscribeHandler={subscribeHandler}
@@ -153,7 +156,3 @@ const MemberPage: NextPage = () => {
 };
 
 export default withLayoutBasic(MemberPage);
-function likeTargetMember(arg0: { variables: { input: string; }; }) {
-	throw new Error('Function not implemented.');
-}
-

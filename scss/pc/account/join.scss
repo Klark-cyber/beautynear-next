@@ -1,75 +1,418 @@
-@import '/scss/variables.scss';
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-#pc-wrap {
-  .join-page {
+.join-page {
+  background: #FAFAFA;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 56px 24px 80px;
+
+  .join-container {
     width: 100%;
-    min-height: calc(100vh - 220px);
-    display: flex;
-    align-items: center;
+    max-width: 480px;
+  }
+
+  .join-main {
+    background: #fff;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 16px 60px rgba(255, 77, 141, 0.1);
+    border: 1px solid rgba(255, 77, 141, 0.06);
+  }
+
+  /* ── LEFT (form) ── */
+  .join-left {
+    width: 100%;
+    padding: 40px 40px 44px;
     justify-content: center;
-    padding: 40px 32px;
-    background: linear-gradient(160deg, #fff8fb 0%, #fff 100%);
 
-    .container {
-      max-width: 960px;
-      width: 100%;
+    .join-logo {
+      margin-bottom: 28px;
+
+      img {
+        height: 42px;
+        object-fit: contain;
+      }
     }
 
-    .main {
-      display: flex;
-      flex-direction: row;
-      border-radius: 24px;
-      overflow: hidden;
-      box-shadow: 0 20px 60px rgba(255, 77, 141, 0.12);
-      min-height: 580px;
+    .join-info {
+      margin-bottom: 28px;
+
+      .ji-title {
+        font-family: 'Playfair Display', serif !important;
+        font-size: 28px !important;
+        font-weight: 700 !important;
+        color: #1a1a1a !important;
+        margin-bottom: 6px !important;
+      }
+
+      .ji-sub {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 14px !important;
+        color: #888 !important;
+        line-height: 1.6 !important;
+      }
     }
 
-    // ── LEFT — Form ───────────────────────────────────────────────────────
-    .left {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 40px;
-      background: $white;
+    .join-inputs {
+      margin-bottom: 8px;
+    }
+  }
 
-      .logo {
+  /* ── INPUT FIELD ── */
+  .field-block {
+    margin-bottom: 16px;
+
+    .field-label {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      color: #555 !important;
+      margin-bottom: 7px !important;
+    }
+
+    .field-input {
+      border: 1.5px solid rgba(255, 77, 141, 0.2);
+      border-radius: 14px;
+      padding: 11px 14px;
+      background: #fff;
+      transition: all 0.2s;
+
+      &:focus-within {
+        border-color: #FF4D8D;
+        box-shadow: 0 0 0 3px rgba(255, 77, 141, 0.08);
+      }
+
+      .fi-icon {
+        color: #FF4D8D;
         display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        margin-bottom: 28px;
+        margin-right: 10px;
+        flex-shrink: 0;
+      }
 
-        img {
-          height: 36px;
-          transition: filter 0.25s;
+      .fi-field {
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 14px;
+        font-family: 'Inter', sans-serif;
+        color: #333;
+        background: transparent;
 
-          &:hover {
-            filter: drop-shadow(0 0 6px rgba(255, 77, 141, 0.4));
-          }
+        &::placeholder {
+          color: #bbb;
         }
       }
 
-      .info {
-        margin-bottom: 24px;
-      }
-
-      .input-wrap {
-        margin-bottom: 8px;
-      }
-
-      .register {
+      .fi-toggle {
+        cursor: pointer;
+        color: #bbb;
         display: flex;
-        flex-direction: column;
+        flex-shrink: 0;
+
+        &:hover {
+          color: #FF4D8D;
+        }
+      }
+    }
+  }
+
+  /* ── USER/AGENT type tanlash ── */
+  .join-type {
+    margin-bottom: 18px;
+
+    .jt-label {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 12px !important;
+      font-weight: 600 !important;
+      color: #555 !important;
+      margin-bottom: 8px !important;
+    }
+
+    .jt-options {
+      width: 100%;
+    }
+
+    .jt-card {
+      flex: 1;
+      border: 1.5px solid rgba(255, 77, 141, 0.2);
+      border-radius: 14px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fff;
+
+      .jtc-title {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        color: #1a1a1a !important;
       }
 
-      .ask-info {
-        margin-top: 20px;
+      .jtc-desc {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 11px !important;
+        color: #999 !important;
+        margin-top: 2px !important;
+      }
+
+      &:hover {
+        border-color: rgba(255, 77, 141, 0.45);
+      }
+
+      &.active {
+        border-color: #FF4D8D;
+        background: rgba(255, 77, 141, 0.04);
+        box-shadow: 0 0 0 3px rgba(255, 77, 141, 0.08);
+
+        .jtc-title {
+          color: #FF4D8D !important;
+        }
+      }
+    }
+  }
+
+  /* ── REGISTER block ── */
+  .join-register {
+    .join-remember {
+      margin-bottom: 16px;
+    }
+
+    .forgot-pw {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 13px !important;
+      color: #FF4D8D !important;
+      cursor: pointer;
+      font-weight: 500 !important;
+
+      &:hover {
+        opacity: 0.8;
       }
     }
 
-    // ── RIGHT — Decorative ────────────────────────────────────────────────
-    .right {
-      width: 380px;
-      flex-shrink: 0;
+    .join-divider {
+      margin: 20px 0;
+
+      .jd-text {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 12px !important;
+        color: #bbb !important;
+        font-weight: 500 !important;
+      }
+    }
+  }
+
+  /* ── SUBMIT button ── */
+  .join-submit {
+    padding: 13px 0 !important;
+    background: linear-gradient(135deg, #FF4D8D, #FF85B3) !important;
+    color: #fff !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 15px !important;
+    border-radius: 14px !important;
+    box-shadow: 0 4px 16px rgba(255, 77, 141, 0.35) !important;
+    transition: all 0.25s !important;
+    text-transform: none !important;
+
+    &:hover {
+      transform: translateY(-2px) !important;
+      box-shadow: 0 8px 24px rgba(255, 77, 141, 0.45) !important;
+      background: linear-gradient(135deg, #e53578, #FF4D8D) !important;
+    }
+
+    &:disabled {
+      background: #eee !important;
+      color: #bbb !important;
+      box-shadow: none !important;
+      transform: none !important;
+    }
+  }
+
+  /* ── SOCIAL buttons ── */
+  .social-btn {
+    padding: 11px 0 !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    border-radius: 14px !important;
+    text-transform: none !important;
+    transition: all 0.2s !important;
+
+    &.kakao {
+      background: #FEE500 !important;
+      color: #3C1E1E !important;
+
+      &:hover {
+        background: #f0d800 !important;
+        transform: translateY(-1px) !important;
+      }
+    }
+
+    &.naver {
+      background: #03C75A !important;
+      color: #fff !important;
+
+      &:hover {
+        background: #02b050 !important;
+        transform: translateY(-1px) !important;
+      }
+    }
+  }
+
+  /* ── ASK (switch) ── */
+  .join-ask {
+    margin-top: 22px;
+
+    .ja-text {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 14px !important;
+      color: #888 !important;
+    }
+
+    .ja-link {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 14px !important;
+      font-weight: 700 !important;
+      color: #FF4D8D !important;
+      cursor: pointer;
+      transition: opacity 0.2s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  /* ── RIGHT (decorative) ── */
+  .join-right {
+    flex: 1;
+    background: linear-gradient(135deg, #FF4D8D 0%, #FF85B3 50%, #ffb3d0 100%);
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+
+    .jr-circle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+
+      &.c1 {
+        width: 300px;
+        height: 300px;
+        top: -100px;
+        right: -100px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      &.c2 {
+        width: 200px;
+        height: 200px;
+        bottom: -60px;
+        left: -60px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+    }
+
+    .jr-title {
+      font-family: 'Playfair Display', serif !important;
+      font-size: 28px !important;
+      font-weight: 700 !important;
+      color: #fff !important;
+      text-align: center !important;
+      line-height: 1.3 !important;
+      position: relative;
+      z-index: 1;
+    }
+
+    .jr-sub {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 14px !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      text-align: center !important;
+      line-height: 1.7 !important;
+      max-width: 300px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .jr-stats {
+      position: relative;
+      z-index: 1;
+
+      .jrs-num {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 22px !important;
+        font-weight: 800 !important;
+        color: #fff !important;
+      }
+
+      .jrs-lbl {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 11px !important;
+        color: rgba(255, 255, 255, 0.8) !important;
+      }
+    }
+
+    .jr-emoji {
+      font-size: 70px;
+      position: relative;
+      z-index: 1;
+    }
+  }
+}
+
+/* ── MOBILE ── */
+.join-page.mobile {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 32px 20px;
+
+  .join-logo-m {
+    margin-bottom: 32px;
+
+    .jl-title {
+      font-family: 'Playfair Display', serif !important;
+      font-size: 22px !important;
+      font-weight: 700 !important;
+      color: #1a1a1a !important;
+      margin-top: 14px !important;
+    }
+
+    .jl-sub {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 13px !important;
+      color: #888 !important;
+      margin-top: 4px !important;
+    }
+  }
+
+  .join-form-m {
+    background: #fff;
+    border-radius: 24px;
+    padding: 28px 24px;
+    box-shadow: 0 4px 24px rgba(255, 77, 141, 0.08);
+  }
+
+  .join-switch {
+    margin-top: 20px;
+
+    .js-text {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 13px !important;
+      color: #888 !important;
+    }
+
+    .js-link {
+      font-family: 'Inter', sans-serif !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      color: #FF4D8D !important;
+      margin-left: 6px !important;
+      cursor: pointer;
     }
   }
 }

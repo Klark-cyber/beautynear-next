@@ -43,3 +43,16 @@ export interface AgentServicesInquiry {
 	direction?: Direction;
 	search: ASVISearch;
 }
+
+interface ALSVISearch {
+	serviceStatus?: ServiceStatus;
+	typeList?: ServiceType[];
+}
+
+export interface AllServicesInquiry {
+	page: number;
+	limit: number;
+	sort?: string;
+	direction?: Direction;
+	search: ALSVISearch;
+}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Stack, Box, Typography, Button, IconButton, Avatar, AvatarGroup } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper';
+import SwiperCore, { Autoplay, Navigation } from 'swiper';
+
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
@@ -13,8 +14,7 @@ import EastIcon from '@mui/icons-material/East';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { useQuery, useMutation } from '@apollo/client';
-import { useReactiveVar } from '@apollo/client';
+import { useQuery, useMutation, useReactiveVar } from '@apollo/client';
 import { GET_SERVICES } from '../../../apollo/user/query';
 import { LIKE_TARGET_SERVICE } from '../../../apollo/user/mutation';
 import { T } from '../../types/common';
@@ -25,7 +25,17 @@ import { Message } from '../../enums/common.enum';
 import { userVar } from '../../../apollo/store';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 
-// Fake specialist avatars for card (in real app, from memberData)
+// ⚠️ TUZATILDI: v8'da modullar ROOT paketdan import qilinadi va
+// SwiperCore.use() orqali ROYXATDAN OTKAZILISHI SHART (v7dan oldingi API)
+SwiperCore.use([Autoplay, Navigation]);
+
+// ⚠️ .toLocaleString() ISHLATMAYMIZ — server va brauzer turli locale bilan
+// formatlab, hydration mismatch xatosiga olib keladi.
+const formatPrice = (n?: number): string => {
+    if (n === undefined || n === null) return '0';
+    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 const FAKE_AVATARS = [
     '/img/profile/defaultUser.svg',
     '/img/profile/defaultUser.svg',
@@ -44,7 +54,7 @@ const TrendingServices = () => {
     const { refetch } = useQuery(GET_SERVICES, {
         fetchPolicy: 'cache-and-network',
         variables: {
-            input: { page: 1, limit: 8, sort: 'serviceLikes', direction: 'DESC', search: {} },
+            input: { page: 1, limit: 6, sort: 'serviceLikes', direction: 'DESC', search: {} },
         },
         notifyOnNetworkStatusChange: true,
         onCompleted: (data: T) => setServices(data?.getServices?.list ?? []),
@@ -63,33 +73,28 @@ const TrendingServices = () => {
 
     if (!services.length) return null;
 
-    // Mobile: horizontal scroll small cards
+    /** MOBILE **/
     if (device === 'mobile') {
         return (
-            <Stack sx={{ py: 4, background: '#fff' }}>
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2, mb: 2 }}>
-                    <Typography sx={{ fontSize: 18, fontWeight: 800, color: '#1a1a1a' }}>{t('Trending Services')}</Typography>
+            <Stack className="trending-services-section mobile">
+                <Stack direction="row" justifyContent="space-between" alignItems="center" className="ts-header">
+                    <Typography className="ts-title">{t('Trending Services')}</Typography>
                     <Link href="/services">
-                        <Typography sx={{ fontSize: 12, color: '#FF4D8D', fontWeight: 600, cursor: 'pointer' }}>{t('View all')}</Typography>
+                        <Typography className="ts-viewall">{t('View all')}</Typography>
                     </Link>
                 </Stack>
-                <Stack direction="row" gap={1.5} sx={{ px: 2, overflowX: 'auto', '&::-webkit-scrollbar': { display: 'none' } }}>
+                <Stack direction="row" gap={1.5} className="ts-scroll">
                     {services.map((svc) => {
-                        const img = svc.serviceImages?.[0] ? `${REACT_APP_API_URL}/${svc.serviceImages[0]}` : '/img/banner/default.jpg';
+                        const raw = svc.serviceImages?.[0];
+                        const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/default.jpg';
                         return (
-                            <Stack
-                                key={svc._id}
-                                onClick={() => router.push(`/services/${svc._id}`)}
-                                sx={{ flexShrink: 0, width: 130, borderRadius: 3, overflow: 'hidden', background: '#fff', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', cursor: 'pointer' }}
-                            >
-                                <Box component="div" sx={{ position: 'relative', height: 110, backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                                    <Box component="div" sx={{ position: 'absolute', top: 6, left: 6, background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)', borderRadius: 1.5, px: 0.75, py: 0.25 }}>
-                                        <Typography sx={{ fontSize: 9, color: '#fff', fontWeight: 700 }}>🔥 {t('Trending')}</Typography>
-                                    </Box>
+                            <Stack key={svc._id} className="ts-card-mobile" onClick={() => router.push(`/services/${svc._id}`)}>
+                                <Box component="div" className="tsm-img" style={{ backgroundImage: `url(${img})` }}>
+                                    <Box component="div" className="tsm-badge">🔥 {t('Trending')}</Box>
                                 </Box>
-                                <Box component="div" sx={{ p: 1 }}>
-                                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: '#1a1a1a', mb: 0.25, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{svc.serviceTitle}</Typography>
-                                    <Typography sx={{ fontSize: 11, color: '#FF4D8D', fontWeight: 600 }}>₩{svc.servicePrice?.toLocaleString()}~</Typography>
+                                <Box component="div" className="tsm-info">
+                                    <Typography className="tsm-name">{svc.serviceTitle}</Typography>
+                                    <Typography className="tsm-price">₩{formatPrice(svc.servicePrice)}~</Typography>
                                 </Box>
                             </Stack>
                         );
@@ -99,165 +104,110 @@ const TrendingServices = () => {
         );
     }
 
-    // Desktop: big cards with Swiper
+    /** PC **/
     return (
-        <Stack sx={{ py: 7, px: 4, background: '#fff' }}>
-            <Stack sx={{ maxWidth: 1280, mx: 'auto', width: '100%' }}>
+        <Stack className="trending-services-section">
+            <Stack className="ts-container">
                 {/* Header */}
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
-                    <Box component="div">
-                        <Typography sx={{ fontSize: 22, fontWeight: 800, color: '#1a1a1a', mb: 0.25 }}>{t('Trending Services')}</Typography>
-                        <Typography sx={{ fontSize: 13, color: '#888' }}>{t('Most loved beauty treatments this week')}</Typography>
-                    </Box>
+                <Stack direction="row" justifyContent="space-between" alignItems="center" className="ts-header">
+                    <Stack>
+                        <Typography className="ts-title">{t('Trending Services')}</Typography>
+                        <Typography className="ts-subtitle">{t('Most loved beauty treatments this week')}</Typography>
+                    </Stack>
                     <Stack direction="row" alignItems="center" gap={2}>
                         <Link href="/services">
-                            <Stack direction="row" alignItems="center" gap={0.5} sx={{ cursor: 'pointer', '&:hover': { opacity: 0.8 } }}>
-                                <Typography sx={{ fontSize: 13, fontWeight: 600, color: '#FF4D8D' }}>{t('View all services')}</Typography>
-                                <Typography sx={{ color: '#FF4D8D' }}>→</Typography>
+                            <Stack direction="row" alignItems="center" gap={0.5} className="ts-viewall">
+                                <Typography className="tsv-text">{t('View all services')}</Typography>
+                                <EastIcon sx={{ fontSize: 16 }} />
                             </Stack>
                         </Link>
-                        <Stack direction="row" gap={0.5}>
-                            <Box component="div" className="swiper-trending-prev" sx={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(255,77,141,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { background: '#FF4D8D', borderColor: '#FF4D8D', '& svg': { color: '#fff' } } }}>
-                                <WestIcon sx={{ fontSize: 14, color: '#FF4D8D' }} />
-                            </Box>
-                            <Box component="div" className="swiper-trending-next" sx={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(255,77,141,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { background: '#FF4D8D', borderColor: '#FF4D8D', '& svg': { color: '#fff' } } }}>
-                                <EastIcon sx={{ fontSize: 14, color: '#FF4D8D' }} />
-                            </Box>
+                        <Stack direction="row" gap={0.75}>
+                            <Box component="div" className="ts-arrow swiper-trending-prev"><WestIcon /></Box>
+                            <Box component="div" className="ts-arrow swiper-trending-next"><EastIcon /></Box>
                         </Stack>
                     </Stack>
                 </Stack>
 
+                {/* Slider */}
                 <Swiper
-                    slidesPerView="auto"
+                    slidesPerView={5}
                     spaceBetween={20}
                     modules={[Autoplay, Navigation]}
                     navigation={{ nextEl: '.swiper-trending-next', prevEl: '.swiper-trending-prev' }}
                     autoplay={{ delay: 4000, disableOnInteraction: false }}
+                    loop={services.length > 4}
                 >
                     {services.map((svc) => {
-                        const img = svc.serviceImages?.[0] ? `${REACT_APP_API_URL}/${svc.serviceImages[0]}` : '/img/banner/default.jpg';
+                        const raw = svc.serviceImages?.[0];
+                        const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/default.jpg';
                         const liked = svc.meLiked?.[0]?.myFavorite;
 
                         return (
-                            <SwiperSlide key={svc._id} style={{ width: 280 }}>
-                                <Stack
-                                    sx={{
-                                        width: 280,
-                                        borderRadius: 4,
-                                        overflow: 'hidden',
-                                        background: '#fff',
-                                        boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-                                        border: '1px solid rgba(255,77,141,0.08)',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': { transform: 'translateY(-6px)', boxShadow: '0 16px 48px rgba(255,77,141,0.15)', borderColor: 'rgba(255,77,141,0.2)' },
-                                    }}
-                                >
+                            <SwiperSlide key={svc._id} className="ts-slide">
+                                <Stack className="trending-card">
                                     {/* Image */}
-                                    <Box
-                                        component="div"
-                                        onClick={() => router.push(`/services/${svc._id}`)}
-                                        sx={{ position: 'relative', height: 220, backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center', cursor: 'pointer' }}
-                                    >
-                                        {/* Trending badge */}
-                                        <Box component="div" sx={{ position: 'absolute', top: 12, left: 12, background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)', borderRadius: 2, px: 1.25, py: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <WhatshotIcon sx={{ fontSize: 12, color: '#fff' }} />
-                                            <Typography sx={{ fontSize: 11, color: '#fff', fontWeight: 700 }}>{t('Trending')}</Typography>
-                                        </Box>
+                                    <Box component="div" className="tc-img" style={{ backgroundImage: `url(${img})` }}
+                                        onClick={() => router.push(`/services/${svc._id}`)}>
+                                        <Stack direction="row" alignItems="center" gap={0.5} className="tc-badge">
+                                            <WhatshotIcon sx={{ fontSize: 12 }} />
+                                            <Typography className="tcb-text">{t('Trending')}</Typography>
+                                        </Stack>
 
-                                        {/* Like */}
-                                        <IconButton
-                                            onClick={(e: any) => { e.stopPropagation(); likeHandler(svc._id); }}
-                                            sx={{ position: 'absolute', top: 8, right: 8, background: 'rgba(255,255,255,0.9)', width: 32, height: 32, transition: 'all 0.2s', '&:hover': { background: '#fff', transform: 'scale(1.1)' } }}
-                                        >
-                                            {liked ? <FavoriteIcon sx={{ fontSize: 16, color: '#FF4D8D' }} /> : <FavoriteBorderIcon sx={{ fontSize: 16, color: '#666' }} />}
+                                        <IconButton className="tc-like" onClick={(e: any) => { e.stopPropagation(); likeHandler(svc._id); }}>
+                                            {liked
+                                                ? <FavoriteIcon sx={{ fontSize: 16, color: '#FF4D8D' }} />
+                                                : <FavoriteBorderIcon sx={{ fontSize: 16, color: '#666' }} />}
                                         </IconButton>
 
-                                        {/* Specialist avatars + count */}
-                                        <Stack direction="row" justifyContent="space-between" alignItems="center"
-                                            sx={{ position: 'absolute', bottom: 10, left: 12, right: 12 }}>
-                                            <AvatarGroup max={3} sx={{ '& .MuiAvatar-root': { width: 28, height: 28, fontSize: 10, border: '2px solid #fff' } }}>
+                                        <Stack direction="row" justifyContent="space-between" alignItems="center" className="tc-overlay">
+                                            <AvatarGroup max={3} className="tc-avatars">
                                                 {FAKE_AVATARS.map((av, i) => <Avatar key={i} src={av} />)}
                                             </AvatarGroup>
-                                            <Box component="div" sx={{ background: 'rgba(0,0,0,0.5)', borderRadius: 1.5, px: 1, py: 0.25 }}>
-                                                <Typography sx={{ fontSize: 11, color: '#fff', fontWeight: 600 }}>
-                                                    {svc.serviceViews >= 1000 ? `${(svc.serviceViews / 1000).toFixed(1)}K+` : `${svc.serviceViews}+`}
-                                                </Typography>
+                                            <Box component="div" className="tc-views">
+                                                {svc.serviceViews >= 1000 ? `${(svc.serviceViews / 1000).toFixed(1)}K+` : `${svc.serviceViews}+`}
                                             </Box>
                                         </Stack>
                                     </Box>
 
                                     {/* Info */}
-                                    <Box component="div" sx={{ p: 2 }}>
-                                        <Typography
-                                            onClick={() => router.push(`/services/${svc._id}`)}
-                                            sx={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a', mb: 0.25, cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', '&:hover': { color: '#FF4D8D' } }}
-                                        >
+                                    <Box component="div" className="tc-info">
+                                        <Typography className="tc-name" onClick={() => router.push(`/services/${svc._id}`)}>
                                             {svc.serviceTitle}
                                         </Typography>
 
-                                        {svc.serviceDesc && (
-                                            <Typography sx={{ fontSize: 12, color: '#888', mb: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                {svc.serviceDesc}
-                                            </Typography>
-                                        )}
+                                        {svc.serviceDesc && <Typography className="tc-desc">{svc.serviceDesc}</Typography>}
 
-                                        {/* Price + discount */}
-                                        <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 1.5 }}>
-                                            <Typography sx={{ fontSize: 15, fontWeight: 700, color: '#FF4D8D' }}>
-                                                ₩{svc.servicePrice?.toLocaleString()}~
-                                            </Typography>
-                                            <Box component="div" sx={{ background: 'rgba(255,77,141,0.1)', borderRadius: 1.5, px: 1, py: 0.25 }}>
-                                                <Typography sx={{ fontSize: 11, color: '#FF4D8D', fontWeight: 700 }}>20% OFF</Typography>
-                                            </Box>
+                                        <Stack direction="row" alignItems="center" gap={1} className="tc-price-row">
+                                            <Typography className="tc-price">₩{formatPrice(svc.servicePrice)}~</Typography>
+                                            <Box component="div" className="tc-discount">20% OFF</Box>
                                         </Stack>
 
-                                        {/* Stats */}
-                                        <Stack direction="row" alignItems="center" gap={1.5} sx={{ mb: 2 }}>
+                                        <Stack direction="row" alignItems="center" gap={1.5} className="tc-stats">
                                             <Stack direction="row" alignItems="center" gap={0.25}>
                                                 <RemoveRedEyeIcon sx={{ fontSize: 13, color: '#999' }} />
-                                                <Typography sx={{ fontSize: 12, color: '#999' }}>
+                                                <Typography className="tcs-num">
                                                     {svc.serviceViews >= 1000 ? `${(svc.serviceViews / 1000).toFixed(1)}K` : svc.serviceViews}
                                                 </Typography>
                                             </Stack>
                                             <Stack direction="row" alignItems="center" gap={0.25}>
                                                 <FavoriteBorderIcon sx={{ fontSize: 13, color: '#999' }} />
-                                                <Typography sx={{ fontSize: 12, color: '#999' }}>
+                                                <Typography className="tcs-num">
                                                     {svc.serviceLikes >= 1000 ? `${(svc.serviceLikes / 1000).toFixed(1)}K` : svc.serviceLikes}
                                                 </Typography>
                                             </Stack>
                                             <Stack direction="row" alignItems="center" gap={0.25}>
                                                 <StarIcon sx={{ fontSize: 13, color: '#FFB800' }} />
-                                                <Typography sx={{ fontSize: 12, fontWeight: 600, color: '#333' }}>
+                                                <Typography className="tcs-rating">
                                                     {svc.serviceRating > 0 ? svc.serviceRating.toFixed(1) : '4.9'}
                                                 </Typography>
                                             </Stack>
                                         </Stack>
 
-                                        {/* Buttons */}
                                         <Stack direction="row" gap={1}>
-                                            <Button
-                                                fullWidth
-                                                onClick={() => router.push(`/salons/${svc.salonId}`)}
-                                                sx={{
-                                                    background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
-                                                    color: '#fff', fontWeight: 700, fontSize: 12,
-                                                    borderRadius: 2.5,
-                                                    boxShadow: '0 3px 12px rgba(255,77,141,0.3)',
-                                                    transition: 'all 0.25s',
-                                                    '&:hover': { transform: 'scale(1.03)', boxShadow: '0 6px 20px rgba(255,77,141,0.4)' },
-                                                }}
-                                            >
+                                            <Button fullWidth className="tc-book-btn" onClick={() => router.push(`/salons/${svc.salonId}`)}>
                                                 {t('Book Now')}
                                             </Button>
-                                            <IconButton
-                                                sx={{
-                                                    width: 36, height: 36,
-                                                    border: '1.5px solid rgba(255,77,141,0.3)',
-                                                    borderRadius: 2,
-                                                    transition: 'all 0.2s',
-                                                    '&:hover': { background: 'rgba(255,77,141,0.08)', borderColor: '#FF4D8D' },
-                                                }}
-                                            >
+                                            <IconButton className="tc-add-btn">
                                                 <AddIcon sx={{ fontSize: 18, color: '#FF4D8D' }} />
                                             </IconButton>
                                         </Stack>

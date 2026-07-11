@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Stack, Box, Typography, Button, IconButton, Chip } from '@mui/material';
+import { Stack, Box, Typography, IconButton, Chip } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper';
+import SwiperCore, { Autoplay, Navigation } from 'swiper';
+
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -24,6 +25,17 @@ import { userVar } from '../../../apollo/store';
 import { isSalonOpen } from '../../utils';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 
+// ⚠️ TUZATILDI: v8'da modullar ROOT paketdan import qilinadi va
+// SwiperCore.use() orqali ROYXATDAN OTKAZILISHI SHART (v7dan oldingi API)
+SwiperCore.use([Autoplay, Navigation]);
+
+// ⚠️ .toLocaleString() ISHLATMAYMIZ — server va brauzer turli locale bilan
+// formatlab, hydration mismatch xatosiga olib keladi.
+const formatPrice = (n?: number): string => {
+	if (n === undefined || n === null) return '0';
+	return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
+
 const PopularSalons = () => {
 	const { t } = useTranslation('common');
 	const router = useRouter();
@@ -36,7 +48,7 @@ const PopularSalons = () => {
 	const { refetch } = useQuery(GET_SALONS, {
 		fetchPolicy: 'cache-and-network',
 		variables: {
-			input: { page: 1, limit: 8, sort: 'salonRank', direction: 'DESC', search: {} },
+			input: { page: 1, limit: 6, sort: 'salonRank', direction: 'DESC', search: {} },
 		},
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => setSalons(data?.getSalons?.list ?? []),
@@ -56,128 +68,110 @@ const PopularSalons = () => {
 	if (!salons.length) return null;
 
 	const SalonCard = ({ salon }: { salon: Salon }) => {
-		const img = salon.salonImages?.[0] ? `${REACT_APP_API_URL}/${salon.salonImages[0]}` : '/img/banner/default.jpg';
+		const raw = salon.salonImages?.[0];
+		const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/default.jpg';
 		const isOpen = isSalonOpen(salon.salonWorkHours);
-		const isTop = salon.salonRank >= topSalonRank;
 		const liked = salon.meLiked?.[0]?.myFavorite;
 
 		return (
-			<Stack
-				sx={{
-					width: device === 'mobile' ? 200 : 240,
-					borderRadius: 4,
-					overflow: 'hidden',
-					background: '#fff',
-					boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-					border: '1px solid rgba(255,77,141,0.08)',
-					transition: 'all 0.3s ease',
-					'&:hover': { transform: 'translateY(-6px)', boxShadow: '0 16px 48px rgba(255,77,141,0.15)', borderColor: 'rgba(255,77,141,0.2)' },
-				}}
-			>
+			<Stack className="popular-card">
 				{/* Image */}
-				<Box
-					component="div"
-					onClick={() => router.push(`/salons/${salon._id}`)}
-					sx={{ position: 'relative', height: 170, backgroundImage: `url(${img})`, backgroundSize: 'cover', backgroundPosition: 'center', cursor: 'pointer' }}
-				>
-					<Chip label={isOpen ? t('Open') : t('Closed')} size="small"
-						sx={{ position: 'absolute', top: 8, left: 8, background: isOpen ? '#4CAF50' : '#e53935', color: '#fff', fontWeight: 700, fontSize: 10 }} />
-					<IconButton
-						onClick={(e: any) => { e.stopPropagation(); likeHandler(salon._id); }}
-						sx={{ position: 'absolute', top: 4, right: 4, background: 'rgba(255,255,255,0.9)', width: 28, height: 28, transition: 'all 0.2s', '&:hover': { transform: 'scale(1.1)' } }}
-					>
-						{liked ? <FavoriteIcon sx={{ fontSize: 14, color: '#FF4D8D' }} /> : <FavoriteBorderIcon sx={{ fontSize: 14, color: '#666' }} />}
+				<Box component="div" className="pc-img" style={{ backgroundImage: `url(${img})` }}
+					onClick={() => router.push(`/salons/${salon._id}`)}>
+					<Chip
+						label={isOpen ? t('Open') : t('Closed')}
+						size="small"
+						className={`pc-status ${isOpen ? 'open' : 'closed'}`}
+					/>
+					<IconButton className="pc-like" onClick={(e: any) => { e.stopPropagation(); likeHandler(salon._id); }}>
+						{liked
+							? <FavoriteIcon sx={{ fontSize: 15, color: '#FF4D8D' }} />
+							: <FavoriteBorderIcon sx={{ fontSize: 15, color: '#666' }} />}
 					</IconButton>
 				</Box>
 
 				{/* Info */}
-				<Box component="div" sx={{ p: 1.5 }}>
-					<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.25 }}>
-						<Typography
-							onClick={() => router.push(`/salons/${salon._id}`)}
-							sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a', cursor: 'pointer', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, mr: 1, '&:hover': { color: '#FF4D8D' } }}
-						>
+				<Box component="div" className="pc-info">
+					<Stack direction="row" justifyContent="space-between" alignItems="center" className="pc-name-row">
+						<Typography className="pc-name" onClick={() => router.push(`/salons/${salon._id}`)}>
 							{salon.salonTitle}
 						</Typography>
-						<Stack direction="row" alignItems="center" gap={0.25}>
-							<StarIcon sx={{ fontSize: 12, color: '#FFB800' }} />
-							<Typography sx={{ fontSize: 11, fontWeight: 600 }}>4.9</Typography>
+						<Stack direction="row" alignItems="center" gap={0.25} className="pc-rating">
+							<StarIcon sx={{ fontSize: 13, color: '#FFB800' }} />
+							<Typography className="pcr-num">4.9</Typography>
 						</Stack>
 					</Stack>
 
-					<Typography sx={{ fontSize: 11, color: '#888', mb: 1, display: 'flex', alignItems: 'center', gap: 0.25 }}>
-						<LocationOnIcon sx={{ fontSize: 12 }} />
-						{salon.salonLocation}
-					</Typography>
-
-					<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-						<Typography sx={{ fontSize: 12, color: '#FF4D8D', fontWeight: 600 }}>₩30,000~</Typography>
+					<Stack direction="row" alignItems="center" gap={0.25} className="pc-location">
+						<LocationOnIcon sx={{ fontSize: 13 }} />
+						<Typography className="pcl-text">{salon.salonLocation}</Typography>
 					</Stack>
 
-					<Stack direction="row" alignItems="center" gap={0.5} sx={{ pt: 1, borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-						<ShieldOutlinedIcon sx={{ fontSize: 12, color: '#FF85B3' }} />
-						<Typography sx={{ fontSize: 10, color: '#999' }}>
-							{t('Deposit')}: ₩{salon.depositAmount?.toLocaleString()}
+					<Typography className="pc-price">₩30,000~</Typography>
+
+					<Stack direction="row" alignItems="center" gap={0.5} className="pc-deposit">
+						<ShieldOutlinedIcon sx={{ fontSize: 13, color: '#FF85B3' }} />
+						<Typography className="pcd-text">
+							{t('Deposit')}: ₩{formatPrice(salon.depositAmount)}
 						</Typography>
 					</Stack>
 				</Box>
-			</Stack >
+			</Stack>
 		);
 	};
 
-	// Mobile
+	/** MOBILE **/
 	if (device === 'mobile') {
 		return (
-			<Stack sx={{ py: 4, background: '#FAFAFA' }}>
-				<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2, mb: 2 }}>
-					<Typography sx={{ fontSize: 18, fontWeight: 800, color: '#1a1a1a' }}>{t('Popular Salons')}</Typography>
+			<Stack className="popular-salons-section mobile">
+				<Stack direction="row" justifyContent="space-between" alignItems="center" className="ps-header">
+					<Typography className="ps-title">{t('Popular Salons')}</Typography>
 					<Link href="/salons">
-						<Typography sx={{ fontSize: 12, color: '#FF4D8D', fontWeight: 600, cursor: 'pointer' }}>{t('View all')}</Typography>
+						<Typography className="ps-viewall">{t('View all')}</Typography>
 					</Link>
 				</Stack>
-				<Stack direction="row" gap={1.5} sx={{ px: 2, overflowX: 'auto', '&::-webkit-scrollbar': { display: 'none' }, pb: 1 }}>
+				<Stack direction="row" gap={1.5} className="ps-scroll">
 					{salons.map((salon) => <SalonCard key={salon._id} salon={salon} />)}
 				</Stack>
 			</Stack>
 		);
 	}
 
-	// Desktop
+	/** PC **/
 	return (
-		<Stack sx={{ py: 7, px: 4, background: '#FAFAFA' }}>
-			<Stack sx={{ maxWidth: 1280, mx: 'auto', width: '100%' }}>
-				<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
-					<Box component="div">
-						<Typography sx={{ fontSize: 22, fontWeight: 800, color: '#1a1a1a', mb: 0.25 }}>{t('Popular Salons')}</Typography>
-						<Typography sx={{ fontSize: 13, color: '#888' }}>{t('Top rated salons by our community')}</Typography>
-					</Box>
+		<Stack className="popular-salons-section">
+			<Stack className="ps-container">
+				{/* Header */}
+				<Stack direction="row" justifyContent="space-between" alignItems="center" className="ps-header">
+					<Stack>
+						<Typography className="ps-title">{t('Popular Salons')}</Typography>
+						<Typography className="ps-subtitle">{t('Top rated salons by our community')}</Typography>
+					</Stack>
 					<Stack direction="row" alignItems="center" gap={2}>
 						<Link href="/salons">
-							<Stack direction="row" alignItems="center" gap={0.5} sx={{ cursor: 'pointer', '&:hover': { opacity: 0.8 } }}>
-								<Typography sx={{ fontSize: 13, fontWeight: 600, color: '#FF4D8D' }}>{t('View all salons')}</Typography>
-								<Typography sx={{ color: '#FF4D8D' }}>→</Typography>
+							<Stack direction="row" alignItems="center" gap={0.5} className="ps-viewall">
+								<Typography className="psv-text">{t('View all salons')}</Typography>
+								<EastIcon sx={{ fontSize: 16 }} />
 							</Stack>
 						</Link>
-						<Stack direction="row" gap={0.5}>
-							<Box component="div" className="swiper-popular-prev" sx={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(255,77,141,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { background: '#FF4D8D', '& svg': { color: '#fff' } } }}>
-								<WestIcon sx={{ fontSize: 14, color: '#FF4D8D' }} />
-							</Box>
-							<Box component="div" className="swiper-popular-next" sx={{ width: 32, height: 32, borderRadius: '50%', border: '1.5px solid rgba(255,77,141,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s', '&:hover': { background: '#FF4D8D', '& svg': { color: '#fff' } } }}>
-								<EastIcon sx={{ fontSize: 14, color: '#FF4D8D' }} />
-							</Box>
+						<Stack direction="row" gap={0.75}>
+							<Box component="div" className="ps-arrow swiper-popular-prev"><WestIcon /></Box>
+							<Box component="div" className="ps-arrow swiper-popular-next"><EastIcon /></Box>
 						</Stack>
 					</Stack>
 				</Stack>
 
+				{/* Slider */}
 				<Swiper
-					slidesPerView="auto"
+					slidesPerView={5}
 					spaceBetween={20}
 					modules={[Autoplay, Navigation]}
 					navigation={{ nextEl: '.swiper-popular-next', prevEl: '.swiper-popular-prev' }}
 					autoplay={{ delay: 5000, disableOnInteraction: false }}
+					loop={salons.length > 4}
 				>
 					{salons.map((salon) => (
-						<SwiperSlide key={salon._id} style={{ width: 240 }}>
+						<SwiperSlide key={salon._id} className="ps-slide">
 							<SalonCard salon={salon} />
 						</SwiperSlide>
 					))}

@@ -1,0 +1,220 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ADD NEW SERVICE (Create / Update rejimi) — addNewSalon.scss bilan
+   bir xil uslub, mustaqil dublikat
+   main.scss ga: @import '/scss/pc/mypage/addNewService';
+═══════════════════════════════════════════════════════════════════════ */
+
+.mypage-page {
+    .mypage-main {
+        .mypage-content {
+            .service-form-card {
+                margin-top: 22px;
+                background: #fff;
+                border-radius: 24px;
+                border: 1px solid rgba(255, 77, 141, 0.08);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+                padding: 36px;
+
+                .section-divider {
+                    height: 1px;
+                    background: rgba(0, 0, 0, 0.06);
+                    margin: 26px 0;
+                }
+
+                .form-row {
+                    margin-bottom: 20px;
+                }
+
+                .form-group {
+                    flex: 1;
+                    margin-bottom: 20px;
+
+                    &.full {
+                        width: 100%;
+                    }
+
+                    .form-label {
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 13px !important;
+                        font-weight: 600 !important;
+                        color: #333 !important;
+                        margin-bottom: 8px !important;
+                    }
+
+                    .form-input {
+                        width: 100%;
+                        height: 47px;
+                        padding: 0 15px;
+                        border-radius: 12px;
+                        border: 1px solid rgba(0, 0, 0, 0.12);
+                        outline: none;
+                        font-family: 'Inter', sans-serif;
+                        font-size: 14px;
+                        color: #1a1a1a;
+                        box-sizing: border-box;
+                        transition: border-color 0.2s;
+
+                        &::placeholder {
+                            color: #aaa;
+                        }
+
+                        &:hover {
+                            border-color: rgba(255, 77, 141, 0.4);
+                        }
+
+                        &:focus {
+                            border-color: #FF4D8D;
+                        }
+                    }
+
+                    .form-select {
+                        height: 47px;
+                        border-radius: 12px !important;
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 14px !important;
+
+                        .MuiOutlinedInput-notchedOutline {
+                            border-color: rgba(0, 0, 0, 0.12) !important;
+                        }
+
+                        &:hover .MuiOutlinedInput-notchedOutline {
+                            border-color: rgba(255, 77, 141, 0.4) !important;
+                        }
+
+                        &.Mui-focused .MuiOutlinedInput-notchedOutline {
+                            border-color: #FF4D8D !important;
+                        }
+                    }
+
+                    .form-textarea {
+                        width: 100%;
+                        height: 110px;
+                        padding: 14px 15px;
+                        border-radius: 12px;
+                        border: 1px solid rgba(0, 0, 0, 0.12);
+                        outline: none;
+                        resize: vertical;
+                        box-sizing: border-box;
+                        font-family: 'Inter', sans-serif;
+                        font-size: 14px;
+                        line-height: 1.6;
+                        color: #1a1a1a;
+
+                        &::placeholder {
+                            color: #aaa;
+                        }
+
+                        &:hover {
+                            border-color: rgba(255, 77, 141, 0.4);
+                        }
+
+                        &:focus {
+                            border-color: #FF4D8D;
+                        }
+                    }
+                }
+
+                .upload-dropzone {
+                    width: 100%;
+                    min-height: 190px;
+                    border-radius: 16px;
+                    border: 1.5px dashed rgba(255, 77, 141, 0.4);
+                    background: rgba(255, 77, 141, 0.02);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 10px;
+                    cursor: pointer;
+                    transition: background 0.2s;
+
+                    &:hover {
+                        background: rgba(255, 77, 141, 0.05);
+                    }
+
+                    .dropzone-title {
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 15px !important;
+                        font-weight: 700 !important;
+                        color: #1a1a1a !important;
+                    }
+
+                    .browse-files-btn {
+                        border: 1.5px solid #FF4D8D !important;
+                        color: #FF4D8D !important;
+                        border-radius: 10px !important;
+                        padding: 7px 18px !important;
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 13px !important;
+                        font-weight: 700 !important;
+                        text-transform: none !important;
+
+                        &:hover {
+                            background: rgba(255, 77, 141, 0.06) !important;
+                        }
+                    }
+                }
+
+                .uploaded-images-row {
+                    margin-top: 16px;
+
+                    .uploaded-thumb {
+                        position: relative;
+                        width: 100px;
+                        height: 100px;
+                        border-radius: 14px;
+                        overflow: hidden;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+
+                        .thumb-remove-btn {
+                            position: absolute;
+                            top: 5px;
+                            right: 5px;
+                            width: 22px;
+                            height: 22px;
+                            background: rgba(0, 0, 0, 0.55) !important;
+                            color: #fff !important;
+                            padding: 0 !important;
+
+                            &:hover {
+                                background: rgba(0, 0, 0, 0.75) !important;
+                            }
+                        }
+                    }
+                }
+
+                .form-submit-row {
+                    margin-top: 28px;
+
+                    .save-salon-btn {
+                        height: 46px;
+                        padding: 0 30px !important;
+                        border-radius: 12px !important;
+                        background: linear-gradient(135deg, #FF4D8D, #FF6B9D) !important;
+                        color: #fff !important;
+                        font-family: 'Inter', sans-serif !important;
+                        font-size: 14.5px !important;
+                        font-weight: 700 !important;
+                        text-transform: none !important;
+                        box-shadow: 0 4px 14px rgba(255, 77, 141, 0.25) !important;
+
+                        &:hover {
+                            transform: scale(1.02);
+                        }
+
+                        &:disabled {
+                            background: #ddd !important;
+                            box-shadow: none !important;
+                            color: #999 !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
