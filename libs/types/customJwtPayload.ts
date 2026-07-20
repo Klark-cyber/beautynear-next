@@ -22,6 +22,9 @@ export interface CustomJwtPayload extends JwtPayload {
 	memberViews: number;
 	memberWarnings: number;
 	memberBlocks: number;
+	memberComments?: number; // ⚠️ TUZATILDI: majburiy edi, ixtiyoriy qilindi
+	memberFollowers?: number; // ⚠️ YANGI
+	memberFollowings?: number; // ⚠️ YANGI
 	memberLatitude?: number;
 	memberLongitude?: number;
 	agentRequestStatus?: string; // ⚠️ YANGI

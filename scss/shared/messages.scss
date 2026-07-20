@@ -1,0 +1,135 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MESSAGES — suhbatlar royxati (mobil + desktop)
+═══════════════════════════════════════════════════════════════════════ */
+
+#mobile-messages,
+#desktop-messages {
+    width: 100%;
+    min-height: 100vh;
+    background: #FFF8FA;
+    padding-bottom: 30px;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .msg-header {
+        padding: 16px 18px;
+        background: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+        .msg-icon-btn {
+            width: 38px;
+            height: 38px;
+            background: #FFF8FA;
+        }
+
+        .msg-header-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+    }
+
+    .msg-list {
+        padding: 14px 18px 0;
+        gap: 10px;
+    }
+
+    .msg-empty {
+        padding: 90px 20px;
+
+        .msg-empty-emoji {
+            font-size: 50px;
+            margin-bottom: 12px;
+        }
+
+        .msg-empty-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 14px !important;
+            color: #999 !important;
+        }
+    }
+
+    .msg-conv-row {
+        background: #fff;
+        border-radius: 16px;
+        padding: 12px 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+        transition: box-shadow 0.15s ease;
+
+        &:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .msg-conv-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+            flex-shrink: 0;
+        }
+
+        .msg-conv-name {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            color: #333 !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            &.unread {
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .msg-conv-time {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #bbb !important;
+            flex-shrink: 0;
+        }
+
+        .msg-conv-preview {
+            margin-top: 2px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12.5px !important;
+            color: #999 !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+
+            &.unread {
+                color: #FF4D8D !important;
+                font-weight: 600 !important;
+            }
+        }
+
+        // ⚠️ YANGI — suhbatni ochirish tugmasi
+        .msg-delete-btn {
+            flex-shrink: 0;
+            color: #ccc;
+            transition: color 0.15s ease;
+
+            &:hover {
+                color: #FF5A5F;
+            }
+        }
+    }
+}
+
+#desktop-messages {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-top: 20px;
+
+    .msg-header {
+        border-radius: 16px 16px 0 0;
+    }
+}

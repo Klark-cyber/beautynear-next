@@ -9,6 +9,9 @@ import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
+import QuestionAnswerOutlinedIcon from '@mui/icons-material/QuestionAnswerOutlined';
+import CampaignOutlinedIcon from '@mui/icons-material/CampaignOutlined';
+import HeadsetMicOutlinedIcon from '@mui/icons-material/HeadsetMicOutlined';
 
 interface MenuEntry {
 	title: string;
@@ -16,9 +19,11 @@ interface MenuEntry {
 	url: string;
 }
 
-// ⚠️ "Cs" (FAQ/Notice/Inquiry) ataylab kiritilmagan — backend'da bu domen uchun
-// hech qanday admin query/mutation yo'q (keyinchalik alohida vazifa sifatida
-// qo'shiladi, hozircha admin apollo layer faqat 5 domenni qo'llab-quvvatlaydi)
+// ⚠️ TUZATILDI: avval "Cs" (FAQ/Notice/Inquiry) ataylab kiritilmagan edi
+// ("backend'da bu domen uchun hech qanday admin query/mutation yo'q" degan
+// izoh bilan) — bu endi ESKIRGAN, chunki FAQ/Notice/Inquiry uchun toliq
+// CRUD allaqachon qurilgan va ishlaydi. Admin ularga faqat Dashboard
+// jadvali orqali BILVOSITA kira olar edi, doimiy sidebar orqali emas.
 const menu_set: MenuEntry[] = [
 	{ title: 'Dashboard', icon: <DashboardOutlinedIcon />, url: '/_admin' },
 	{ title: 'Members', icon: <PeopleOutlineIcon />, url: '/_admin/users' },
@@ -27,6 +32,9 @@ const menu_set: MenuEntry[] = [
 	{ title: 'Services', icon: <ContentCutOutlinedIcon />, url: '/_admin/services' },
 	{ title: 'Bookings', icon: <CalendarMonthOutlinedIcon />, url: '/_admin/bookings' },
 	{ title: 'Community', icon: <ForumOutlinedIcon />, url: '/_admin/community' },
+	{ title: 'FAQ', icon: <QuestionAnswerOutlinedIcon />, url: '/_admin/cs/faq' },
+	{ title: 'Notice', icon: <CampaignOutlinedIcon />, url: '/_admin/cs/notice' },
+	{ title: 'Inquiry', icon: <HeadsetMicOutlinedIcon />, url: '/_admin/cs/inquiry' },
 ];
 
 const AdminMenuList = () => {

@@ -45,7 +45,7 @@ const SalonCard = ({ salon, mode = 'full', onLike, myFavorites, recentlyVisited 
 	const user = useReactiveVar(userVar);
 
 	const raw = salon.salonImages?.[0];
-	const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/default.jpg';
+	const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/hero.jpg';
 
 	const isOpen = isSalonOpen(salon.salonWorkHours);
 	const isTop = salon.salonRank >= topSalonRank;

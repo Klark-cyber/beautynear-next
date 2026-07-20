@@ -11,11 +11,11 @@ import { useTranslation } from 'next-i18next';
  *   public/video/salon-promo.mp4
  *
  * (Ixtiyoriy) Video yuklanmaguncha ko'rinadigan birinchi kadr uchun:
- *   public/video/salon-promo-poster.jpg
+ *   public/img/banner/hero.jpg
  */
 
 const VIDEO_SRC = '/video/salon-promo.mp4';
-const POSTER_SRC = '/video/salon-promo-poster.jpg';
+const POSTER_SRC = '/img/banner/hero.jpg';
 
 const AdReel = () => {
     const { t } = useTranslation('common');

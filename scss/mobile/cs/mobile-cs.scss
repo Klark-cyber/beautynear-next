@@ -1,0 +1,130 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE CS — Notices & Events
+   scss/mobile/main.scss ga: @import '/scss/mobile/cs/mobile-cs';
+═══════════════════════════════════════════════════════════════════════ */
+
+#mobile-cs {
+    width: 100%;
+    min-height: 100vh;
+    background: #FFF8FA;
+    padding-bottom: 30px;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .cs-header {
+        padding: 16px 18px;
+        background: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+        .cs-icon-btn {
+            width: 38px;
+            height: 38px;
+            background: #FFF8FA;
+        }
+
+        .cs-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+    }
+
+    .cs-tabs {
+        gap: 8px;
+        padding: 14px 18px;
+
+        .cs-tab {
+            background: #fff;
+            border: 1px solid #F3E6EC;
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+
+            &.active {
+                background: #FF4D8D;
+                border-color: #FF4D8D;
+                color: #fff;
+            }
+        }
+    }
+
+    .cs-list {
+        padding: 0 18px;
+        gap: 12px;
+    }
+
+    .cs-empty {
+        padding: 60px 20px;
+
+        .cs-empty-emoji {
+            font-size: 44px;
+            margin-bottom: 10px;
+        }
+
+        .cs-empty-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 14px !important;
+            color: #999 !important;
+        }
+    }
+
+    .cs-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 14px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+
+        .cs-type-badge {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 8px;
+        }
+
+        .cs-time {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #bbb !important;
+            margin-left: auto !important;
+        }
+
+        .cs-card-title {
+            margin-top: 8px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+            line-height: 1.35 !important;
+        }
+
+        .cs-card-content {
+            margin-top: 8px !important;
+            padding-top: 8px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12.5px !important;
+            color: #555 !important;
+            line-height: 1.6 !important;
+            white-space: pre-wrap;
+        }
+
+        .cs-views-row {
+            margin-top: 8px;
+        }
+
+        .cs-views {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #bbb !important;
+        }
+    }
+}

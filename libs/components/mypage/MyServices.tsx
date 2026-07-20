@@ -1,32 +1,30 @@
-import React, { useState } from 'react';
-import { NextPage } from 'next';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { Box, Stack, Typography, Chip, Button, IconButton, Pagination as MuiPagination } from '@mui/material';
+import { Box, Stack, Typography, IconButton } from '@mui/material';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import AddIcon from '@mui/icons-material/Add';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import AddIcon from '@mui/icons-material/Add';
+import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_AGENT_SERVICES } from '../../../apollo/user/query';
 import { UPDATE_SERVICE } from '../../../apollo/user/mutation';
-import EmptyList from '../common/Emptylist';
 import { Service } from '../../types/service/service';
-import { AgentServicesInquiry } from '../../types/service/service.input';
 import { ServiceStatus } from '../../enums/service.enum';
 import { T } from '../../types/common';
 import { REACT_APP_API_URL } from '../../config';
 import { sweetConfirmAlert, sweetErrorHandling } from '../../sweetAlert';
 
-const imgUrl = (raw?: string): string => {
-    if (!raw) return '/img/banner/default.jpg';
+/* ─── Helpers ─────────────────────────────────────────────────────────── */
+
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
+    if (!raw) return fallback;
     return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
-
-const formatPrice = (n?: number): string => {
-    if (n === undefined || n === null) return '0';
-    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
+const formatPrice = (n?: number): string => (n ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const TYPE_EMOJI: Record<string, string> = {
     HAIR: '✂️',
@@ -36,171 +34,179 @@ const TYPE_EMOJI: Record<string, string> = {
     MASSAGE: '🪷',
 };
 
-const STATUS_TABS = [
+const STATUS_TABS: { label: string; value?: ServiceStatus }[] = [
+    { label: 'All', value: undefined },
     { label: 'Active', value: ServiceStatus.ACTIVE },
     { label: 'Inactive', value: ServiceStatus.INACTIVE },
+    { label: 'Deleted', value: ServiceStatus.DELETE },
 ];
 
-const limit = 6;
+/* ─── Component ───────────────────────────────────────────────────────────── */
 
-const MyServices: NextPage = ({
-    initialInput = { page: 1, limit, search: { serviceStatus: ServiceStatus.ACTIVE } },
-    ...props
-}: any) => {
-    const router = useRouter();
+// ⚠️ MUHIM: Desktop MyServices.tsx bilan bir xil mantiq — jumladan
+// backend salonId bo'yicha filtrlay olmasligi sababli, CLIENT tomonda
+// filtrlanadi (Desktop'dagi bilan bir xil vaqtinchalik yechim).
+
+const MobileMyServices = () => {
     const { t } = useTranslation('common');
-    const { salonId, salonTitle } = router.query;
+    const router = useRouter();
+    const salonId = router.query.salonId as string | undefined;
+    const salonTitle = router.query.salonTitle as string | undefined;
 
-    const [searchFilter, setSearchFilter] = useState<AgentServicesInquiry>(initialInput);
+    const [activeStatus, setActiveStatus] = useState<ServiceStatus | undefined>(undefined);
     const [allServices, setAllServices] = useState<Service[]>([]);
+    const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
-    /** APOLLO REQUESTS **/
     const [updateService] = useMutation(UPDATE_SERVICE);
 
     const { refetch } = useQuery(GET_AGENT_SERVICES, {
         fetchPolicy: 'network-only',
-        variables: { input: searchFilter },
-        notifyOnNetworkStatusChange: true,
-        onCompleted: (data: T) => {
-            setAllServices(data?.getAgentServices?.list ?? []);
-        },
+        variables: { input: { page: 1, limit: 100, search: activeStatus ? { serviceStatus: activeStatus } : {} } },
+        onCompleted: (data: T) => setAllServices(data?.getAgentServices?.list ?? []),
     });
 
-    // Backend'da salonId bo'yicha filtr yo'qligi sababli — shu salonga
-    // tegishli xizmatlarni FRONTEND'da ajratamiz (vaqtinchalik yechim)
-    const salonServices = salonId ? allServices.filter((svc) => svc.salonId === salonId) : allServices;
+    useEffect(() => {
+        refetch({ input: { page: 1, limit: 100, search: activeStatus ? { serviceStatus: activeStatus } : {} } }).then(({ data }) => {
+            setAllServices(data?.getAgentServices?.list ?? []);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeStatus]);
+
+    // ⚠️ Client-tomon filtri (backend salonId bo'yicha filtrlay olmaydi)
+    const services = salonId ? allServices.filter((s) => s.salonId === salonId) : allServices;
 
     /** HANDLERS **/
-    const tabChangeHandler = (status: ServiceStatus) => {
-        setSearchFilter({ ...searchFilter, page: 1, search: { serviceStatus: status } });
-    };
-
-    const paginationHandler = (_e: any, value: number) => {
-        setSearchFilter({ ...searchFilter, page: value });
-    };
-
     const goAddService = () => {
-        router.push({ pathname: '/mypage', query: { category: 'addService', salonId, salonTitle } });
+        const query: T = { category: 'addService' };
+        if (salonId) query.salonId = salonId;
+        if (salonTitle) query.salonTitle = salonTitle;
+        router.push({ pathname: '/mypage', query });
     };
 
     const editServiceHandler = (id: string) => {
-        router.push({ pathname: '/mypage', query: { category: 'addService', salonId, salonTitle, serviceId: id } });
+        const query: T = { category: 'addService', serviceId: id };
+        if (salonId) query.salonId = salonId;
+        if (salonTitle) query.salonTitle = salonTitle;
+        router.push({ pathname: '/mypage', query });
+    };
+
+    const refetchList = async () => {
+        const { data } = await refetch({ input: { page: 1, limit: 100, search: activeStatus ? { serviceStatus: activeStatus } : {} } });
+        setAllServices(data?.getAgentServices?.list ?? []);
+    };
+
+    const pauseServiceHandler = async (id: string, currentlyInactive: boolean) => {
+        try {
+            await updateService({ variables: { input: { _id: id, serviceStatus: currentlyInactive ? ServiceStatus.ACTIVE : ServiceStatus.INACTIVE } } });
+            await refetchList();
+        } catch (err: any) {
+            sweetErrorHandling(err).then();
+        }
+        setOpenMenuId(null);
     };
 
     const deleteServiceHandler = async (id: string) => {
+        setOpenMenuId(null);
         try {
-            if (await sweetConfirmAlert('Are you sure to delete this service?')) {
+            if (await sweetConfirmAlert(t('Are you sure to delete this service?'))) {
                 await updateService({ variables: { input: { _id: id, serviceStatus: ServiceStatus.DELETE } } });
-                await refetch({ input: searchFilter });
+                await refetchList();
             }
         } catch (err: any) {
-            await sweetErrorHandling(err);
+            sweetErrorHandling(err).then();
         }
     };
 
-    const activeStatus = searchFilter.search.serviceStatus;
-
     return (
-        <Box component="div" className="mypage-content">
-            <Stack direction="row" alignItems="flex-start" justifyContent="space-between" className="services-header-row">
-                <Box component="div">
-                    <Typography className="content-title">{t('Services')}</Typography>
-                    <Typography className="content-subtitle">
-                        {salonTitle ? `${t('Managing services for')} ${salonTitle}` : t('Manage your service listings')}
-                    </Typography>
+        <Box component="div" id="mobile-myservices">
+            {/* ═══ SALON KONTEKSTI (agar filtr bo'lsa) ═══ */}
+            {salonId && salonTitle && (
+                <Box component="div" className="mv-salon-context">
+                    <Typography className="mv-salon-context-label">{t('Managing services for')}</Typography>
+                    <Typography className="mv-salon-context-title">{decodeURIComponent(salonTitle)}</Typography>
                 </Box>
-                <Button className="add-service-btn" startIcon={<AddIcon />} onClick={goAddService}>
-                    {t('Add New Service')}
-                </Button>
-            </Stack>
+            )}
 
-            <Stack direction="row" gap={1.5} className="filter-tabs">
+            {/* ═══ + QOSHISH TUGMASI ═══ */}
+            <Box component="div" className="mv-add-btn" onClick={goAddService}>
+                <AddIcon sx={{ fontSize: 18 }} />
+                {t('Add New Service')}
+            </Box>
+
+            {/* ═══ STATUS TABS ═══ */}
+            <Stack direction="row" className="mv-tabs">
                 {STATUS_TABS.map((tab) => (
                     <Box
-                        key={tab.value}
+                        key={tab.label}
                         component="div"
-                        className={`filter-tab ${activeStatus === tab.value ? 'active' : ''}`}
-                        onClick={() => tabChangeHandler(tab.value)}
+                        className={`mv-tab ${activeStatus === tab.value ? 'active' : ''}`}
+                        onClick={() => setActiveStatus(tab.value)}
                     >
                         {t(tab.label)}
                     </Box>
                 ))}
             </Stack>
 
-            {salonServices.length === 0 ? (
-                <Box component="div" className="follow-page-frame">
-                    <EmptyList
-                        emoji="✂️"
-                        title={t('No services yet')}
-                        desc={t('Add your first service to start receiving bookings')}
-                    />
-                    <Stack alignItems="center" sx={{ mt: 2 }}>
-                        <Button className="add-service-btn" onClick={goAddService}>
-                            {t('Add Your First Service')}
-                        </Button>
+            {/* ═══ XIZMATLAR RO'YXATI ═══ */}
+            <Stack className="mv-list">
+                {services.length === 0 && (
+                    <Stack alignItems="center" className="mv-empty">
+                        <Typography className="mv-empty-emoji">✂️</Typography>
+                        <Typography className="mv-empty-title">{t('No services yet')}</Typography>
+                        <Box component="div" className="mv-empty-btn" onClick={goAddService}>{t('Add Your First Service')}</Box>
                     </Stack>
-                </Box>
-            ) : (
-                <Box component="div" className="follow-page-frame">
-                    <Stack className="service-list">
-                        {salonServices.map((svc) => (
-                            <Stack key={svc._id} direction="row" alignItems="center" className="service-row">
-                                <Box
-                                    component="div"
-                                    className="service-row-img"
-                                    style={{ backgroundImage: `url(${imgUrl(svc.serviceImages?.[0])})` }}
-                                />
+                )}
 
-                                <Stack className="service-row-info" flex={1}>
-                                    <Typography className="service-row-name">{svc.serviceTitle}</Typography>
-                                    <Box component="div" className="service-row-chip">
-                                        {TYPE_EMOJI[svc.serviceType]} {t(svc.serviceType)}
-                                    </Box>
-                                    <Stack direction="row" alignItems="center" gap={0.5} className="service-row-duration-row">
-                                        <AccessTimeIcon sx={{ fontSize: 15, color: '#FF4D8D' }} />
-                                        <Typography className="service-row-duration">{svc.serviceDuration} {t('min')}</Typography>
+                {services.map((svc) => {
+                    const isActive = svc.serviceStatus === ServiceStatus.ACTIVE;
+                    const isDeleted = svc.serviceStatus === ServiceStatus.DELETE;
+
+                    return (
+                        <Stack key={svc._id} direction="row" className="mv-card">
+                            <Box component="div" className="mv-card-img" style={{ backgroundImage: `url(${imgUrl(svc.serviceImages?.[0])})` }} onClick={() => !isDeleted && editServiceHandler(svc._id)} />
+                            <Box className="mv-card-body">
+                                <Stack direction="row" alignItems="center" justifyContent="space-between">
+                                    <Typography className="mv-svc-name">{svc.serviceTitle}</Typography>
+                                    <Box component="div" className={`mv-status-badge ${svc.serviceStatus?.toLowerCase()}`}>{t(svc.serviceStatus)}</Box>
+                                </Stack>
+                                <Box component="div" className="mv-type-chip">{TYPE_EMOJI[svc.serviceType]} {t(svc.serviceType)}</Box>
+
+                                <Stack direction="row" alignItems="center" justifyContent="space-between" className="mv-bottom-row">
+                                    <Stack direction="row" alignItems="center" gap={1.25}>
+                                        <Typography className="mv-price">₩{formatPrice(svc.servicePrice)}</Typography>
+                                        <Stack direction="row" alignItems="center" gap={0.3}>
+                                            <AccessTimeIcon sx={{ fontSize: 12, color: '#999' }} />
+                                            <Typography className="mv-duration">{svc.serviceDuration}{t('min')}</Typography>
+                                        </Stack>
                                     </Stack>
+
+                                    {!isDeleted && (
+                                        <IconButton className="mv-menu-btn" onClick={() => setOpenMenuId((p) => (p === svc._id ? null : svc._id))}>
+                                            <MoreVertIcon sx={{ fontSize: 18 }} />
+                                        </IconButton>
+                                    )}
                                 </Stack>
 
-                                <Box className="service-row-price">
-                                    <Typography>₩{formatPrice(svc.servicePrice)}</Typography>
-                                </Box>
-
-                                <Box component="div" className="service-row-status-col">
-                                    <Chip
-                                        label={t(svc.serviceStatus)}
-                                        size="small"
-                                        className={`status-badge ${svc.serviceStatus.toLowerCase()}`}
-                                    />
-                                </Box>
-
-                                <Stack direction="row" alignItems="center" gap={0.75} className="service-row-actions">
-                                    <IconButton className="service-action-btn edit" onClick={() => editServiceHandler(svc._id)}>
-                                        <EditOutlinedIcon sx={{ fontSize: 16 }} />
-                                    </IconButton>
-                                    <IconButton className="service-action-btn delete" onClick={() => deleteServiceHandler(svc._id)}>
-                                        <DeleteOutlineIcon sx={{ fontSize: 16 }} />
-                                    </IconButton>
-                                </Stack>
-                            </Stack>
-                        ))}
-                    </Stack>
-
-                    {salonServices.length !== 0 && (
-                        <Stack alignItems="center" sx={{ mt: 4 }}>
-                            <MuiPagination
-                                page={searchFilter.page}
-                                count={Math.ceil(salonServices.length / limit) || 1}
-                                onChange={paginationHandler}
-                                shape="circular"
-                                sx={{ '& .MuiPaginationItem-root.Mui-selected': { background: '#FF4D8D', color: '#fff' } }}
-                            />
+                                {openMenuId === svc._id && (
+                                    <Stack className="mv-menu-dropdown" onClick={(e: any) => e.stopPropagation()}>
+                                        <Box component="div" className="mv-menu-item" onClick={() => editServiceHandler(svc._id)}>
+                                            <EditOutlinedIcon sx={{ fontSize: 15 }} /> {t('Edit')}
+                                        </Box>
+                                        <Box component="div" className="mv-menu-item" onClick={() => pauseServiceHandler(svc._id, !isActive)}>
+                                            <PauseCircleOutlineIcon sx={{ fontSize: 15 }} /> {t(isActive ? 'Deactivate' : 'Activate')}
+                                        </Box>
+                                        <Box component="div" className="mv-menu-item danger" onClick={() => deleteServiceHandler(svc._id)}>
+                                            <DeleteOutlineIcon sx={{ fontSize: 15 }} /> {t('Delete')}
+                                        </Box>
+                                    </Stack>
+                                )}
+                            </Box>
                         </Stack>
-                    )}
-                </Box>
-            )}
+                    );
+                })}
+            </Stack>
         </Box>
     );
 };
 
-export default MyServices;
+export default MobileMyServices;

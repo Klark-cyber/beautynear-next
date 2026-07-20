@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileMember from '../../libs/components/member/MobileMember';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { Stack } from '@mui/material';
 import MemberMenu from '../../libs/components/member/MemberMenu';
@@ -115,7 +116,7 @@ const MemberPage: NextPage = () => {
 	};
 
 	if (device === 'mobile') {
-		return <>MEMBER PAGE MOBILE</>;
+		return <MobileMember />;
 	} else {
 		return (
 			<div id="member-page" style={{ position: 'relative' }}>

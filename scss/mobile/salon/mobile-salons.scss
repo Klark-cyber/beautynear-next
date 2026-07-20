@@ -1,0 +1,583 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE SALONS — 1:1 mockup asosida
+   scss/mobile/main.scss ga: @import '/scss/mobile/salon/mobile-salons';
+═══════════════════════════════════════════════════════════════════════ */
+
+#mobile-salons {
+    width: 100%;
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
+    background: #FFF8FA;
+    padding-bottom: 88px;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    /* ═══ HEADER ═══ */
+    .ms-header {
+        padding: 16px 18px 10px;
+
+        .ms-icon-btn {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        .ms-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 18px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+    }
+
+    /* ═══ QIDIRUV ═══ */
+    .ms-search-wrap {
+        padding: 4px 18px 12px;
+
+        .ms-search-input {
+            background: #fff;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+            fieldset {
+                border-color: transparent;
+            }
+        }
+    }
+
+    /* ═══ CHIP QATORLARI (kategoriya + joylashuv) ═══ */
+    .ms-chip-row {
+        padding: 0 18px 10px;
+        gap: 8px;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .ms-chip {
+            flex-shrink: 0;
+            background: #fff;
+            border-radius: 20px;
+            padding: 9px 14px;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+
+            &.active {
+                background: #FF4D8D;
+                color: #fff;
+            }
+
+            .ms-chip-label {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 600 !important;
+                color: inherit !important;
+            }
+        }
+    }
+
+    /* ═══ FILTR QATORI ═══ */
+    .ms-filter-bar {
+        margin: 4px 18px 14px;
+        background: #fff;
+        border-radius: 14px;
+        padding: 10px 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        justify-content: space-between;
+
+        .ms-filter-item {
+            cursor: pointer;
+
+            .ms-filter-label {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 600 !important;
+                color: #555 !important;
+                white-space: nowrap;
+
+                &.pink {
+                    color: #FF4D8D !important;
+                }
+            }
+        }
+
+        .ms-filter-btn {
+            position: relative;
+
+            .ms-filter-badge {
+                position: absolute;
+                top: -8px;
+                right: -10px;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #FF4D8D;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                font-size: 9px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
+    }
+
+    /* ═══ NATIJALAR SARLAVHASI ═══ */
+    .ms-results-head {
+        padding: 0 18px 12px;
+
+        .ms-results-count {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12.5px !important;
+            color: #666 !important;
+
+            b {
+                color: #1a1a1a;
+            }
+        }
+
+        .ms-sort-label {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11.5px !important;
+            color: #999 !important;
+        }
+
+        .ms-sort-pill {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #FF4D8D;
+        }
+    }
+
+    /* ═══ SALON RO'YXATI ═══ */
+    .ms-list {
+        padding: 0 18px;
+        gap: 16px;
+    }
+
+    .ms-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 10px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+
+        .ms-card-img {
+            position: relative;
+            width: 108px;
+            height: 108px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+
+            .ms-badge-status {
+                position: absolute;
+                top: 6px;
+                left: 6px;
+                font-family: 'Inter', sans-serif;
+                font-size: 9px;
+                font-weight: 700;
+                padding: 3px 8px;
+                border-radius: 8px;
+                color: #fff;
+
+                &.open {
+                    background: rgba(62, 160, 67, 0.92);
+                }
+
+                &.closed {
+                    background: rgba(220, 53, 69, 0.92);
+                }
+            }
+
+            .ms-card-like {
+                position: absolute;
+                top: 4px;
+                right: 4px;
+                width: 26px;
+                height: 26px;
+                background: rgba(255, 255, 255, 0.9);
+                overflow: hidden;
+            }
+
+            .ms-photo-count {
+                position: absolute;
+                bottom: 5px;
+                left: 5px;
+                background: rgba(0, 0, 0, 0.55);
+                color: #fff;
+                padding: 2px 6px;
+                border-radius: 6px;
+                font-family: 'Inter', sans-serif;
+                font-size: 9px;
+            }
+        }
+
+        .ms-card-info {
+            flex: 1;
+            min-width: 0;
+
+            .ms-card-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 14px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .ms-card-sub {
+                margin-top: 2px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11px !important;
+                color: #999 !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .ms-card-meta {
+                margin-top: 8px;
+
+                .ms-card-rating,
+                .ms-card-dist {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 11px !important;
+                    color: #777 !important;
+                }
+            }
+
+            .ms-deposit-pill {
+                background: rgba(255, 77, 141, 0.08);
+                color: #FF4D8D;
+                font-family: 'Inter', sans-serif;
+                font-size: 10.5px;
+                font-weight: 700;
+                padding: 5px 10px;
+                border-radius: 8px;
+            }
+        }
+    }
+
+    /* ═══ SKELETON (yuklanish holati) ═══ */
+    .ms-skeleton-card {
+        .ms-skeleton-img {
+            width: 108px;
+            height: 108px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: ms-shimmer 1.4s infinite;
+            flex-shrink: 0;
+        }
+
+        .ms-skeleton-line {
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: ms-shimmer 1.4s infinite;
+        }
+    }
+
+    @keyframes ms-shimmer {
+        0% {
+            background-position: 200% 0;
+        }
+
+        100% {
+            background-position: -200% 0;
+        }
+    }
+
+    /* ═══ BO'SH HOLAT ═══ */
+    .ms-empty {
+        padding: 48px 20px;
+
+        .ms-empty-emoji {
+            font-size: 44px;
+            margin-bottom: 10px;
+        }
+
+        .ms-empty-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .ms-empty-desc {
+            margin-top: 4px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12px !important;
+            color: #999 !important;
+            text-align: center;
+        }
+
+        .ms-empty-btn {
+            margin-top: 16px;
+            background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+    }
+
+    /* ═══ "Can't find the right salon?" ═══ */
+    .ms-recommend-banner {
+        margin: 20px 18px 0;
+        background: linear-gradient(135deg, #FFE3ED, #FFF0F5);
+        border-radius: 18px;
+        padding: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+
+        .ms-recommend-left {
+            flex: 1;
+            min-width: 0;
+
+            .ms-recommend-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 14px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+                line-height: 1.3 !important;
+            }
+
+            .ms-recommend-desc {
+                margin-top: 3px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10.5px !important;
+                color: #888 !important;
+                line-height: 1.4 !important;
+            }
+
+            .ms-recommend-btn {
+                margin-top: 10px;
+                display: inline-block;
+                background: #FF4D8D;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                font-size: 11px;
+                font-weight: 700;
+                padding: 8px 16px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(255, 77, 141, 0.25);
+            }
+
+            .ms-mini-avatars {
+                .ms-mini-av {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    border: 1.5px solid #fff;
+                    overflow: hidden;
+                    flex-shrink: 0;
+
+                    img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+
+                    &.av1,
+                    &.av2 {
+                        margin-left: -7px;
+                    }
+                }
+            }
+
+            .ms-mini-count {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                color: #888 !important;
+            }
+        }
+
+        .ms-recommend-map {
+            position: relative;
+            width: 92px;
+            height: 92px;
+            flex-shrink: 0;
+            border-radius: 14px;
+            background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.5) 0 1px, transparent 1px 14px),
+                repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0 1px, transparent 1px 14px),
+                #FFD7E4;
+            overflow: hidden;
+
+            .ms-map-center {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: #fff;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 16px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .pin {
+                position: absolute;
+                color: #FF4D8D;
+                font-size: 18px;
+            }
+
+            .pin1 {
+                top: 10px;
+                left: 16px;
+            }
+
+            .pin2 {
+                top: 20px;
+                right: 10px;
+            }
+
+            .pin3 {
+                bottom: 8px;
+                right: 20px;
+            }
+        }
+    }
+
+    /* ═══ LOAD MORE ═══ */
+    .ms-load-more {
+        margin: 20px 18px 0;
+        border: 1.5px solid rgba(255, 77, 141, 0.3);
+        border-radius: 14px;
+        padding: 12px;
+        text-align: center;
+        color: #FF4D8D;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        cursor: pointer;
+
+        .spin {
+            animation: ms-spin 0.8s linear infinite;
+        }
+    }
+
+    @keyframes ms-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* ═══ BOTTOM NAV — Homepage bilan bir xil ═══ */
+    .ms-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: #fff;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        padding: 8px 0;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+        justify-content: space-around;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+
+        .ms-nav-item {
+            color: #999;
+            cursor: pointer;
+
+            &.active {
+                color: #FF4D8D;
+            }
+
+            .ms-nav-label {
+                margin-top: 2px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 9.5px !important;
+                font-weight: 600 !important;
+                color: inherit !important;
+            }
+        }
+    }
+
+    /* ═══ EXPLORE MENYUSI ═══ */
+    .ms-explore-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .ms-explore-sheet {
+        width: 100%;
+        background: #fff;
+        border-radius: 24px 24px 0 0;
+        padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+
+        .ms-explore-head {
+            margin-bottom: 16px;
+
+            .ms-explore-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 16px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .ms-explore-grid {
+            .ms-explore-item {
+                width: calc(50% - 6px);
+                cursor: pointer;
+
+                .ms-explore-icon {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .ms-explore-label {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 12px !important;
+                    font-weight: 700 !important;
+                    color: #333 !important;
+                }
+            }
+        }
+    }
+}

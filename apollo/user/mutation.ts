@@ -430,6 +430,7 @@ export const CREATE_COMMENT = gql`
 			commentStatus
 			commentGroup
 			commentContent
+			commentRating
 			commentRefId
 			memberId
 			createdAt
@@ -525,5 +526,28 @@ export const REQUEST_AGENT_ROLE = gql`
 			_id
 			agentRequestStatus
 		}
+	}
+`;
+export const LIKE_TARGET_COMMENT = gql`
+	mutation LikeTargetComment($input: String!) {
+		likeTargetComment(commentId: $input) {
+			_id
+			commentLikes
+		}
+	}
+`;
+
+export const MARK_NOTIFICATION_AS_READ = gql`
+	mutation MarkNotificationAsRead($input: String!) {
+		markNotificationAsRead(notificationId: $input) {
+			_id
+			notificationStatus
+		}
+	}
+`;
+
+export const MARK_ALL_NOTIFICATIONS_AS_READ = gql`
+	mutation MarkAllNotificationsAsRead {
+		markAllNotificationsAsRead
 	}
 `;

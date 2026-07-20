@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Stack, Box, Button, Select, MenuItem, InputBase } from '@mui/material';
+import { Stack, Box, Button, Select, MenuItem, InputBase, Autocomplete, TextField } from '@mui/material';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import GridViewOutlinedIcon from '@mui/icons-material/GridViewOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -112,16 +112,26 @@ const HeaderFilter = (props: HeaderFilterProps) => {
 
             <Box component="div" className="search-sep" />
 
-            {/* District */}
+            {/* District — endi hudud enum'lari TAVSIYA qilinadi (erkin matn ham mumkin) */}
             <Stack direction="row" alignItems="center" gap={1} className="search-field">
                 <LocationOnOutlinedIcon className="sf-icon" />
-                <InputBase
-                    value={district}
-                    onChange={(e) => districtChangeHandler(e.target.value)}
-                    placeholder="Gangnam-gu, Apgujeong"
-                    className="sf-input"
+                <Autocomplete
+                    freeSolo
+                    disablePortal={false}
+                    options={Object.values(SalonLocation)}
+                    inputValue={district}
+                    onInputChange={(_, value) => districtChangeHandler(value)}
+                    className="sf-autocomplete"
+                    renderInput={(params) => (
+                        <InputBase
+                            {...params.InputProps}
+                            inputProps={params.inputProps}
+                            ref={params.InputProps.ref}
+                            placeholder="Gangnam-gu, Apgujeong"
+                            className="sf-input"
+                        />
+                    )}
                 />
-                <KeyboardArrowDownIcon className="sf-arrow" />
             </Stack>
 
             <Box component="div" className="search-sep" />

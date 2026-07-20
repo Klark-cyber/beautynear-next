@@ -1,0 +1,235 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE MEMBER — foydalanuvchi ommaviy profili
+   scss/mobile/main.scss ga: @import '/scss/mobile/member/mobile-member';
+═══════════════════════════════════════════════════════════════════════ */
+
+#mobile-member {
+    width: 100%;
+    min-height: 100vh;
+    background: #FFF8FA;
+    padding-bottom: 30px;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .mm-header {
+        padding: 16px 18px;
+        background: #fff;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        gap: 10px;
+
+        .mm-icon-btn {
+            width: 38px;
+            height: 38px;
+            background: #FFF8FA;
+        }
+
+        .mm-header-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+    }
+
+    .mm-profile-card {
+        padding: 20px;
+
+        .mm-avatar {
+            width: 84px;
+            height: 84px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .mm-name {
+            margin-top: 10px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 18px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .mm-type-badge {
+            margin-top: 4px;
+            background: rgba(255, 77, 141, 0.1);
+            color: #FF4D8D;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 8px;
+        }
+
+        .mm-rating {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+            color: #333 !important;
+        }
+
+        .mm-stats-row {
+            margin-top: 16px;
+            gap: 28px;
+
+            .mm-stat {
+                cursor: pointer;
+
+                .mm-stat-num {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 16px !important;
+                    font-weight: 800 !important;
+                    color: #1a1a1a !important;
+                }
+
+                .mm-stat-label {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 10.5px !important;
+                    color: #999 !important;
+                }
+            }
+        }
+
+        .mm-action-row {
+            margin-top: 16px;
+            width: 100%;
+
+            .mm-follow-btn {
+                flex: 1;
+                text-align: center;
+                background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                font-size: 13px;
+                font-weight: 700;
+                padding: 10px;
+                border-radius: 12px;
+                cursor: pointer;
+
+                &.following {
+                    background: #eee;
+                    color: #666;
+                }
+            }
+
+            .mm-like-btn {
+                border: 1.5px solid rgba(255, 77, 141, 0.3);
+                border-radius: 12px;
+                width: 42px;
+            }
+        }
+    }
+
+    .mm-tabs {
+        gap: 8px;
+        padding: 0 18px 14px;
+        overflow-x: auto;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+
+        .mm-tab {
+            flex-shrink: 0;
+            background: #fff;
+            border: 1px solid #F3E6EC;
+            color: #666;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+
+            &.active {
+                background: #FF4D8D;
+                border-color: #FF4D8D;
+                color: #fff;
+            }
+        }
+    }
+
+    .mm-content {
+        padding: 0 18px;
+    }
+
+    .mm-empty-text {
+        text-align: center;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 13px !important;
+        color: #999 !important;
+        padding: 40px 0 !important;
+    }
+
+    .mm-list-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+
+        .mm-list-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+            flex-shrink: 0;
+        }
+
+        .mm-list-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mm-list-sub {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11px !important;
+            color: #999 !important;
+        }
+
+        .mm-list-meta {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #888 !important;
+        }
+    }
+
+    .mm-person-row {
+        background: #fff;
+        border-radius: 14px;
+        padding: 10px 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+
+        .mm-person-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+            flex-shrink: 0;
+        }
+
+        .mm-person-name {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+    }
+}

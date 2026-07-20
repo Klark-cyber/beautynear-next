@@ -18,6 +18,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileServices from '../../libs/components/service/MobileServices';
 import StarIcon from '@mui/icons-material/Star';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
@@ -85,7 +87,7 @@ const formatRating = (n?: number): string => {
     return n.toFixed(1);
 };
 
-const imgUrl = (raw?: string, fallback = '/img/banner/default.jpg'): string => {
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
     if (!raw) return fallback;
     return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
@@ -120,6 +122,7 @@ const SORT_OPTIONS = [
 /* ─── Page ────────────────────────────────────────────────────────────── */
 
 const ServiceList: NextPage = ({ initialInput, ...props }: any) => {
+    const device = useDeviceDetect();
     const router = useRouter();
     const { t } = useTranslation('common');
     const user = useReactiveVar(userVar);
@@ -245,6 +248,14 @@ const ServiceList: NextPage = ({ initialInput, ...props }: any) => {
 
     // Minimum Rating — frontend-side filter (backend qo'llab-quvvatlamaydi)
     const visibleServices = minRating > 0 ? services.filter((s) => (s.serviceRating ?? 0) >= minRating) : services;
+
+    // ⚠️ TUZATILDI: mobil return BARCHA hook'lardan keyin bo'lishi shart
+    // — React qoidasi: hook'lar har renderда bir xil tartibda chaqirilishi kerak.
+    // Avval bu return boshqa hook'lardan OLDIN edi, bu "Rendered fewer
+    // hooks than expected" xatosiga sabab bo'lgan edi.
+    if (device === 'mobile') {
+        return <MobileServices />;
+    }
 
     /* ─── RENDER ──────────────────────────────────────────────────────── */
     return (

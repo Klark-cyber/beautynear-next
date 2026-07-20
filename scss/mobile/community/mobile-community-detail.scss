@@ -1,0 +1,325 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE COMMUNITY DETAIL
+   scss/mobile/main.scss ga: @import '/scss/mobile/community/mobile-community-detail';
+═══════════════════════════════════════════════════════════════════════ */
+
+#mobile-community-detail {
+    width: 100%;
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
+    background: #fff;
+    padding-bottom: 30px;
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .cd-header {
+        padding: 16px 18px;
+
+        .cd-icon-btn {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+    }
+
+    .cd-body {
+        padding: 0 20px;
+    }
+
+    .cd-cat-badge {
+        display: inline-block;
+        font-family: 'Inter', sans-serif;
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 8px;
+    }
+
+    .cd-title {
+        margin-top: 10px !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 21px !important;
+        font-weight: 800 !important;
+        color: #1a1a1a !important;
+        line-height: 1.3 !important;
+    }
+
+    .cd-author-row {
+        margin-top: 14px;
+
+        .cd-author-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+        }
+
+        .cd-author-name {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+
+        .cd-time {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11px !important;
+            color: #999 !important;
+        }
+
+        .cd-dot {
+            color: #ccc;
+            font-size: 11px;
+        }
+
+        .cd-mini-like {
+            cursor: pointer;
+        }
+    }
+
+    .cd-main-img {
+        position: relative;
+        margin-top: 16px;
+        width: 100%;
+        height: 200px;
+        border-radius: 16px;
+        background-size: cover;
+        background-position: center;
+        background-color: #eee;
+
+        .cd-img-like-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 38px;
+            height: 38px;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(2px);
+        }
+    }
+
+    .cd-content {
+        margin-top: 18px;
+        gap: 12px;
+
+        .cd-paragraph {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 14px !important;
+            color: #333 !important;
+            line-height: 1.7 !important;
+        }
+    }
+
+    .cd-like-section {
+        margin-top: 24px;
+        padding: 18px 0;
+        cursor: pointer;
+
+        .cd-like-count {
+            margin-top: 6px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #FF4D8D !important;
+        }
+    }
+
+    .cd-comments-section {
+        margin-top: 8px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+        .cd-comments-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .cd-comment-form {
+            margin-top: 14px;
+
+            .cd-comment-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                flex-shrink: 0;
+            }
+
+            .cd-comment-input {
+                flex: 1;
+                border: 1.5px solid #eee;
+                border-radius: 20px;
+                padding: 10px 16px;
+                font-family: 'Inter', sans-serif;
+                font-size: 12.5px;
+                outline: none;
+                min-width: 0;
+
+                &:focus {
+                    border-color: #FF4D8D;
+                }
+
+                &::placeholder {
+                    color: #bbb;
+                }
+            }
+
+            .cd-comment-post {
+                width: 38px;
+                height: 38px;
+                background: linear-gradient(135deg, #FF4D8D, #FF85B3); // ⚠️ TUZATILDI: doim rangli
+                color: #fff;
+                box-shadow: 0 4px 10px rgba(255, 77, 141, 0.3);
+                flex-shrink: 0;
+
+                &.disabled {
+                    opacity: 0.4;
+                    pointer-events: none;
+                    box-shadow: none;
+                }
+            }
+        }
+
+        .cd-login-note {
+            margin-top: 6px !important;
+            margin-left: 42px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #bbb !important;
+        }
+
+        .cd-comment-item {
+            .cd-comment-like {
+                flex-shrink: 0;
+                cursor: pointer;
+                padding-top: 2px;
+
+                .cd-comment-like-count {
+                    margin-top: 2px !important;
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 9.5px !important;
+                    color: #999 !important;
+                }
+            }
+
+            .cd-comment-item-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                flex-shrink: 0;
+            }
+
+            .cd-comment-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+            }
+
+            .cd-comment-time {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10.5px !important;
+                color: #bbb !important;
+            }
+
+            .cd-comment-text {
+                margin-top: 3px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12.5px !important;
+                color: #444 !important;
+                line-height: 1.5 !important;
+            }
+        }
+
+        .cd-viewall {
+            margin-top: 16px;
+            color: #FF4D8D;
+            font-family: 'Inter', sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    }
+
+    .cd-related-section {
+        margin-top: 28px;
+
+        .cd-related-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .cd-related-swiper {
+            margin-top: 12px;
+            padding-bottom: 4px;
+        }
+
+        .cd-related-card {
+            cursor: pointer;
+
+            .cd-related-img {
+                position: relative;
+                width: 100%;
+                height: 90px;
+                border-radius: 12px;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+
+                .cd-related-badge {
+                    position: absolute;
+                    top: 6px;
+                    left: 6px;
+                    color: #fff;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 8px;
+                    font-weight: 700;
+                    padding: 2px 7px;
+                    border-radius: 6px;
+                }
+            }
+
+            .cd-related-card-title {
+                margin-top: 6px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11.5px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                line-height: 1.35 !important;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+
+            .cd-related-author {
+                margin-top: 2px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10px !important;
+                color: #999 !important;
+            }
+
+            .cd-related-views {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 9.5px !important;
+                color: #bbb !important;
+            }
+        }
+    }
+}

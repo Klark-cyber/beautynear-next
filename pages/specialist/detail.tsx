@@ -21,10 +21,12 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
 import PersonRemoveOutlinedIcon from '@mui/icons-material/PersonRemoveOutlined';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import Link from 'next/link';
 import moment from 'moment';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileSpecialistDetail from '../../libs/components/specialist/MobileSpecialistDetail';
 import RatingStars from '../../libs/components/common/Ratingstars';
 import Emptylist from '../../libs/components/common/Emptylist';
 import { GET_MEMBER, GET_SERVICES, GET_SALONS, GET_COMMENTS, GET_MY_BOOKINGS } from '../../apollo/user/query';
@@ -41,6 +43,7 @@ import { BookingStatus } from '../../libs/enums/booking.enum';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { REACT_APP_API_URL } from '../../libs/config';
 import { userVar } from '../../apollo/store';
+import { useChatContext } from '../../libs/context/ChatContext';
 import { isSalonOpen } from '../../libs/utils';
 import { sweetErrorHandling, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 
@@ -92,6 +95,7 @@ const SpecialistDetail: NextPage = () => {
     const router = useRouter();
     const device = useDeviceDetect();
     const user = useReactiveVar(userVar);
+    const { openChatWith } = useChatContext();
     const memberId = router.query.id as string;
 
     const [specialist, setSpecialist] = useState<Member | null>(null);
@@ -209,19 +213,54 @@ const SpecialistDetail: NextPage = () => {
 
     /** HANDLERS **/
     const likeHandler = useCallback(async () => {
+        console.log('[SPECIALIST LIKE] clicked, user._id:', user._id, 'memberId:', memberId);
         try {
             if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
-            await likeTargetMember({ variables: { input: memberId } });
+            const likeResult = await likeTargetMember({ variables: { input: memberId } });
+            console.log('[SPECIALIST LIKE] mutation result:', likeResult);
             // ⚠️ TUZATILDI: onCompleted refetch()da ishonchli qayta ishga
             // tushmasligi mumkin — refetch natijasidan to'g'ridan-to'g'ri
             // state'ni yangilaymiz
             const result = await memberRefetch({ input: memberId });
+            console.log('[SPECIALIST LIKE] refetch result:', result?.data?.getMember);
             if (result?.data?.getMember) setSpecialist(result.data.getMember);
             await sweetTopSmallSuccessAlert('success', 800);
         } catch (err: any) {
+            console.log('[SPECIALIST LIKE] ERROR:', err);
             sweetMixinErrorAlert(err.message).then();
         }
     }, [user, memberId]);
+
+    // ⚠️ YANGI — 1-ga-1 shaxsiy chatni ochish
+    // ⚠️ YANGI — avval Share tugmasida hech qanday onClick yo'q edi
+    const shareHandler = useCallback(async () => {
+        const shareUrl = window.location.href;
+        try {
+            if (navigator.share) {
+                await navigator.share({ title: specialist?.memberNick ?? t('Specialist'), text: t('Check out this specialist on BeautyNear!'), url: shareUrl });
+            } else if (navigator.clipboard) {
+                await navigator.clipboard.writeText(shareUrl);
+                alert(t('Link copied to clipboard!'));
+            } else {
+                window.prompt(t('Copy this link:'), shareUrl);
+            }
+        } catch (err) {
+            console.log('ERROR, shareHandler:', err);
+        }
+    }, [specialist, t]);
+
+    const messageHandler = useCallback(() => {
+        if (!user?._id) {
+            router.push('/account/join');
+            return;
+        }
+        if (!specialist?._id) return;
+        openChatWith({
+            memberId: specialist._id as unknown as string,
+            nick: specialist.memberNick,
+            image: specialist.memberImage,
+        });
+    }, [user, specialist, openChatWith, router]);
 
     const followHandler = useCallback(async () => {
         try {
@@ -370,7 +409,7 @@ const SpecialistDetail: NextPage = () => {
                             <Link href={`/salons/${s._id}`} key={s._id} style={{ textDecoration: 'none' }}>
                                 <Stack direction="row" gap={1.25} alignItems="center" className="sp-salon-row">
                                     <Box component="div" className="sp-salon-row-img"
-                                        style={{ backgroundImage: `url(${s.salonImages?.[0] ? imgUrl(s.salonImages[0]) : '/img/banner/default.jpg'})` }} />
+                                        style={{ backgroundImage: `url(${s.salonImages?.[0] ? imgUrl(s.salonImages[0]) : '/img/banner/hero.jpg'})` }} />
                                     <Box component="div" sx={{ flex: 1, minWidth: 0 }}>
                                         <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                                             {s.salonTitle}
@@ -393,159 +432,14 @@ const SpecialistDetail: NextPage = () => {
 
     // ── MOBILE ──────────────────────────────────────────────────────────────────
     if (device === 'mobile') {
-        return (
-            <Stack className="specialist-detail-page mobile">
-                {/* Cover */}
-                <Box component="div" className="sp-detail-cover-mobile"
-                    style={{ backgroundImage: `url(${coverImg})` }}>
-                    <IconButton className="sp-back-btn-mobile" onClick={() => router.back()}>
-                        <ArrowBackIcon sx={{ fontSize: 18, color: '#fff' }} />
-                    </IconButton>
-                    <IconButton className="sp-like-btn-cover" onClick={likeHandler}>
-                        {liked ? <FavoriteIcon sx={{ fontSize: 16, color: '#FF4D8D' }} /> : <FavoriteBorderIcon sx={{ fontSize: 16, color: '#fff' }} />}
-                    </IconButton>
-                </Box>
-
-                {/* Avatar overlap */}
-                <Stack alignItems="center" sx={{ mt: '-40px', mb: 1 }}>
-                    <Box component="div" sx={{ position: 'relative' }}>
-                        <Avatar src={profileImg} sx={{ width: 80, height: 80, border: '3px solid #fff', boxShadow: '0 4px 16px rgba(0,0,0,0.12)' }} />
-                        <Box component="div" className="sp-online-dot-lg" />
-                        <Box component="div" sx={{ position: 'absolute', bottom: 2, right: 2, width: 20, height: 20, borderRadius: '50%', background: '#FF4D8D', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <VerifiedIcon sx={{ fontSize: 12, color: '#fff' }} />
-                        </Box>
-                    </Box>
-                </Stack>
-
-                {/* Name + rating */}
-                <Stack alignItems="center" sx={{ px: 2, mb: 1.5 }}>
-                    <Typography sx={{ fontSize: 20, fontWeight: 800, color: '#1a1a1a' }}>{specialist.memberNick}</Typography>
-                    <RatingStars rating={4.9} count={commentTotal} size="small" />
-                    {specialist.memberSpecialty && specialist.memberSpecialty.length > 0 && (
-                        <Stack direction="row" gap={0.75} flexWrap="wrap" justifyContent="center" sx={{ mt: 0.75 }}>
-                            {specialist.memberSpecialty.map((sp) => (
-                                <Box key={sp} component="div" className="sp-specialty-chip"
-                                    style={{ color: SPECIALTY_COLORS[sp] ?? '#FF4D8D', background: `${SPECIALTY_COLORS[sp] ?? '#FF4D8D'}15`, borderColor: `${SPECIALTY_COLORS[sp] ?? '#FF4D8D'}30` }}>
-                                    {sp}
-                                </Box>
-                            ))}
-                        </Stack>
-                    )}
-                </Stack>
-
-                {/* Action buttons */}
-                <Stack direction="row" gap={1} sx={{ px: 2, mb: 1.5 }}>
-                    <Button fullWidth className={`sp-follow-btn ${isFollowing ? 'following' : ''}`}
-                        startIcon={isFollowing ? <PersonRemoveOutlinedIcon /> : <PersonAddOutlinedIcon />}
-                        onClick={followHandler}>
-                        {isFollowing ? t('Following') : t('Follow')}
-                    </Button>
-                    <Button fullWidth className={`sp-like-action-btn ${liked ? 'liked' : ''}`}
-                        startIcon={liked ? <FavoriteIcon sx={{ color: '#FF4D8D' }} /> : <FavoriteBorderIcon />}
-                        onClick={likeHandler}>
-                        {liked ? t('Liked') : t('Like')}
-                    </Button>
-                    <IconButton className="sp-share-btn"><ShareOutlinedIcon sx={{ fontSize: 18 }} /></IconButton>
-                </Stack>
-
-                {/* Stats */}
-                <Stack direction="row" justifyContent="center" gap={3} sx={{ mb: 2 }}>
-                    <Stack alignItems="center">
-                        <Typography sx={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>{specialist.memberFollowers ?? 0}</Typography>
-                        <Typography sx={{ fontSize: 11, color: '#888' }}>{t('Followers')}</Typography>
-                    </Stack>
-                    <Stack alignItems="center">
-                        <Typography sx={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>{commentTotal}</Typography>
-                        <Typography sx={{ fontSize: 11, color: '#888' }}>{t('Reviews')}</Typography>
-                    </Stack>
-                    <Stack alignItems="center">
-                        <Typography sx={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>
-                            {specialist.memberViews >= 1000 ? `${(specialist.memberViews / 1000).toFixed(1)}K` : specialist.memberViews}
-                        </Typography>
-                        <Typography sx={{ fontSize: 11, color: '#888' }}>{t('Views')}</Typography>
-                    </Stack>
-                </Stack>
-
-                {/* Mobile Tabs */}
-                <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} centered
-                    sx={{ borderBottom: '1px solid rgba(255,77,141,0.1)', mb: 0, '& .MuiTab-root': { fontSize: 12, fontWeight: 600, color: '#888', minWidth: 80 }, '& .Mui-selected': { color: '#FF4D8D' }, '& .MuiTabs-indicator': { background: '#FF4D8D' } }}>
-                    <Tab label={t('Portfolio')} />
-                    <Tab label={t('Salons')} />
-                    <Tab label={t('Reviews')} />
-                </Tabs>
-
-                {/* Portfolio tab */}
-                {activeTab === 0 && (
-                    <Box component="div" sx={{ p: 2 }}>
-                        <Box component="div" className="sp-portfolio-grid-mobile">
-                            {specialist.memberPortfolio?.map((img, i) => (
-                                <Box key={i} component="div" className="sp-portfolio-item-mobile"
-                                    style={{ backgroundImage: `url(${imgUrl(img)})` }} />
-                            )) ?? <Typography sx={{ fontSize: 13, color: '#888', textAlign: 'center', py: 4 }}>{t('No portfolio yet')}</Typography>}
-                        </Box>
-                    </Box>
-                )}
-
-                {/* Services tab */}
-                {activeTab === 1 && (
-                    <Stack gap={1.5} sx={{ p: 2 }}>
-                        {salons.length === 0 ? (
-                            <Typography sx={{ fontSize: 13, color: '#888', textAlign: 'center', py: 4 }}>{t('No salons yet')}</Typography>
-                        ) : salons.map((s) => (
-                            <Link href={`/salons/${s._id}`} key={s._id} style={{ textDecoration: 'none' }}>
-                                <Stack direction="row" gap={1.5} sx={{ background: '#fff', borderRadius: 2, overflow: 'hidden', border: '1px solid rgba(255,77,141,0.08)', p: 1.25 }}>
-                                    <Box component="div" sx={{ width: 70, height: 60, borderRadius: 1.5, backgroundImage: `url(${s.salonImages?.[0] ? imgUrl(s.salonImages[0]) : '/img/banner/default.jpg'})`, backgroundSize: 'cover', flexShrink: 0, backgroundColor: '#f5f5f5' }} />
-                                    <Box component="div" sx={{ flex: 1 }}>
-                                        <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#1a1a1a' }}>{s.salonTitle}</Typography>
-                                        <Typography sx={{ fontSize: 11, color: '#888' }}>{s.salonAddress}</Typography>
-                                        <Typography sx={{ fontSize: 10.5, fontWeight: 600, color: isSalonOpen(s.salonWorkHours) ? '#4CAF50' : '#e53935' }}>
-                                            {isSalonOpen(s.salonWorkHours) ? t('Open') : t('Closed')}
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-                            </Link>
-                        ))}
-                    </Stack>
-                )}
-
-                {/* Reviews tab */}
-                {activeTab === 2 && (
-                    <Stack sx={{ p: 2 }}>
-                        {comments.length === 0 ? (
-                            <Emptylist emoji="💬" title={t('No reviews yet')} />
-                        ) : comments.map((comment) => (
-                            <Stack key={comment._id} sx={{ mb: 2, pb: 2, borderBottom: '1px solid rgba(0,0,0,0.06)' }}>
-                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 0.75 }}>
-                                    <Stack direction="row" alignItems="center" gap={1}>
-                                        <Avatar src={imgUrl(comment.memberData?.memberImage, '/img/profile/defaultUser.svg')} sx={{ width: 32, height: 32 }} />
-                                        <Box component="div">
-                                            <Typography sx={{ fontSize: 13, fontWeight: 600 }}>{comment.memberData?.memberNick}</Typography>
-                                            <Typography sx={{ fontSize: 11, color: '#bbb' }}>{moment(comment.createdAt).format('MMM DD, YYYY')}</Typography>
-                                        </Box>
-                                    </Stack>
-                                    <RatingStars rating={4.9} size="small" showNumber={false} />
-                                </Stack>
-                                <Typography sx={{ fontSize: 13, color: '#555', lineHeight: 1.6 }}>{comment.commentContent}</Typography>
-                            </Stack>
-                        ))}
-                    </Stack>
-                )}
-
-                {/* Sticky bottom */}
-                <Stack sx={{ position: 'fixed', bottom: 64, left: 0, right: 0, background: '#fff', borderTop: '1px solid rgba(255,77,141,0.1)', boxShadow: '0 -4px 16px rgba(0,0,0,0.06)', px: 2, py: 1.25, zIndex: 100 }}>
-                    <Button fullWidth className="sp-book-now-btn" onClick={() => setActiveTab(1)}>
-                        {t('Book Now')} — ₩10,000 →
-                    </Button>
-                </Stack>
-            </Stack>
-        );
+        return <MobileSpecialistDetail memberId={memberId} />;
     }
 
     // ── DESKTOP ──────────────────────────────────────────────────────────────────
     return (
         <Stack className="specialist-detail-page">
             {/* Back */}
-            <Stack direction="row" alignItems="center" gap={0.75} className="sp-back-link" onClick={() => router.back()}>
+            <Stack direction="row" alignItems="center" gap={0.75} className="sp-back-link" onClick={() => router.push('/specialist')}>
                 <ArrowBackIcon sx={{ fontSize: 15 }} />
                 <Typography sx={{ fontSize: 13 }}>{t('Back to specialists')}</Typography>
             </Stack>
@@ -637,7 +531,10 @@ const SpecialistDetail: NextPage = () => {
                             onClick={likeHandler}>
                             {liked ? t('Liked') : t('Like')}
                         </Button>
-                        <IconButton className="sp-share-btn"><ShareOutlinedIcon sx={{ fontSize: 18 }} /></IconButton>
+                        <IconButton className="sp-share-btn" onClick={shareHandler}><ShareOutlinedIcon sx={{ fontSize: 18 }} /></IconButton>
+                        <Button className="sp-message-btn" startIcon={<ChatBubbleOutlineIcon sx={{ fontSize: 16 }} />} onClick={messageHandler}>
+                            {t('Message')}
+                        </Button>
                     </Stack>
                 </Box>
             </Stack>

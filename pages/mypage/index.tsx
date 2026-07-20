@@ -18,10 +18,15 @@ import MyArticles from '../../libs/components/mypage/MyArticles';
 import WriteArticle from '../../libs/components/mypage/WriteArticle';
 import MyServices from '../../libs/components/mypage/MyServices';
 import AddNewService from '../../libs/components/mypage/AddNewServices';
+import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileMyPage from '../../libs/components/mypage/MobileMyPage';
+import MobileMyPageWrapper from '../../libs/components/mypage/MobileMyPageWrapper';
 
 const MyPage: NextPage = () => {
 	const router = useRouter();
+	const device = useDeviceDetect();
 	const category = (router.query.category as string) ?? 'myBookings';
+	const hasCategoryParam = Boolean(router.query.category);
 
 	const renderContent = () => {
 		switch (category) {
@@ -55,6 +60,14 @@ const MyPage: NextPage = () => {
 				return <MyBookings />;
 		}
 	};
+
+	// ⚠️ Mobil filial — barcha hook'lardan keyin joylashtirildi
+	if (device === 'mobile') {
+		if (!hasCategoryParam) {
+			return <MobileMyPage />;
+		}
+		return <MobileMyPageWrapper category={category} />;
+	}
 
 	return (
 		<Stack className="mypage-page">

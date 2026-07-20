@@ -18,6 +18,7 @@ export interface Salon {
     salonViews: number;
     salonLikes: number;
     salonComments: number;
+    salonRating?: number;
     salonRank: number;
     salonFollowers: number;
     depositAmount: number;

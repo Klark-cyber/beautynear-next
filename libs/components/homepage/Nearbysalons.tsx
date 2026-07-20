@@ -114,7 +114,7 @@ const NearbySalons = () => {
                     {salons.map((salon) => {
                         const img = salon.salonImages?.[0]
                             ? (salon.salonImages[0].startsWith('http') ? salon.salonImages[0] : `${REACT_APP_API_URL}/${salon.salonImages[0]}`)
-                            : '/img/banner/default.jpg';
+                            : '/img/banner/hero.jpg';
                         const isOpen = isSalonOpen(salon.salonWorkHours);
                         const isTop = salon.salonRank >= topSalonRank;
                         const liked = salon.meLiked?.[0]?.myFavorite;

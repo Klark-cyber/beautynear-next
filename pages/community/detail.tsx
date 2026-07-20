@@ -20,6 +20,7 @@ import moment from 'moment';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileCommunityDetail from '../../libs/components/community/MobileCommunityDetail';
 import { BoardArticle } from '../../libs/types/board-article/board-article';
 import { Comment } from '../../libs/types/comment/comment';
 import { CommentInput, CommentsInquiry } from '../../libs/types/comment/comment.input';
@@ -244,7 +245,7 @@ const CommunityDetail: NextPage = ({
 
 	/* ── MOBILE ── */
 	if (device === 'mobile') {
-		return <div>COMMUNITY DETAIL PAGE MOBILE</div>;
+		return <MobileCommunityDetail articleId={articleId} />;
 	}
 
 	/* ── DESKTOP ── */

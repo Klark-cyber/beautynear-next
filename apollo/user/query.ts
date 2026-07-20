@@ -121,6 +121,7 @@ export const GET_SALON = gql`
 			salonViews
 			salonLikes
 			salonComments
+			salonRating
 			salonRank
 			salonFollowers
 			depositAmount
@@ -193,6 +194,7 @@ export const GET_SALONS = gql`
 				salonViews
 				salonLikes
 				salonComments
+				salonRating
 				salonRank
 				salonFollowers
 				depositAmount
@@ -243,6 +245,7 @@ export const GET_AGENT_SALONS = gql`
 				salonViews
 				salonLikes
 				salonComments
+				salonRating
 				salonRank
 				salonFollowers
 				depositAmount
@@ -272,6 +275,8 @@ export const GET_FAVORITE_SALONS = gql`
 				salonViews
 				salonLikes
 				salonRank
+				salonRating
+				depositAmount
 				memberId
 				createdAt
 				updatedAt
@@ -304,6 +309,7 @@ export const GET_VISITED_SALONS = gql`
 				salonViews
 				salonLikes
 				salonRank
+				salonRating
 				memberId
 				createdAt
 				updatedAt
@@ -731,6 +737,8 @@ export const GET_COMMENTS = gql`
 				commentStatus
 				commentGroup
 				commentContent
+				commentRating
+				commentLikes
 				commentRefId
 				memberId
 				createdAt
@@ -748,6 +756,11 @@ export const GET_COMMENTS = gql`
 					createdAt
 					updatedAt
 					accessToken
+				}
+				meLiked {
+					memberId
+					likeRefId
+					myFavorite
 				}
 			}
 			metaCounter {
@@ -948,5 +961,50 @@ export const GET_MY_INQUIRIES = gql`
 				total
 			}
 		}
+	}
+`;
+export const GET_BOOKED_SLOTS = gql`
+	query GetBookedSlots($salonId: String!, $date: String!) {
+		getBookedSlots(salonId: $salonId, date: $date)
+	}
+`;
+
+/**************************
+ *      NOTIFICATION      *
+ *************************/
+
+export const GET_NOTIFICATIONS = gql`
+	query GetNotifications($input: NotificationsInquiry!) {
+		getNotifications(input: $input) {
+			list {
+				_id
+				notificationType
+				notificationStatus
+				notificationGroup
+				notificationTitle
+				notificationDesc
+				authorId
+				authorData {
+					_id
+					memberNick
+					memberImage
+					memberType
+				}
+				receiverId
+				salonId
+				articleId
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_UNREAD_NOTIFICATION_COUNT = gql`
+	query GetUnreadNotificationCount {
+		getUnreadNotificationCount
 	}
 `;

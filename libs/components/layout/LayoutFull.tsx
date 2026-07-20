@@ -181,6 +181,8 @@ const withLayoutFull = (Component: any) => {
 							<Footer />
 						</Stack>
 						<MobileBottomNav />
+						{/* ⚠️ YANGI — avval Chat faqat Desktop'da render qilinardi */}
+						{user?._id && <Chat />}
 					</Stack>
 				</>
 			);

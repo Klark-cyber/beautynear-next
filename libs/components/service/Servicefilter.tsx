@@ -31,14 +31,18 @@ const DURATION_OPTIONS = [
     { label: 'Any duration', value: 0 },
 ];
 
-/* Service Type — backend enum bilan mos (label rasmdagidek) */
-const TYPE_OPTIONS: { label: string; value: ServiceType }[] = [
-    { label: 'Facial', value: ServiceType.SKIN },
-    { label: 'Nail', value: ServiceType.NAIL },
-    { label: 'Hair', value: ServiceType.HAIR },
-    { label: 'Massage', value: ServiceType.MASSAGE },
-    { label: 'Clinic', value: ServiceType.CLINIC },
+// ⚠️ TUZATILDI: avval ikonlarsiz edi — endi Salonfilter bilan bir xil emoji
+const TYPE_OPTIONS: { label: string; value: ServiceType; emoji: string }[] = [
+    { label: 'Hair', value: ServiceType.HAIR, emoji: '✂️' },
+    { label: 'Nail', value: ServiceType.NAIL, emoji: '💅' },
+    { label: 'Facial', value: ServiceType.SKIN, emoji: '🧴' },
+    { label: 'Clinic', value: ServiceType.CLINIC, emoji: '💉' },
+    { label: 'Massage', value: ServiceType.MASSAGE, emoji: '🪷' },
 ];
+
+// ⚠️ MUHIM: avval "Apply Filters" tugmasi bosilmaguncha HECH NARSA
+// qo'llanmasdi. Endi Salonfilter bilan bir xil — HAR bir tanlov
+// DARHOL qo'llanadi (tugma shart emas).
 
 const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
     const { t } = useTranslation('common');
@@ -49,24 +53,50 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
     const [minRating, setMinRating] = useState<number>(0);
     const [durationMax, setDurationMax] = useState<number>(0);
 
-    const typeToggle = (value: ServiceType) => {
-        setTypes((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]));
+    const buildAndApply = (overrides: Partial<{ location: string; types: ServiceType[]; priceRange: number[]; minRating: number; durationMax: number }> = {}) => {
+        const loc = overrides.location !== undefined ? overrides.location : location;
+        const ty = overrides.types !== undefined ? overrides.types : types;
+        const pr = overrides.priceRange !== undefined ? overrides.priceRange : priceRange;
+        const mr = overrides.minRating !== undefined ? overrides.minRating : minRating;
+        const dm = overrides.durationMax !== undefined ? overrides.durationMax : durationMax;
+
+        const search: any = {};
+        search.locationList = loc ? [loc] : undefined;
+        search.typeList = ty.length > 0 ? ty : undefined;
+        search.priceMin = pr[0] > PRICE_MIN ? pr[0] : undefined;
+        search.priceMax = pr[1] < PRICE_MAX ? pr[1] : undefined;
+        search.durationMax = dm > 0 ? dm : undefined;
+
+        onApply(search, mr);
     };
 
-    const applyHandler = () => {
-        const search: any = {};
-        if (location) search.locationList = [location];
-        else search.locationList = undefined;
-        if (types.length > 0) search.typeList = types;
-        else search.typeList = undefined;
-        if (priceRange[0] > PRICE_MIN) search.priceMin = priceRange[0];
-        else search.priceMin = undefined;
-        if (priceRange[1] < PRICE_MAX) search.priceMax = priceRange[1];
-        else search.priceMax = undefined;
-        if (durationMax > 0) search.durationMax = durationMax;
-        else search.durationMax = undefined;
+    const locationHandler = (value: string) => {
+        setLocation(value);
+        buildAndApply({ location: value });
+    };
 
-        onApply(search, minRating);
+    const typeToggle = (value: ServiceType) => {
+        const next = types.includes(value) ? types.filter((v) => v !== value) : [...types, value];
+        setTypes(next);
+        buildAndApply({ types: next });
+    };
+
+    const ratingHandler = (r: number) => {
+        const next = minRating === r ? 0 : r;
+        setMinRating(next);
+        buildAndApply({ minRating: next });
+    };
+
+    const durationHandler = (value: number) => {
+        setDurationMax(value);
+        buildAndApply({ durationMax: value });
+    };
+
+    // Narx — sudralayotganda emas, QO'YIB YUBORILGANDA qo'llanadi (ortiqcha sorovlarning oldini olish uchun)
+    const priceCommitHandler = (_e: any, v: number | number[]) => {
+        const next = v as number[];
+        setPriceRange(next);
+        buildAndApply({ priceRange: next });
     };
 
     const resetHandler = () => {
@@ -93,12 +123,12 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
                     <Typography className="sf-label">{t('Location')}</Typography>
                 </Stack>
                 <Stack className="sf-options">
-                    <Stack direction="row" alignItems="center" className="sf-option" onClick={() => setLocation('')}>
+                    <Stack direction="row" alignItems="center" className="sf-option" onClick={() => locationHandler('')}>
                         <Radio checked={location === ''} size="small" className="sf-radio" />
                         <Typography className="sf-option-label">{t('All Korea')}</Typography>
                     </Stack>
                     {Object.values(SalonLocation).map((loc) => (
-                        <Stack key={loc} direction="row" alignItems="center" className="sf-option" onClick={() => setLocation(loc)}>
+                        <Stack key={loc} direction="row" alignItems="center" className="sf-option" onClick={() => locationHandler(loc)}>
                             <Radio checked={location === loc} size="small" className="sf-radio" />
                             <Typography className="sf-option-label">{t(loc)}</Typography>
                         </Stack>
@@ -106,7 +136,7 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
                 </Stack>
             </Stack>
 
-            {/* ── Service Type ── */}
+            {/* ── Service Type — endi ikonlar bilan, Salon bilan bir xil tartibda ── */}
             <Stack className="sf-section">
                 <Stack direction="row" alignItems="center" gap={0.75} className="sf-section-title">
                     <ContentCutIcon sx={{ fontSize: 16 }} />
@@ -122,7 +152,7 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
                             className="sf-option"
                             onClick={() => typeToggle(opt.value)}
                         >
-                            <Typography className="sf-option-label">{t(opt.label)}</Typography>
+                            <Typography className="sf-option-label">{opt.emoji} {t(opt.label)}</Typography>
                             <Checkbox checked={types.includes(opt.value)} size="small" className="sf-checkbox" />
                         </Stack>
                     ))}
@@ -148,6 +178,7 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
                     max={PRICE_MAX}
                     step={10000}
                     onChange={(_e, v) => setPriceRange(v as number[])}
+                    onChangeCommitted={priceCommitHandler}
                     className="sf-slider"
                     sx={{
                         color: '#FF4D8D',
@@ -165,7 +196,7 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
                 </Stack>
                 <Stack className="sf-options">
                     {[4.5, 4.0].map((r) => (
-                        <Stack key={r} direction="row" alignItems="center" className="sf-option" onClick={() => setMinRating(minRating === r ? 0 : r)}>
+                        <Stack key={r} direction="row" alignItems="center" className="sf-option" onClick={() => ratingHandler(r)}>
                             <Radio checked={minRating === r} size="small" className="sf-radio" />
                             <Typography className="sf-option-label">{r} & {t('above')}</Typography>
                             <Stack direction="row" sx={{ ml: 1 }}>
@@ -194,7 +225,7 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
                             direction="row"
                             alignItems="center"
                             className="sf-option"
-                            onClick={() => setDurationMax(opt.value)}
+                            onClick={() => durationHandler(opt.value)}
                         >
                             <Radio checked={durationMax === opt.value} size="small" className="sf-radio" />
                             <Typography className="sf-option-label">{t(opt.label)}</Typography>
@@ -203,10 +234,8 @@ const Servicefilter = ({ onApply, onReset }: ServicefilterProps) => {
                 </Stack>
             </Stack>
 
-            {/* ── Tugmalar ── */}
-            <Button fullWidth className="sf-apply-btn" onClick={applyHandler}>
-                {t('Apply Filters')}
-            </Button>
+            {/* ⚠️ TUZATILDI: "Apply Filters" tugmasi olib tashlandi — har bir
+               tanlov endi DARHOL qo'llanadi (Salonfilter bilan bir xil) */}
             <Button fullWidth className="sf-reset-btn" startIcon={<RestartAltIcon />} onClick={resetHandler}>
                 {t('Reset')}
             </Button>

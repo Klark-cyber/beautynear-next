@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { Box, Stack, Typography, IconButton, Badge, Menu, MenuItem } from '@mui/material';
@@ -9,6 +9,7 @@ import StarIcon from '@mui/icons-material/Star';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import MyLocationIcon from '@mui/icons-material/MyLocation';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import HomeIcon from '@mui/icons-material/Home';
 import PersonIcon from '@mui/icons-material/Person';
@@ -18,11 +19,14 @@ import ContentCutOutlinedIcon from '@mui/icons-material/ContentCutOutlined';
 import Face3OutlinedIcon from '@mui/icons-material/Face3Outlined';
 import ForumOutlinedIcon from '@mui/icons-material/ForumOutlined';
 import CloseIcon from '@mui/icons-material/Close';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { useQuery, useMutation, useReactiveVar } from '@apollo/client';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore, { Navigation } from 'swiper';
+import SwiperCore, { Navigation, Autoplay } from 'swiper';
 import moment from 'moment';
-import { GET_SALONS, GET_SERVICES, GET_BOARD_ARTICLES, GET_NOTICES } from '../../../apollo/user/query';
+import { GET_SALONS, GET_SERVICES, GET_BOARD_ARTICLES, GET_NOTICES, GET_MY_BOOKINGS } from '../../../apollo/user/query';
 import { LIKE_TARGET_SALON, LIKE_TARGET_SERVICE } from '../../../apollo/user/mutation';
 import { userVar } from '../../../apollo/store';
 import { REACT_APP_API_URL } from '../../../libs/config';
@@ -32,10 +36,12 @@ import { Service } from '../../../libs/types/service/service';
 import { BoardArticle } from '../../../libs/types/board-article/board-article';
 import { Notice } from '../../../libs/types/notice/notice';
 import { logOut } from '../../auth';
+import { useNotificationSocket } from '../../hooks/useNotificationSocket';
+import { getUserCoords, hasUserLocation, requestUserLocation, calcDistanceKm, formatDistance } from '../../geo';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────── */
 
-const imgUrl = (raw?: string, fallback = '/img/banner/default.jpg'): string => {
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
     if (!raw) return fallback;
     return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
@@ -65,7 +71,7 @@ const HOW_IT_WORKS = [
 
 // ⚠️ v8'da modullar ROOT paketdan import qilinadi va SwiperCore.use()
 // orqali ro'yxatdan o'tkazilishi SHART
-SwiperCore.use([Navigation]);
+SwiperCore.use([Navigation, Autoplay]);
 
 const AVATARS = [
     'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&q=80',
@@ -79,6 +85,11 @@ const EXPLORE_ITEMS = [
     { label: 'Services', href: '/service', icon: <ContentCutOutlinedIcon sx={{ fontSize: 22 }} />, color: '#9B59B6' },
     { label: 'Specialists', href: '/specialist', icon: <Face3OutlinedIcon sx={{ fontSize: 22 }} />, color: '#2980B9' },
     { label: 'Community', href: '/community', icon: <ForumOutlinedIcon sx={{ fontSize: 22 }} />, color: '#F57C00' },
+    { label: 'Saved', href: '/saved', icon: <BookmarkBorderIcon sx={{ fontSize: 22 }} />, color: '#3EA043' },
+    // ⚠️ YANGI — CS markazi (Notice/Event/FAQ'dan xabardor bolish uchun)
+    { label: 'Support Center', href: '/cs', icon: <SupportAgentOutlinedIcon sx={{ fontSize: 22 }} />, color: '#16A085' },
+    // ⚠️ YANGI — avval /messages sahifasiga hech qanday doimiy havola yoq edi
+    { label: 'Messages', href: '/messages', icon: <ChatBubbleOutlineIcon sx={{ fontSize: 22 }} />, color: '#FF4D8D' },
 ];
 
 /* ─── Component ───────────────────────────────────────────────────────────── */
@@ -91,6 +102,63 @@ const MobileHome = () => {
     const [activeCategory, setActiveCategory] = useState('ALL');
     const [exploreOpen, setExploreOpen] = useState(false);
     const [anchorUser, setAnchorUser] = useState<null | HTMLElement>(null);
+    // ⚠️ YANGI — avval qongiroqcha shunchaki dekorativ nuqta edi
+    const { unreadCount } = useNotificationSocket();
+
+    // ⚠️ YANGI — haqiqiy geolokatsiya: avval "Seoul, Korea" hardcoded,
+    // "0.4 km" ham hardcoded edi. Endi GPS orqali haqiqiy joylashuv olinadi.
+    const [showGeoBar, setShowGeoBar] = useState(false);
+    // ⚠️ YANGI — avval bu joyda har doim SOXTA ma'lumot ko'rsatilardi
+    // (moment().add(2, 'days') + tasodifiy salon nomi). Endi haqiqiy,
+    // eng yaqin kelayotgan bron ko'rsatiladi.
+    const [nearestBooking, setNearestBooking] = useState<any>(null);
+
+    useQuery(GET_MY_BOOKINGS, {
+        fetchPolicy: 'cache-and-network',
+        variables: { input: { page: 1, limit: 20, sort: 'bookingDate', direction: 'ASC', search: {} } },
+        skip: !user?._id,
+        onCompleted: (data: T) => {
+            const list = data?.getMyBookings?.list ?? [];
+            const now = moment();
+            const upcoming = list
+                .filter((b: any) => (b.bookingStatus === 'PENDING' || b.bookingStatus === 'CONFIRMED'))
+                .filter((b: any) => {
+                    const dt = moment(b.bookingDate);
+                    const [h, m] = (b.bookingTime ?? '00:00').split(':').map(Number);
+                    dt.set({ hour: h, minute: m });
+                    return dt.isAfter(now);
+                })
+                .sort((a: any, b: any) => moment(a.bookingDate).diff(moment(b.bookingDate)));
+            setNearestBooking(upcoming[0] ?? null);
+        },
+    });
+    const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+    useEffect(() => {
+        if (hasUserLocation()) {
+            setUserCoords(getUserCoords());
+        } else {
+            setShowGeoBar(true);
+        }
+    }, []);
+
+    const allowLocationHandler = () => {
+        requestUserLocation(() => {
+            setUserCoords(getUserCoords());
+            setShowGeoBar(false);
+        });
+    };
+
+    const skipLocationHandler = () => setShowGeoBar(false);
+
+    // ⚠️ YANGI — Desktop Top.tsx bilan bir xil til almashtirish mexanizmi
+    const langChoiceHandler = useCallback(
+        async (locale: string) => {
+            localStorage.setItem('locale', locale);
+            await router.push(router.asPath, router.asPath, { locale });
+        },
+        [router],
+    );
     const [salons, setSalons] = useState<Salon[]>([]);
     const [services, setServices] = useState<Service[]>([]);
     const [clinics, setClinics] = useState<Salon[]>([]);
@@ -191,15 +259,29 @@ const MobileHome = () => {
                         <Typography className="mh-logo-text">BeautyNear</Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" gap={1.5}>
-                        <Badge color="error" variant="dot">
-                            <NotificationsNoneIcon sx={{ color: '#333', fontSize: 24 }} />
-                        </Badge>
+                        <Stack direction="row" alignItems="center" className="mh-lang-tabs">
+                            {['kr', 'en', 'ru'].map((code) => (
+                                <Box
+                                    key={code}
+                                    component="div"
+                                    className={`mh-lang-tab ${router.locale === code ? 'active' : ''}`}
+                                    onClick={() => langChoiceHandler(code)}
+                                >
+                                    {code.toUpperCase()}
+                                </Box>
+                            ))}
+                        </Stack>
+                        <IconButton onClick={() => router.push('/notifications')} sx={{ p: 0.5 }}>
+                            <Badge badgeContent={unreadCount} color="error" max={9}>
+                                <NotificationsNoneIcon sx={{ color: '#333', fontSize: 24 }} />
+                            </Badge>
+                        </IconButton>
                         {user?._id ? (
                             <>
                                 <Box
                                     component="div"
                                     className="mh-avatar"
-                                    onClick={(e) => setAnchorUser(e.currentTarget)}
+                                    onClick={(e: React.MouseEvent<HTMLElement>) => setAnchorUser(e.currentTarget)}
                                     style={{ backgroundImage: `url(${imgUrl(user?.memberImage, '/img/profile/defaultUser.svg')})` }}
                                 />
                                 <Menu anchorEl={anchorUser} open={Boolean(anchorUser)} onClose={() => setAnchorUser(null)}>
@@ -208,16 +290,28 @@ const MobileHome = () => {
                                 </Menu>
                             </>
                         ) : (
-                            <Box component="div" className="mh-avatar" onClick={() => router.push('/account/join')} style={{ backgroundImage: `url(/img/profile/defaultUser.svg)` }} />
+                            <Box component="div" className="mh-login-btn" onClick={() => router.push('/account/join')}>
+                                {t('Login')}
+                            </Box>
                         )}
                     </Stack>
                 </Stack>
 
                 <Stack direction="row" alignItems="center" gap={0.5} className="mh-location-pill" onClick={() => router.push('/salons')}>
                     <LocationOnIcon sx={{ fontSize: 15, color: '#FF4D8D' }} />
-                    <Typography className="mh-location-text">{t('Seoul, Korea')}</Typography>
+                    <Typography className="mh-location-text">{userCoords ? t('My Location') : t('Seoul, Korea')}</Typography>
                     <KeyboardArrowDownIcon sx={{ fontSize: 16, color: '#888' }} />
                 </Stack>
+
+                {/* ⚠️ YANGI — GPS ruxsati so'raluvchi panel (faqat hali ruxsat berilmagan bo'lsa) */}
+                {showGeoBar && (
+                    <Stack direction="row" alignItems="center" gap={1} className="mh-geo-bar">
+                        <MyLocationIcon sx={{ fontSize: 18, color: '#FF4D8D' }} />
+                        <Typography className="mh-geo-text">{t('Allow location access to see salons near you')}</Typography>
+                        <Box component="div" className="mh-geo-allow" onClick={allowLocationHandler}>{t('Allow')}</Box>
+                        <Box component="div" className="mh-geo-skip" onClick={skipLocationHandler}>{t('Skip')}</Box>
+                    </Stack>
+                )}
 
                 <Box component="div" className="mh-hero-text">
                     <Typography className="mh-h1">
@@ -232,15 +326,22 @@ const MobileHome = () => {
                     <Box component="div" className="mh-search-btn"><SearchIcon sx={{ color: '#fff', fontSize: 18 }} /></Box>
                 </Stack>
 
-                {/* Floating card — Booking Confirmed */}
-                <Box component="div" className="mh-float-card mh-float-booking">
-                    <Stack direction="row" alignItems="center" gap={0.5}>
-                        <CheckCircleIcon sx={{ fontSize: 13, color: '#3EA043' }} />
-                        <Typography className="mh-float-label">{t('Booking Confirmed')}</Typography>
-                    </Stack>
-                    <Typography className="mh-float-title">{salons[0]?.salonTitle ?? 'Glow Skin Clinic'}</Typography>
-                    <Typography className="mh-float-sub">{moment().add(2, 'days').format('MMM DD, YYYY · h:mm A')}</Typography>
-                </Box>
+                {/* Floating card — eng yaqin kelayotgan bron (haqiqiy) */}
+                {nearestBooking ? (
+                    <Box component="div" className="mh-float-card mh-float-booking" onClick={() => router.push('/mypage?category=myBookings')}>
+                        <Stack direction="row" alignItems="center" gap={0.5}>
+                            <CheckCircleIcon sx={{ fontSize: 13, color: '#3EA043' }} />
+                            <Typography className="mh-float-label">{t(nearestBooking.bookingStatus === 'CONFIRMED' ? 'Booking Confirmed' : 'Booking Pending')}</Typography>
+                        </Stack>
+                        <Typography className="mh-float-title">{nearestBooking.salonData?.salonTitle}</Typography>
+                        <Typography className="mh-float-sub">{moment(nearestBooking.bookingDate).format('MMM DD, YYYY')} · {nearestBooking.bookingTime}</Typography>
+                    </Box>
+                ) : (
+                    <Box component="div" className="mh-float-card mh-float-empty" onClick={() => router.push('/salons')}>
+                        <Typography className="mh-float-empty-emoji">📅</Typography>
+                        <Typography className="mh-float-empty-text">{t('No booking yet')}</Typography>
+                    </Box>
+                )}
 
                 <Stack direction="row" className="mh-stats-row">
                     <Stack direction="row" alignItems="center" gap={0.75} className="mh-stat">
@@ -291,7 +392,7 @@ const MobileHome = () => {
                 <video
                     className="mh-video-el"
                     src="/video/salon-promo.mp4"
-                    poster="/video/salon-promo-poster.jpg"
+                    poster="/img/banner/hero.jpg"
                     autoPlay
                     muted
                     loop
@@ -327,15 +428,21 @@ const MobileHome = () => {
                     <Typography className="mh-section-title">{t('Trending Services')}</Typography>
                     <Typography className="mh-view-all" onClick={() => router.push('/service')}>{t('View All')}</Typography>
                 </Stack>
-                <Swiper slidesPerView={2.3} spaceBetween={12} className="mh-swiper">
+                <Swiper
+                    slidesPerView={2.3}
+                    spaceBetween={12}
+                    loop
+                    autoplay={{ delay: 3500, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                    className="mh-swiper"
+                >
                     {services.map((svc) => {
                         const liked = svc.meLiked?.[0]?.myFavorite;
                         return (
                             <SwiperSlide key={svc._id}>
-                                <Stack className="mh-ts-card" onClick={() => router.push(`/service/detail?id=${svc._id}`)}>
+                                <Stack className="mh-ts-card" onClick={() => router.push(`/service/${svc._id}`)}>
                                     <Box component="div" className="mh-ts-img" style={{ backgroundImage: `url(${imgUrl(svc.serviceImages?.[0])})` }}>
                                         <Box component="div" className="mh-ts-badge">{t('Trending')}</Box>
-                                        <IconButton className="mh-ts-like" onClick={(e) => { e.stopPropagation(); likeServiceHandler(svc._id); }}>
+                                        <IconButton className="mh-ts-like" onClick={(e: any) => { e.stopPropagation(); likeServiceHandler(svc._id); }}>
                                             {liked ? <FavoriteIcon className="mh-heart-icon liked" sx={{ fontSize: 15, color: '#FF4D8D' }} /> : <FavoriteBorderIcon className="mh-heart-icon" sx={{ fontSize: 15, color: '#fff' }} />}
                                         </IconButton>
                                     </Box>
@@ -359,7 +466,13 @@ const MobileHome = () => {
                     <Typography className="mh-section-title">{t('Featured Clinics')}</Typography>
                     <Typography className="mh-view-all" onClick={() => router.push('/salons?input=' + JSON.stringify({ page: 1, limit: 9, search: { typeList: ['CLINIC', 'SKIN'] } }))}>{t('View All')}</Typography>
                 </Stack>
-                <Swiper slidesPerView={2.3} spaceBetween={12} className="mh-swiper">
+                <Swiper
+                    slidesPerView={2.3}
+                    spaceBetween={12}
+                    loop
+                    autoplay={{ delay: 4200, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                    className="mh-swiper"
+                >
                     {clinics.map((clinic) => {
                         const liked = clinic.meLiked?.[0]?.myFavorite;
                         return (
@@ -367,7 +480,7 @@ const MobileHome = () => {
                                 <Stack className="mh-fc-card" onClick={() => router.push(`/salons/${clinic._id}`)}>
                                     <Box component="div" className="mh-fc-img" style={{ backgroundImage: `url(${imgUrl(clinic.salonImages?.[0])})` }}>
                                         <Box component="div" className="mh-fc-open">{t('Open')}</Box>
-                                        <IconButton className="mh-fc-like" onClick={(e) => { e.stopPropagation(); likeSalonHandler(clinic._id); }}>
+                                        <IconButton className="mh-fc-like" onClick={(e: any) => { e.stopPropagation(); likeSalonHandler(clinic._id); }}>
                                             {liked ? <FavoriteIcon className="mh-heart-icon liked" sx={{ fontSize: 15, color: '#FF4D8D' }} /> : <FavoriteBorderIcon className="mh-heart-icon" sx={{ fontSize: 15, color: '#fff' }} />}
                                         </IconButton>
                                     </Box>
@@ -393,7 +506,13 @@ const MobileHome = () => {
                     <Typography className="mh-section-title">{t('Popular Salons Near You')}</Typography>
                     <Typography className="mh-view-all" onClick={() => router.push('/salons')}>{t('View All')}</Typography>
                 </Stack>
-                <Swiper slidesPerView={2.3} spaceBetween={12} className="mh-swiper">
+                <Swiper
+                    slidesPerView={2.3}
+                    spaceBetween={12}
+                    loop
+                    autoplay={{ delay: 4900, disableOnInteraction: false, pauseOnMouseEnter: true }}
+                    className="mh-swiper"
+                >
                     {salons.map((salon) => (
                         <SwiperSlide key={salon._id}>
                             <Stack className="mh-ps-card" onClick={() => router.push(`/salons/${salon._id}`)}>
@@ -404,9 +523,11 @@ const MobileHome = () => {
                                 <Typography className="mh-ps-desc">{salon.salonAddress}</Typography>
                                 <Stack direction="row" alignItems="center" gap={0.5} className="mh-ps-meta">
                                     <StarIcon sx={{ fontSize: 11, color: '#FFB800' }} />
-                                    <Typography className="mh-ps-rating">4.9</Typography>
+                                    <Typography className="mh-ps-rating">{(salon.salonRating ?? 0).toFixed(1)}</Typography>
                                     <Typography className="mh-ps-dot">·</Typography>
-                                    <Typography className="mh-ps-dist">0.4 km</Typography>
+                                    <Typography className="mh-ps-dist">
+                                        {userCoords ? formatDistance(calcDistanceKm(userCoords.lat, userCoords.lng, salon.salonLatitude, salon.salonLongitude)) || '—' : '—'}
+                                    </Typography>
                                 </Stack>
                                 <Typography className="mh-ps-deposit">{t('Deposit')} ₩{formatPrice(salon.depositAmount ?? 10000)}</Typography>
                             </Stack>
@@ -421,10 +542,10 @@ const MobileHome = () => {
                     <Box component="div" className="mh-col">
                         <Stack direction="row" alignItems="center" justifyContent="space-between" className="mh-section-head">
                             <Typography className="mh-section-title sm">{t('Community Highlights')}</Typography>
-                            <Typography className="mh-view-all sm">{t('View All')}</Typography>
+                            <Typography className="mh-view-all sm" onClick={() => router.push('/community')}>{t('View All')}</Typography>
                         </Stack>
                         {articles.map((a) => (
-                            <Stack key={a._id} direction="row" gap={1} className="mh-community-item" onClick={() => router.push(`/community/detail?articleId=${a._id}`)}>
+                            <Stack key={a._id} direction="row" gap={1} className="mh-community-item" onClick={() => router.push(`/community/detail?id=${a._id}`)}>
                                 <Box component="div" sx={{ flex: 1, minWidth: 0 }}>
                                     <Stack direction="row" alignItems="center" gap={0.5}>
                                         <Box component="div" className="mh-avatar-sm" style={{ backgroundImage: `url(${imgUrl(a.memberData?.memberImage, '/img/profile/defaultUser.svg')})` }} />
@@ -440,7 +561,7 @@ const MobileHome = () => {
                     <Box component="div" className="mh-col">
                         <Stack direction="row" alignItems="center" justifyContent="space-between" className="mh-section-head">
                             <Typography className="mh-section-title sm">{t('Upcoming Events')}</Typography>
-                            <Typography className="mh-view-all sm">{t('View All')}</Typography>
+                            <Typography className="mh-view-all sm" onClick={() => router.push('/cs')}>{t('View All')}</Typography>
                         </Stack>
                         {events.map((ev) => (
                             <Stack key={ev._id} direction="row" gap={1} className="mh-event-item">
@@ -523,7 +644,7 @@ const MobileHome = () => {
             {/* ═══ EXPLORE MENYUSI (pastdan chiquvchi) ═══ */}
             {exploreOpen && (
                 <Box component="div" className="mh-explore-backdrop" onClick={() => setExploreOpen(false)}>
-                    <Stack className="mh-explore-sheet" onClick={(e) => e.stopPropagation()}>
+                    <Stack className="mh-explore-sheet" onClick={(e: any) => e.stopPropagation()}>
                         <Stack direction="row" alignItems="center" justifyContent="space-between" className="mh-explore-head">
                             <Typography className="mh-explore-title">{t('Explore')}</Typography>
                             <IconButton onClick={() => setExploreOpen(false)}><CloseIcon /></IconButton>

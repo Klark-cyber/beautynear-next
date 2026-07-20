@@ -1,4 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import moment from 'moment';
+import { useQuery } from '@apollo/client';
+import { GET_MY_BOOKINGS } from '../../../apollo/user/query';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Head from 'next/head';
 import Top from '../Top';
@@ -41,6 +45,30 @@ const withLayoutMain = (Component: any) => {
 	return (props: any) => {
 		const device = useDeviceDetect();
 		const user = useReactiveVar(userVar);
+		const router = useRouter();
+		// ⚠️ YANGI — avval bu joyda "Glow Skin Clinic" degan SOXTA
+		// ma'lumot doim ko'rsatilardi (mobil'da tuzatilgan bilan bir xil sabab)
+		const [nearestBooking, setNearestBooking] = useState<any>(null);
+
+		useQuery(GET_MY_BOOKINGS, {
+			fetchPolicy: 'cache-and-network',
+			variables: { input: { page: 1, limit: 20, sort: 'bookingDate', direction: 'ASC', search: {} } },
+			skip: !user?._id,
+			onCompleted: (data: any) => {
+				const list = data?.getMyBookings?.list ?? [];
+				const now = moment();
+				const upcoming = list
+					.filter((b: any) => b.bookingStatus === 'PENDING' || b.bookingStatus === 'CONFIRMED')
+					.filter((b: any) => {
+						const dt = moment(b.bookingDate);
+						const [h, m] = (b.bookingTime ?? '00:00').split(':').map(Number);
+						dt.set({ hour: h, minute: m });
+						return dt.isAfter(now);
+					})
+					.sort((a: any, b: any) => moment(a.bookingDate).diff(moment(b.bookingDate)));
+				setNearestBooking(upcoming[0] ?? null);
+			},
+		});
 		const { t } = useTranslation('common');
 
 		/** LIFECYCLES **/
@@ -61,6 +89,8 @@ const withLayoutMain = (Component: any) => {
 					    tashlandi — MobileHome endi o'zining header, hero va
 					    pastki navigatsiyasini o'z ichida to'liq boshqaradi. */}
 					<Component {...props} />
+					{/* ⚠️ YANGI — avval Chat faqat Desktop'da render qilinardi */}
+					{user?._id && <Chat />}
 				</>
 			);
 		}
@@ -172,25 +202,35 @@ const withLayoutMain = (Component: any) => {
 								<HeaderLocationFinder />
 							</Stack>
 
-							{/* FLOATING CARD 1 — Booking Confirmed */}
-							<Stack className="float-card booking-card">
-								<Stack direction="row" alignItems="center" gap={0.75} className="fc-head">
-									<CheckCircleOutlinedIcon className="fc-check" />
-									<Typography className="fc-title">{t('Booking Confirmed')}</Typography>
-								</Stack>
-								<Stack direction="row" gap={1.5} alignItems="center" className="fc-body">
-									<Box component="div" className="booking-thumb">
-										<img src="/img/banner/hero.jpg" alt="clinic" />
-									</Box>
-									<Stack>
-										<Typography className="fc-name">Glow Skin Clinic</Typography>
-										<Typography className="fc-date">May 24, 2025 · 2:00 PM</Typography>
+							{/* FLOATING CARD 1 — endi haqiqiy eng yaqin bron */}
+							{nearestBooking ? (
+								<Stack className="float-card booking-card" onClick={() => router.push('/mypage?category=myBookings')} sx={{ cursor: 'pointer' }}>
+									<Stack direction="row" alignItems="center" gap={0.75} className="fc-head">
+										<CheckCircleOutlinedIcon className="fc-check" />
+										<Typography className="fc-title">{t(nearestBooking.bookingStatus === 'CONFIRMED' ? 'Booking Confirmed' : 'Booking Pending')}</Typography>
 									</Stack>
+									<Stack direction="row" gap={1.5} alignItems="center" className="fc-body">
+										<Box component="div" className="booking-thumb">
+											<img src="/img/banner/hero.jpg" alt="clinic" />
+										</Box>
+										<Stack>
+											<Typography className="fc-name">{nearestBooking.salonData?.salonTitle}</Typography>
+											<Typography className="fc-date">{moment(nearestBooking.bookingDate).format('MMM DD, YYYY')} · {nearestBooking.bookingTime}</Typography>
+										</Stack>
+									</Stack>
+									<Box component="div" className="fc-footer">
+										<Typography className="fc-link">{t('View Details')}</Typography>
+									</Box>
 								</Stack>
-								<Box component="div" className="fc-footer">
-									<Typography className="fc-link">{t('View Details')}</Typography>
-								</Box>
-							</Stack>
+							) : (
+								<Stack className="float-card booking-card empty" onClick={() => router.push('/salons')} sx={{ cursor: 'pointer' }}>
+									<Stack direction="row" alignItems="center" gap={0.75} className="fc-head">
+										<CheckCircleOutlinedIcon className="fc-check" sx={{ opacity: 0.4 }} />
+										<Typography className="fc-title">{t('No booking yet')}</Typography>
+									</Stack>
+									<Typography className="fc-empty-hint">{t('Want to book? Click here')}</Typography>
+								</Stack>
+							)}
 
 							{/* FLOATING CARD 2 — Special Offer */}
 							<Stack className="float-card offer-card">

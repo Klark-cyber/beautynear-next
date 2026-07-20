@@ -9,6 +9,7 @@ import { appWithTranslation } from 'next-i18next';
 import '../scss/app.scss';
 import '../scss/pc/main.scss';
 import '../scss/mobile/main.scss';
+import { ChatProvider } from '../libs/context/ChatContext';
 
 const App = ({ Component, pageProps }: AppProps) => {
 	// @ts-ignore
@@ -19,7 +20,9 @@ const App = ({ Component, pageProps }: AppProps) => {
 		<ApolloProvider client={client}>
 			<ThemeProvider theme={theme}>
 				<CssBaseline />
-				<Component {...pageProps} />
+				<ChatProvider>
+					<Component {...pageProps} />
+				</ChatProvider>
 			</ThemeProvider>
 		</ApolloProvider>
 	);

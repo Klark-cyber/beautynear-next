@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Stack, Box, Typography, Button, IconButton, Avatar, AvatarGroup } from '@mui/material';
+import { Stack, Box, Typography, Button, IconButton, Avatar } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Autoplay, Navigation } from 'swiper';
 
@@ -8,7 +8,6 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import StarIcon from '@mui/icons-material/Star';
 import WhatshotIcon from '@mui/icons-material/Whatshot';
-import AddIcon from '@mui/icons-material/Add';
 import WestIcon from '@mui/icons-material/West';
 import EastIcon from '@mui/icons-material/East';
 import Link from 'next/link';
@@ -36,11 +35,11 @@ const formatPrice = (n?: number): string => {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-const FAKE_AVATARS = [
-    '/img/profile/defaultUser.svg',
-    '/img/profile/defaultUser.svg',
-    '/img/profile/defaultUser.svg',
-];
+// ⚠️ YANGI — avval FAKE_AVATARS (3 ta bir xil rasm) ishlatilardi
+const imgUrl = (raw?: string): string => {
+    if (!raw) return '/img/profile/defaultUser.svg';
+    return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
+};
 
 const TrendingServices = () => {
     const { t } = useTranslation('common');
@@ -79,16 +78,16 @@ const TrendingServices = () => {
             <Stack className="trending-services-section mobile">
                 <Stack direction="row" justifyContent="space-between" alignItems="center" className="ts-header">
                     <Typography className="ts-title">{t('Trending Services')}</Typography>
-                    <Link href="/services">
+                    <Link href="/service">
                         <Typography className="ts-viewall">{t('View all')}</Typography>
                     </Link>
                 </Stack>
                 <Stack direction="row" gap={1.5} className="ts-scroll">
                     {services.map((svc) => {
                         const raw = svc.serviceImages?.[0];
-                        const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/default.jpg';
+                        const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/hero.jpg';
                         return (
-                            <Stack key={svc._id} className="ts-card-mobile" onClick={() => router.push(`/services/${svc._id}`)}>
+                            <Stack key={svc._id} className="ts-card-mobile" onClick={() => router.push(`/service/${svc._id}`)}>
                                 <Box component="div" className="tsm-img" style={{ backgroundImage: `url(${img})` }}>
                                     <Box component="div" className="tsm-badge">🔥 {t('Trending')}</Box>
                                 </Box>
@@ -115,7 +114,7 @@ const TrendingServices = () => {
                         <Typography className="ts-subtitle">{t('Most loved beauty treatments this week')}</Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" gap={2}>
-                        <Link href="/services">
+                        <Link href="/service">
                             <Stack direction="row" alignItems="center" gap={0.5} className="ts-viewall">
                                 <Typography className="tsv-text">{t('View all services')}</Typography>
                                 <EastIcon sx={{ fontSize: 16 }} />
@@ -139,7 +138,7 @@ const TrendingServices = () => {
                 >
                     {services.map((svc) => {
                         const raw = svc.serviceImages?.[0];
-                        const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/default.jpg';
+                        const img = raw ? (raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`) : '/img/banner/hero.jpg';
                         const liked = svc.meLiked?.[0]?.myFavorite;
 
                         return (
@@ -147,7 +146,7 @@ const TrendingServices = () => {
                                 <Stack className="trending-card">
                                     {/* Image */}
                                     <Box component="div" className="tc-img" style={{ backgroundImage: `url(${img})` }}
-                                        onClick={() => router.push(`/services/${svc._id}`)}>
+                                        onClick={() => router.push(`/service/${svc._id}`)}>
                                         <Stack direction="row" alignItems="center" gap={0.5} className="tc-badge">
                                             <WhatshotIcon sx={{ fontSize: 12 }} />
                                             <Typography className="tcb-text">{t('Trending')}</Typography>
@@ -160,9 +159,13 @@ const TrendingServices = () => {
                                         </IconButton>
 
                                         <Stack direction="row" justifyContent="space-between" alignItems="center" className="tc-overlay">
-                                            <AvatarGroup max={3} className="tc-avatars">
-                                                {FAKE_AVATARS.map((av, i) => <Avatar key={i} src={av} />)}
-                                            </AvatarGroup>
+                                            {/* ⚠️ TUZATILDI: avval 3 ta bir xil SOXTA defaultUser rasm ko'rsatilardi */}
+                                            <Stack direction="row" alignItems="center" gap={0.5}>
+                                                <Avatar src={imgUrl(svc.memberData?.memberImage)} sx={{ width: 24, height: 24, border: '2px solid #fff' }} />
+                                                <Typography sx={{ fontSize: 11, color: '#fff', fontWeight: 600, textShadow: '0 1px 3px rgba(0,0,0,0.4)' }}>
+                                                    {svc.memberData?.memberNick}
+                                                </Typography>
+                                            </Stack>
                                             <Box component="div" className="tc-views">
                                                 {svc.serviceViews >= 1000 ? `${(svc.serviceViews / 1000).toFixed(1)}K+` : `${svc.serviceViews}+`}
                                             </Box>
@@ -171,7 +174,7 @@ const TrendingServices = () => {
 
                                     {/* Info */}
                                     <Box component="div" className="tc-info">
-                                        <Typography className="tc-name" onClick={() => router.push(`/services/${svc._id}`)}>
+                                        <Typography className="tc-name" onClick={() => router.push(`/service/${svc._id}`)}>
                                             {svc.serviceTitle}
                                         </Typography>
 
@@ -207,9 +210,6 @@ const TrendingServices = () => {
                                             <Button fullWidth className="tc-book-btn" onClick={() => router.push(`/salons/${svc.salonId}`)}>
                                                 {t('Book Now')}
                                             </Button>
-                                            <IconButton className="tc-add-btn">
-                                                <AddIcon sx={{ fontSize: 18, color: '#FF4D8D' }} />
-                                            </IconButton>
                                         </Stack>
                                     </Box>
                                 </Stack>

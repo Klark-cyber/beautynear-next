@@ -20,6 +20,29 @@
         position: relative;
         z-index: 2;
         padding: 14px 0 8px; // ⚠️ gorizontal padding endi ota (.mh-hero)dan keladi
+
+        .mh-lang-tabs {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 10px;
+            padding: 2px;
+            gap: 2px;
+
+            .mh-lang-tab {
+                padding: 4px 7px;
+                border-radius: 8px;
+                font-family: 'Inter', sans-serif;
+                font-size: 10px;
+                font-weight: 700;
+                color: #666;
+                cursor: pointer;
+
+                &.active {
+                    background: #FF4D8D;
+                    color: #fff;
+                }
+            }
+        }
+
         background: transparent; // ⚠️ TUZATILDI: endi hero rasmi ustida, alohida oq panel emas
 
         .mh-logo-emoji {
@@ -40,6 +63,19 @@
             background-size: cover;
             background-position: center;
             background-color: #eee;
+        }
+
+        // ⚠️ YANGI — login qilinmagan holatda dumaloq rasm o'rniga matn
+        .mh-login-btn {
+            background: #FF4D8D;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 7px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            white-space: nowrap;
             border: 1.5px solid #fff;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             cursor: pointer;
@@ -84,6 +120,47 @@
                 font-size: 12.5px !important;
                 font-weight: 600 !important;
                 color: #333 !important;
+            }
+        }
+
+        // ⚠️ YANGI — GPS ruxsati so'raluvchi panel
+        .mh-geo-bar {
+            position: relative;
+            z-index: 2;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 14px;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
+            .mh-geo-text {
+                flex: 1;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11px !important;
+                color: #444 !important;
+                line-height: 1.35 !important;
+            }
+
+            .mh-geo-allow {
+                flex-shrink: 0;
+                background: #FF4D8D;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                font-size: 11px;
+                font-weight: 700;
+                padding: 6px 12px;
+                border-radius: 9px;
+                cursor: pointer;
+            }
+
+            .mh-geo-skip {
+                flex-shrink: 0;
+                color: #999;
+                font-family: 'Inter', sans-serif;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 6px 6px;
+                cursor: pointer;
             }
         }
 
@@ -227,6 +304,27 @@
             .mh-float-sub {
                 font-family: 'Inter', sans-serif !important;
                 font-size: 9px !important;
+                color: #999 !important;
+            }
+        }
+
+        // ⚠️ YANGI — bron yo'q holati
+        .mh-float-empty {
+            top: 150px;
+            right: 18px;
+            width: clamp(130px, 38vw, 170px);
+            text-align: center;
+            cursor: pointer;
+
+            .mh-float-empty-emoji {
+                font-size: 22px;
+            }
+
+            .mh-float-empty-text {
+                margin-top: 2px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10.5px !important;
+                font-weight: 700 !important;
                 color: #999 !important;
             }
         }

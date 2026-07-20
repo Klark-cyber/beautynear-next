@@ -1,192 +1,76 @@
 import React from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import {
-	TableCell,
-	TableHead,
-	TableBody,
-	TableRow,
-	Table,
-	TableContainer,
-	Button,
-	Menu,
-	Fade,
-	MenuItem,
-} from '@mui/material';
-import Avatar from '@mui/material/Avatar';
-import Typography from '@mui/material/Typography';
-import { Stack } from '@mui/material';
+import { Box, Stack, Typography, Chip } from '@mui/material';
+import moment from 'moment';
+import { REACT_APP_API_URL } from '../../../config';
 
-interface Data {
-	category: string;
-	qna_case_status: string;
-	title: string;
-	writer: string;
-	date: string;
-	status: string;
-	id?: string;
+const imgUrl = (raw?: string): string => {
+	if (!raw) return '/img/profile/defaultUser.svg';
+	return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
+};
+
+const STATUS_COLOR: Record<string, string> = {
+	WAITING: 'type-admin',
+	ANSWERED: 'type-agent',
+	CLOSED: 'type-user',
+};
+
+interface InquiryListProps {
+	inquiries: any[];
+	onSelect: (inquiry: any) => void;
+	selectedId: string | null;
 }
 
-type Order = 'asc' | 'desc';
+// ⚠️ MUHIM: bu komponent avval "Users" jadvalidan nusxa kochirilgan,
+// hech qanday haqiqiy malumotga ega bolmagan holat edi. Endi toliq
+// qayta qurildi.
 
-interface HeadCell {
-	disablePadding: boolean;
-	id: keyof Data;
-	label: string;
-	numeric: boolean;
-}
-
-const headCells: readonly HeadCell[] = [
-	{
-		id: 'category',
-		numeric: true,
-		disablePadding: false,
-		label: 'CATEGORY',
-	},
-	{
-		id: 'title',
-		numeric: true,
-		disablePadding: false,
-		label: 'TITLE',
-	},
-	{
-		id: 'writer',
-		numeric: true,
-		disablePadding: false,
-		label: 'WRITER',
-	},
-	{
-		id: 'date',
-		numeric: true,
-		disablePadding: false,
-		label: 'DATE',
-	},
-	{
-		id: 'qna_case_status',
-		numeric: false,
-		disablePadding: false,
-		label: 'QNA STATUS',
-	},
-];
-
-interface EnhancedTableProps {
-	numSelected: number;
-	onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
-	onSelectAllClick: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	order: Order;
-	orderBy: string;
-	rowCount: number;
-}
-
-function EnhancedTableHead(props: EnhancedTableProps) {
-	const { onSelectAllClick } = props;
-
+export const InquiryList = ({ inquiries, onSelect, selectedId }: InquiryListProps) => {
 	return (
-		<TableHead>
-			<TableRow>
-				{headCells.map((headCell) => (
-					<TableCell
-						key={headCell.id}
-						align={headCell.numeric ? 'left' : 'center'}
-						padding={headCell.disablePadding ? 'none' : 'normal'}
-					>
-						{headCell.label}
-					</TableCell>
-				))}
-			</TableRow>
-		</TableHead>
-	);
-}
+		<Box component="div">
+			<Stack direction="row" alignItems="center" className="admin-table-head">
+				<Typography className="th" sx={{ width: '22%' }}>FROM</Typography>
+				<Typography className="th" sx={{ width: '38%' }}>SUBJECT</Typography>
+				<Typography className="th" sx={{ width: '15%' }}>STATUS</Typography>
+				<Typography className="th" sx={{ width: '25%' }}>DATE</Typography>
+			</Stack>
 
-interface InquiryPanelListType {
-	dense?: boolean;
-	membersData?: any;
-	searchMembers?: any;
-	anchorEl?: any;
-	handleMenuIconClick?: any;
-	handleMenuIconClose?: any;
-	generateMentorTypeHandle?: any;
-}
+			{inquiries.length === 0 && (
+				<Stack alignItems="center" className="admin-no-data">
+					<Typography>No inquiries found</Typography>
+				</Stack>
+			)}
 
-export const InquiryList = (props: InquiryPanelListType) => {
-	const {
-		dense,
-		membersData,
-		searchMembers,
-		anchorEl,
-		handleMenuIconClick,
-		handleMenuIconClose,
-		generateMentorTypeHandle,
-	} = props;
-	const router = useRouter();
-
-	/** APOLLO REQUESTS **/
-	/** LIFECYCLES **/
-	/** HANDLERS **/
-
-	return (
-		<Stack>
-			<TableContainer>
-				<Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle" size={dense ? 'small' : 'medium'}>
-					{/*@ts-ignore*/}
-					<EnhancedTableHead />
-					<TableBody>
-						{[1, 2, 3, 4, 5].map((ele: any, index: number) => {
-							const member_image = '/img/profile/defaultUser.svg';
-
-							let status_class_name = '';
-
-							return (
-								<TableRow hover key={'member._id'} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-									<TableCell align="left">mb id</TableCell>
-									<TableCell align="left">member.mb_full_name</TableCell>
-									<TableCell align="left" className={'name'}>
-										<Stack direction={'row'}>
-											<Link href={`/_admin/users/detail?mb_id=$'{member._id'}`}>
-												<div>
-													<Avatar alt="Remy Sharp" src={member_image} sx={{ ml: '2px', mr: '10px' }} />
-												</div>
-											</Link>
-											<Link href={`/_admin/users/detail?mb_id=${'member._id'}`}>
-												<div>member.mb_nick</div>
-											</Link>
-										</Stack>
-									</TableCell>
-									<TableCell align="left">member.mb_phone</TableCell>
-									<TableCell align="center">
-										<Button onClick={(e: any) => handleMenuIconClick(e, index)} className={'badge success'}>
-											member.mb_type
-										</Button>
-
-										<Menu
-											className={'menu-modal'}
-											MenuListProps={{
-												'aria-labelledby': 'fade-button',
-											}}
-											anchorEl={anchorEl[index]}
-											open={Boolean(anchorEl[index])}
-											onClose={handleMenuIconClose}
-											TransitionComponent={Fade}
-											sx={{ p: 1 }}
-										>
-											<MenuItem onClick={(e) => generateMentorTypeHandle('member._id', 'mentor', 'originate')}>
-												<Typography variant={'subtitle1'} component={'span'}>
-													MENTOR
-												</Typography>
-											</MenuItem>
-											<MenuItem onClick={(e) => generateMentorTypeHandle('member._id', 'user', 'remove')}>
-												<Typography variant={'subtitle1'} component={'span'}>
-													USER
-												</Typography>
-											</MenuItem>
-										</Menu>
-									</TableCell>
-								</TableRow>
-							);
-						})}
-					</TableBody>
-				</Table>
-			</TableContainer>
-		</Stack>
+			{inquiries.map((inquiry) => (
+				<Stack
+					key={inquiry._id}
+					direction="row"
+					alignItems="center"
+					className="admin-table-row"
+					onClick={() => onSelect(inquiry)}
+					sx={{ cursor: 'pointer', background: selectedId === inquiry._id ? 'rgba(255,77,141,0.04)' : undefined }}
+				>
+					<Stack direction="row" alignItems="center" gap={1} sx={{ width: '22%', minWidth: 0 }}>
+						<Box
+							component="div"
+							sx={{
+								width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+								backgroundImage: `url(${imgUrl(inquiry.memberData?.memberImage)})`,
+								backgroundSize: 'cover', backgroundPosition: 'center',
+							}}
+						/>
+						<Typography className="td" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+							{inquiry.memberData?.memberNick}
+						</Typography>
+					</Stack>
+					<Typography className="td" sx={{ width: '38%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+						{inquiry.inquirySubject}
+					</Typography>
+					<Box sx={{ width: '15%' }}>
+						<Chip label={inquiry.inquiryStatus} size="small" className={`admin-chip ${STATUS_COLOR[inquiry.inquiryStatus] ?? 'type-user'}`} />
+					</Box>
+					<Typography className="td" sx={{ width: '25%' }}>{moment(inquiry.createdAt).format('MMM DD, YYYY')}</Typography>
+				</Stack>
+			))}
+		</Box>
 	);
 };

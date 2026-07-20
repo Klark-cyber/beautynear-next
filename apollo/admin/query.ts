@@ -99,7 +99,7 @@ export const GET_ALL_SALONS_BY_ADMIN = gql`
  *************************/
 
 export const GET_ALL_SERVICES_BY_ADMIN = gql`
-	query GetAllServicesByAdmin($input: ServicesInquiry!) {
+	query GetAllServicesByAdmin($input: AllServicesInquiry!) {
 		getAllServicesByAdmin(input: $input) {
 			list {
 				_id
@@ -355,7 +355,6 @@ export const GET_AGENT_REQUESTS = gql`
 				memberFullName
 				memberPhone
 				memberImage
-				memberEmail
 				createdAt
 			}
 			metaCounter {

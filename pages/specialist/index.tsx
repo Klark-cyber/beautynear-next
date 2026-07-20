@@ -10,6 +10,7 @@ import { useRouter } from 'next/router';
 import { useQuery, useMutation, useReactiveVar } from '@apollo/client';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileSpecialists from '../../libs/components/specialist/MobileSpecialists';
 import Pagination from '../../libs/components/common/Pagination';
 import Emptylist from '../../libs/components/common/Emptylist';
 import { GET_AGENTS } from '../../apollo/user/query';
@@ -161,12 +162,21 @@ const Specialists: NextPage = ({ initialInput }: any) => {
 
     // ── Specialist Card (Masonry style) ────────────────────────────────────────
     const SpecialistCard = ({ member, index }: { member: Member; index: number }) => {
-        const img = member.memberImage ? `${REACT_APP_API_URL}/${member.memberImage}` : '/img/profile/defaultUser.svg';
-        const portfolioImg = member.memberPortfolio?.[0] ? `${REACT_APP_API_URL}/${member.memberPortfolio[0]}` : img;
+        // ⚠️ TUZATILDI: avval har doim REACT_APP_API_URL old qatorga qo'shilar
+        // edi — tashqi (masalan Unsplash) rasm URL'lari uchun bu buzuq
+        // manzil hosil qilardi. Endi to'liq URL bo'lsa, o'zgartirilmaydi.
+        const img = member.memberImage
+            ? (member.memberImage.startsWith('http') ? member.memberImage : `${REACT_APP_API_URL}/${member.memberImage}`)
+            : '/img/profile/defaultUser.svg';
+        const portfolioImg = member.memberPortfolio?.[0]
+            ? (member.memberPortfolio[0].startsWith('http') ? member.memberPortfolio[0] : `${REACT_APP_API_URL}/${member.memberPortfolio[0]}`)
+            : img;
         const liked = member.meLiked?.[0]?.myFavorite;
         const isFollowing = member.meFollowed?.[0]?.myFollowing;
-        const heights = [220, 260, 200, 240, 280, 210];
-        const imgHeight = heights[index % heights.length];
+        // ⚠️ TUZATILDI: avval Masonry uslubida turli balandlik (220-280px)
+        // bo'lgan — bu boshqa ro'yxat sahifalari (Salons/Services) bilan
+        // nomuvofiq ko'rinardi. Endi barcha kartalar bir xil balandlikda.
+        const imgHeight = 240;
 
         return (
             <Stack className="sp-card">
@@ -261,98 +271,9 @@ const Specialists: NextPage = ({ initialInput }: any) => {
         );
     };
 
-    // ── MOBILE ──────────────────────────────────────────────────────────────────
+    // ── MOBILE ──
     if (device === 'mobile') {
-        return (
-            <Stack className="specialists-page mobile">
-                <Stack className="sp-mobile-search">
-                    <OutlinedInput fullWidth size="small" value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        placeholder={t('Search specialists, skills...')}
-                        onKeyDown={(e) => e.key === 'Enter' && searchHandler()}
-                        startAdornment={<InputAdornment position="start"><SearchIcon sx={{ fontSize: 16, color: '#FF4D8D' }} /></InputAdornment>}
-                        sx={{ borderRadius: 2.5, fontSize: 13, '& fieldset': { borderColor: 'rgba(255,77,141,0.2)' } }}
-                    />
-                </Stack>
-
-                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2, py: 1 }}>
-                    <Typography sx={{ fontSize: 12, color: '#888' }}>
-                        <Box component="span" sx={{ color: '#FF4D8D', fontWeight: 700 }}>{total}</Box> {t('specialists')}
-                    </Typography>
-                    <Select value={activeSort} onChange={(e) => sortHandler(e.target.value)} size="small"
-                        sx={{ fontSize: 11, '& fieldset': { borderColor: 'rgba(255,77,141,0.2)' } }}>
-                        {SORT_OPTIONS.map((s) => <MenuItem key={s.value} value={s.value}>{t(s.label)}</MenuItem>)}
-                    </Select>
-                </Stack>
-
-                {specialists.length === 0 ? (
-                    <Emptylist emoji="👩‍🎨" title={t('No specialists found')} desc={t('Try a different search')} />
-                ) : (
-                    <Box component="div" className="sp-mobile-grid">
-                        {specialists.map((member, i) => {
-                            const img = member.memberImage ? `${REACT_APP_API_URL}/${member.memberImage}` : '/img/profile/defaultUser.svg';
-                            const portfolioImg = member.memberPortfolio?.[0] ? `${REACT_APP_API_URL}/${member.memberPortfolio[0]}` : img;
-                            const liked = member.meLiked?.[0]?.myFavorite;
-                            const isFollowing = member.meFollowed?.[0]?.myFollowing;
-                            const heights = [180, 220, 200, 240, 190, 210];
-                            const imgH = heights[i % heights.length];
-                            return (
-                                <Stack key={member._id} className="sp-mobile-card">
-                                    <Box component="div" className="sp-mobile-cover"
-                                        style={{ height: imgH, backgroundImage: `url(${portfolioImg})` }}
-                                        onClick={() => goDetail(member._id)}>
-                                        <IconButton className={`sp-like-btn ${liked ? 'liked' : ''}`} size="small"
-                                            onClick={(e) => { e.stopPropagation(); likeHandler(member._id); }}>
-                                            {liked ? <FavoriteIcon sx={{ fontSize: 13, color: '#FF4D8D' }} /> : <FavoriteBorderIcon sx={{ fontSize: 13, color: '#fff' }} />}
-                                        </IconButton>
-                                    </Box>
-                                    <Box component="div" className="sp-mobile-avatar-wrap">
-                                        <img src={img} alt={member.memberNick} className="sp-mobile-avatar" />
-                                        <Box component="div" className="sp-online-dot-sm" />
-                                    </Box>
-                                    <Box component="div" className="sp-mobile-info">
-                                        <Stack direction="row" alignItems="center" gap={0.5} justifyContent="center" sx={{ mb: 0.25 }}>
-                                            <Typography className="sp-mobile-name" onClick={() => goDetail(member._id)}>
-                                                {member.memberNick}
-                                            </Typography>
-                                            <VerifiedIcon sx={{ fontSize: 11, color: '#FF4D8D' }} />
-                                        </Stack>
-                                        {member.memberSpecialty && member.memberSpecialty.length > 0 && (
-                                            <Stack direction="row" gap={0.4} justifyContent="center" flexWrap="wrap" sx={{ mb: 0.5 }}>
-                                                {member.memberSpecialty.slice(0, 1).map((sp) => (
-                                                    <Box key={sp} component="div" className="sp-specialty-chip-sm"
-                                                        style={{ color: SPECIALTY_COLORS[sp] ?? '#FF4D8D', background: `${SPECIALTY_COLORS[sp] ?? '#FF4D8D'}15` }}>
-                                                        {sp}
-                                                    </Box>
-                                                ))}
-                                            </Stack>
-                                        )}
-                                        <Stack direction="row" gap={0.5} justifyContent="center" sx={{ mb: 0.75 }}>
-                                            <Typography sx={{ fontSize: 10, color: '#888' }}>❤️ {member.memberLikes}</Typography>
-                                            <Typography sx={{ fontSize: 10, color: '#bbb' }}>·</Typography>
-                                            <Typography sx={{ fontSize: 10, color: '#888' }}>👁️ {member.memberViews >= 1000 ? `${(member.memberViews / 1000).toFixed(1)}K` : member.memberViews}</Typography>
-                                        </Stack>
-                                        <Stack direction="row" gap={0.5}>
-                                            <Button size="small" fullWidth
-                                                className={`sp-follow-btn-sm ${isFollowing ? 'following' : ''}`}
-                                                onClick={() => followHandler(member)}>
-                                                {isFollowing ? '✓' : '♡'} {isFollowing ? t('Following') : t('Follow')}
-                                            </Button>
-                                            <Button size="small" fullWidth className="sp-book-btn-sm"
-                                                onClick={() => goDetail(member._id)}>
-                                                {t('Book')}
-                                            </Button>
-                                        </Stack>
-                                    </Box>
-                                </Stack>
-                            );
-                        })}
-                    </Box>
-                )}
-
-                <Pagination page={searchFilter.page} limit={searchFilter.limit} total={total} onChange={pageHandler} />
-            </Stack>
-        );
+        return <MobileSpecialists />;
     }
 
     // ── DESKTOP ─────────────────────────────────────────────────────────────────

@@ -5,6 +5,7 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import EastIcon from '@mui/icons-material/East';
 import Link from 'next/link';
+import { sweetTopSmallSuccessAlert } from '../../sweetAlert';
 import { useTranslation } from 'next-i18next';
 import { useQuery } from '@apollo/client';
 import { GET_BOARD_ARTICLES } from '../../../apollo/user/query';
@@ -44,7 +45,7 @@ const EventsCommunity = () => {
         <Stack className="ec-col events-col">
             <Stack direction="row" justifyContent="space-between" alignItems="center" className="ec-head">
                 <Typography className="ec-title">{t('Upcoming Events')}</Typography>
-                <Link href="/events">
+                <Link href="/cs">
                     <Stack direction="row" alignItems="center" gap={0.5} className="ec-viewall">
                         <Typography className="ecv-text">{t('View all events')}</Typography>
                         <EastIcon sx={{ fontSize: 15 }} />
@@ -67,7 +68,10 @@ const EventsCommunity = () => {
                                 <Typography className="evl-text">{ev.loc}</Typography>
                             </Stack>
                         </Stack>
-                        <Box component="div" className="ev-join">{t('Join Event')}</Box>
+                        {/* ⚠️ YANGI — avval hech qanday onClick yo'q edi */}
+                        <Box component="div" className="ev-join" onClick={() => sweetTopSmallSuccessAlert(t('Your profile joined event'), 1200)}>
+                            {t('Join Event')}
+                        </Box>
                     </Stack>
                 ))}
             </Stack>

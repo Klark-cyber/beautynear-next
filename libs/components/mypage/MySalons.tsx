@@ -25,7 +25,7 @@ import { sweetConfirmAlert, sweetErrorHandling } from '../../sweetAlert';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────── */
 
-const imgUrl = (raw?: string, fallback = '/img/banner/default.jpg'): string => {
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
     if (!raw) return fallback;
     return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };

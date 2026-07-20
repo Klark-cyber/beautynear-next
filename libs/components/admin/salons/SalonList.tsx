@@ -35,7 +35,7 @@ const STATUS_COLOR: Record<string, string> = {
 };
 
 const imgUrl = (raw?: string): string => {
-	if (!raw) return '/img/banner/default.jpg';
+	if (!raw) return '/img/banner/hero.jpg';
 	return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
 

@@ -5,6 +5,25 @@
 /** HOMEPAGE **/
 @import '/scss/mobile/homepage/homepage';
 @import '/scss/mobile/homepage/mobile-home';
+@import '/scss/mobile/salon/mobile-salons';
+@import '/scss/mobile/salon/mobile-salon-detail';
+@import '/scss/mobile/service/mobile-services';
+@import '/scss/mobile/service/mobile-service-detail';
+@import '/scss/mobile/specialist/mobile-specialists';
+@import '/scss/mobile/specialist/mobile-specialist-detail';
+@import '/scss/mobile/community/mobile-community';
+@import '/scss/mobile/community/mobile-community-detail';
+@import '/scss/mobile/mypage/mobile-mypage';
+@import '/scss/mobile/mypage/mobile-mybookings';
+@import '/scss/mobile/mypage/mobile-mypage-subpages';
+@import '/scss/mobile/mypage/mobile-agentbookings';
+@import '/scss/mobile/cs/mobile-cs';
+@import '/scss/mobile/notification/mobile-notifications';
+@import '/scss/mobile/member/mobile-member';
+@import '/scss/shared/messages';
+@import '/scss/mobile/mypage/mobile-mysalons';
+@import '/scss/mobile/mypage/mobile-myservices';
+@import '/scss/mobile/salon/mobile-saved';
 
 /** SALON **/
 // @import '/scss/mobile/salon';        ← keyinroq qo'shiladi

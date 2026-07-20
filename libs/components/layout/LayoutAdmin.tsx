@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { ComponentType } from 'react';
 import {
 	Box, AppBar, Toolbar, Avatar, IconButton,
-	Menu, MenuItem, Divider, Typography, Tooltip, Badge,
+	Menu, MenuItem, Divider, Typography, Tooltip,
 } from '@mui/material';
 import MenuList from '../admin/AdminMenuList';
 import { getJwtToken, logOut, updateUserInfo } from '../../auth';
@@ -11,7 +11,7 @@ import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 import { REACT_APP_API_URL } from '../../config';
 import { MemberType } from '../../enums/member.enum';
-import { Logout, NotificationsOutlined } from '@mui/icons-material';
+import { Logout } from '@mui/icons-material';
 import { useTranslation } from 'next-i18next';
 
 const DRAWER_WIDTH = 260;
@@ -109,13 +109,8 @@ const withAdminLayout = (Component: ComponentType) => {
 						}}
 					>
 						<Toolbar sx={{ justifyContent: 'flex-end', gap: 1.5, minHeight: '80px !important' }}>
-							<IconButton
-								sx={{ color: '#666', '&:hover': { color: '#FF4D8D', background: 'rgba(255,77,141,0.08)' } }}
-							>
-								<Badge badgeContent={2} color="error" sx={{ '& .MuiBadge-badge': { fontSize: 10 } }}>
-									<NotificationsOutlined />
-								</Badge>
-							</IconButton>
+							{/* ⚠️ TUZATILDI: qo'ng'iroqcha (bildirishnoma) ikonkasi
+							    admin panelidan butunlay olib tashlandi */}
 
 							<Tooltip title={t('Account settings')}>
 								<Box

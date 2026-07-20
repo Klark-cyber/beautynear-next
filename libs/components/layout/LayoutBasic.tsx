@@ -95,7 +95,7 @@ const withLayoutBasic = (Component: any) => {
 					bgImage: '/img/banner/specialists.jpg',
 				},
 			};
-			return configs[router.pathname] ?? { title: 'BeautyNear', desc: '', bgImage: '/img/banner/default.jpg' };
+			return configs[router.pathname] ?? { title: 'BeautyNear', desc: '', bgImage: '/img/banner/hero.jpg' };
 		}, [router.pathname]);
 
 		/** MOBILE **/

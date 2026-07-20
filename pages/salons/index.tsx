@@ -14,6 +14,7 @@ import SalonCard from '../../libs/components/salon/Saloncard';
 import SalonFilter from '../../libs/components/salon/Salonfilter';
 import Pagination from '../../libs/components/common/Pagination';
 import EmptyList from '../../libs/components/common/Emptylist';
+import MobileSalons from '../../libs/components/salon/MobileSalons';
 import { GET_SALONS } from '../../apollo/user/query';
 import { LIKE_TARGET_SALON } from '../../apollo/user/mutation';
 import { T } from '../../libs/types/common';
@@ -315,56 +316,7 @@ const Salons: NextPage = ({ initialInput }: any) => {
 
 	/** MOBILE **/
 	if (device === 'mobile') {
-		return (
-			<Stack className="salons-page mobile">
-				<GeoModal />
-				<Stack className="mobile-search-bar">
-					<OutlinedInput
-						fullWidth size="small"
-						value={searchText}
-						onChange={(e) => setSearchText(e.target.value)}
-						placeholder={t('Search salons, specialists...')}
-						onKeyDown={(e) => e.key === 'Enter' && searchHandler()}
-						startAdornment={<InputAdornment position="start"><SearchIcon sx={{ fontSize: 18, color: '#FF4D8D' }} /></InputAdornment>}
-						sx={{ borderRadius: 2.5, fontSize: 13, '& fieldset': { borderColor: 'rgba(255,77,141,0.2)' } }}
-					/>
-				</Stack>
-
-				<Box component="div" className="mobile-cat-scroll">
-					<CategoryBar />
-				</Box>
-
-				<Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ px: 2, py: 1.5 }}>
-					<Typography sx={{ fontSize: 13, color: '#888' }}>
-						<Box component="span" sx={{ color: '#FF4D8D', fontWeight: 700 }}>{total}</Box> {t('salons found')}
-					</Typography>
-				</Stack>
-
-				<Stack className="mobile-cards" gap={2} sx={{ px: 2 }}>
-					{salons.length === 0 ? (
-						<EmptyList emoji="💅" title={t('No salons found')} desc={t('Try changing your filters')} />
-					) : (
-						salons.map((salon) => <SalonCard key={salon._id} salon={salon} mode="full" onLike={likeHandler} />)
-					)}
-				</Stack>
-
-				<Pagination page={searchFilter.page} limit={searchFilter.limit} total={total} onChange={pageHandler} />
-
-				<Stack direction="row" className="mobile-bottom-bar">
-					<Button fullWidth onClick={() => setMobileFilterOpen(true)} startIcon={<TuneIcon />} className="mobile-filter-btn">{t('Filter')}</Button>
-					<Select value={activeSort} onChange={(e) => sortHandler(e.target.value)} size="small" className="mobile-sort-select">
-						{SORT_OPTIONS.map((s) => <MenuItem key={s.value} value={s.value}>{t(s.label)}</MenuItem>)}
-					</Select>
-				</Stack>
-
-				<Drawer anchor="bottom" open={mobileFilterOpen} onClose={() => setMobileFilterOpen(false)}
-					PaperProps={{ sx: { borderRadius: '20px 20px 0 0', maxHeight: '85vh', overflow: 'auto' } }}>
-					<Box component="div" sx={{ p: 2 }}>
-						<SalonFilter searchFilter={searchFilter} setSearchFilter={setSearchFilter} initialInput={initialInput} onReset={resetAllHandler} />
-					</Box>
-				</Drawer>
-			</Stack>
-		);
+		return <MobileSalons />;
 	}
 
 	/** DESKTOP **/

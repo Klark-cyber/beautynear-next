@@ -3,158 +3,378 @@
    main.scss ga: @import '/scss/pc/mypage/myBookings';
 ═══════════════════════════════════════════════════════════════════════ */
 
-.mypage-page {
-    .mypage-main {
-        .mypage-content {
+/* ⚠️ TUZATILDI: avval faqat ".mypage-page .mypage-main .mypage-content"
+   ota-klasslar zanjiri ichida ishlar edi. MyBookings.tsx'ning o'zi esa
+   faqat ".mypage-content" klassini o'z ustiga qo'yadi (ota-klasslar
+   Desktop sahifasining o'zidan keladi) — shuning uchun bu komponent
+   mobil "wrapper" ichida yolg'iz ko'rsatilganda HECH QANDAY stil
+   qo'llanilmas edi. Endi ".mypage-content" to'g'ridan-to'g'ri, mustaqil
+   selektor sifatida ham ishlaydi. */
+.mypage-content {
 
-            /* Hamma bookinglarni o'rab turuvchi umumiy fon-karta (mustaqil dublikat) */
-            .follow-page-frame {
-                margin-top: 22px;
-                background: #fff;
-                border-radius: 24px;
-                border: 1px solid rgba(255, 77, 141, 0.08);
-                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-                padding: 32px;
+    /* Hamma bookinglarni o'rab turuvchi umumiy fon-karta (mustaqil dublikat) */
+    .follow-page-frame {
+        margin-top: 22px;
+        background: #fff;
+        border-radius: 24px;
+        border: 1px solid rgba(255, 77, 141, 0.08);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+        padding: 32px;
+    }
+
+    .booking-list {
+        width: 100%;
+    }
+
+    // ⚠️ TUZATILDI: avval ".booking-row" deb yozilgan edi, lekin TSX'da
+    // ".booking-card" ishlatilgan — ikkalasi hech qachon mos kelmagan,
+    // stillar UMUMAN qo'llanilmagan edi (na desktop, na mobilda)!
+    .booking-card {
+        padding: 20px 0;
+        cursor: pointer;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+        gap: 24px;
+        transition: background 0.2s;
+
+        &:first-of-type {
+            padding-top: 0;
+        }
+
+        &:last-of-type {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        &:hover {
+            background: rgba(255, 77, 141, 0.02);
+        }
+
+        /* Rasm */
+        .booking-img {
+            flex-shrink: 0;
+            width: 90px;
+            height: 90px;
+            border-radius: 16px;
+            background-size: cover;
+            background-position: center;
+            background-color: #FFE8F0;
+        }
+
+        /* Salon / xizmat / manzil */
+        .booking-info {
+            min-width: 0;
+
+            .booking-salon-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 17px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
-            .booking-list {
-                width: 100%;
+            .booking-service {
+                margin-top: 3px;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13.5px !important;
+                color: #777 !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
             }
 
-            .booking-row {
-                padding: 20px 0;
-                cursor: pointer;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-                gap: 24px;
-                transition: background 0.2s;
+            .booking-address-row {
+                margin-top: 8px;
 
-                &:first-of-type {
-                    padding-top: 0;
-                }
-
-                &:last-of-type {
-                    border-bottom: none;
-                    padding-bottom: 0;
-                }
-
-                &:hover {
-                    background: rgba(255, 77, 141, 0.02);
-                }
-
-                /* Rasm */
-                .booking-img {
-                    flex-shrink: 0;
-                    width: 90px;
-                    height: 90px;
-                    border-radius: 16px;
-                    background-size: cover;
-                    background-position: center;
-                    background-color: #FFE8F0;
-                }
-
-                /* Salon / xizmat / manzil */
-                .booking-info {
-                    min-width: 0;
-
-                    .booking-salon-name {
-                        font-family: 'Inter', sans-serif !important;
-                        font-size: 17px !important;
-                        font-weight: 700 !important;
-                        color: #1a1a1a !important;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-
-                    .booking-service {
-                        margin-top: 3px;
-                        font-family: 'Inter', sans-serif !important;
-                        font-size: 13.5px !important;
-                        color: #777 !important;
-                        overflow: hidden;
-                        text-overflow: ellipsis;
-                        white-space: nowrap;
-                    }
-
-                    .booking-address-row {
-                        margin-top: 8px;
-
-                        .booking-address {
-                            font-family: 'Inter', sans-serif !important;
-                            font-size: 12.5px !important;
-                            color: #999 !important;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
-                            white-space: nowrap;
-                        }
-                    }
-                }
-
-                /* Sana / vaqt ustuni */
-                .booking-datetime-col {
-                    flex-shrink: 0;
-                    width: 165px;
-
-                    .booking-date,
-                    .booking-time {
-                        font-family: 'Inter', sans-serif !important;
-                        font-size: 13.5px !important;
-                        font-weight: 600 !important;
-                        color: #333 !important;
-                        white-space: nowrap;
-                    }
-                }
-
-                /* Status badge ustuni */
-                .booking-status-col {
-                    flex-shrink: 0;
-                    width: 100px;
-
-                    .status-badge {
-                        font-family: 'Inter', sans-serif !important;
-                        font-size: 12px !important;
-                        font-weight: 700 !important;
-                        color: #fff !important;
-                        height: 28px !important;
-                        border-radius: 8px !important;
-
-                        &.upcoming {
-                            background: #FF4D8D !important;
-                        }
-
-                        &.completed {
-                            background: #3EA043 !important;
-                        }
-
-                        &.cancelled {
-                            background: #9e9e9e !important;
-                        }
-                    }
-                }
-
-                /* Narx ustuni */
-                .booking-price-col {
-                    flex-shrink: 0;
-                    width: 150px;
-
-                    .booking-price-row {
-                        .booking-price {
-                            font-family: 'Inter', sans-serif !important;
-                            font-size: 18px !important;
-                            font-weight: 800 !important;
-                            color: #FF4D8D !important;
-                        }
-                    }
-
-                    .booking-deposit {
-                        margin-top: 4px;
-                        font-family: 'Inter', sans-serif !important;
-                        font-size: 12px !important;
-                        color: #999 !important;
-                        white-space: nowrap;
-                    }
+                .booking-address {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 12.5px !important;
+                    color: #999 !important;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
             }
+        }
+
+        /* Sana / vaqt ustuni */
+        .booking-datetime-col {
+            flex-shrink: 0;
+            width: 165px;
+
+            .booking-date,
+            .booking-time {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13.5px !important;
+                font-weight: 600 !important;
+                color: #333 !important;
+                white-space: nowrap;
+            }
+        }
+
+        /* Status badge ustuni */
+        .booking-status-col {
+            flex-shrink: 0;
+            width: 100px;
+
+            .status-badge {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #fff !important;
+                height: 28px !important;
+                border-radius: 8px !important;
+
+                &.upcoming {
+                    background: #FF4D8D !important;
+                }
+
+                &.completed {
+                    background: #3EA043 !important;
+                }
+
+                &.cancelled {
+                    background: #9e9e9e !important;
+                }
+            }
+        }
+
+        /* Narx ustuni */
+        .booking-price-col {
+            flex-shrink: 0;
+            width: 150px;
+
+            .booking-price-row {
+                .booking-price {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 18px !important;
+                    font-weight: 800 !important;
+                    color: #FF4D8D !important;
+                }
+            }
+
+            .booking-deposit {
+                margin-top: 4px;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12px !important;
+                color: #999 !important;
+                white-space: nowrap;
+            }
+        }
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ⚠️ YANGI — MOBIL RESPONSIVE (≤768px)
+   Desktop'dagi qat'iy kenglikdagi ustunlar (165px/100px/150px) tor mobil
+   ekranga sig'maydi — shuning uchun mobilda vertikal karta ko'rinishiga
+   butunlay qayta tuziladi (TSX o'zgarmaydi, faqat CSS).
+═══════════════════════════════════════════════════════════════════════ */
+@media screen and (max-width: 768px) {
+    .mypage-content {
+        .follow-page-frame {
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            background: transparent;
+            margin-top: 0;
+        }
+
+        .booking-list {
+            gap: 16px;
+        }
+
+        .booking-card {
+            position: relative;
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 0 !important;
+            padding: 0 !important;
+            margin-bottom: 16px;
+            background: #fff;
+            border-radius: 18px;
+            border-bottom: none !important;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+
+            /* Rasm — endi tepada, to'liq kenglikda */
+            .booking-img {
+                width: 100% !important;
+                height: 130px !important;
+                border-radius: 0 !important;
+            }
+
+            .booking-info {
+                padding: 12px 14px 0;
+                order: 2;
+
+                .booking-salon-name {
+                    font-size: 15px !important;
+                }
+
+                .booking-service {
+                    font-size: 12.5px !important;
+                }
+            }
+
+            .booking-datetime-col {
+                order: 3;
+                width: 100% !important;
+                padding: 6px 14px 0;
+                display: flex;
+                flex-direction: row !important;
+                gap: 12px;
+
+                .booking-date,
+                .booking-time {
+                    font-size: 12px !important;
+                }
+            }
+
+            .booking-status-col {
+                order: 1;
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                width: auto !important;
+            }
+
+            .booking-price-col {
+                order: 4;
+                width: 100% !important;
+                padding: 10px 14px 14px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+
+                .booking-price-row .booking-price {
+                    font-size: 16px !important;
+                }
+            }
+        }
+    }
+
+    .cancel-btn,
+    .rate-btn {
+        width: 100%;
+        text-align: center;
+        padding: 10px 14px;
+    }
+}
+
+/* ═══ CANCEL / RATE tugmalari ═══ */
+.cancel-btn {
+    background: #fff;
+    border: 1.5px solid #e0e0e0;
+    color: #999;
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: #e53935;
+        color: #e53935;
+    }
+}
+
+.rate-btn {
+    background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(255, 77, 141, 0.25);
+}
+
+/* ═══ RATE MODAL ═══ */
+.rate-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.rate-modal {
+    width: 100%;
+    max-width: 420px;
+    background: #fff;
+    border-radius: 20px;
+    padding: 24px;
+
+    .rate-modal-head {
+        margin-bottom: 12px;
+
+        .rate-modal-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 17px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+    }
+
+    .rate-modal-salon {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 13.5px !important;
+        color: #888 !important;
+        margin-bottom: 16px !important;
+    }
+
+    .rate-modal-stars {
+        margin-bottom: 16px;
+        justify-content: center;
+    }
+
+    .rate-modal-textarea {
+        width: 100%;
+        border: 1.5px solid #eee;
+        border-radius: 14px;
+        padding: 12px;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        color: #333;
+        resize: none;
+        outline: none;
+        box-sizing: border-box;
+
+        &:focus {
+            border-color: #FF4D8D;
+        }
+
+        &::placeholder {
+            color: #bbb;
+        }
+    }
+
+    .rate-modal-submit {
+        margin-top: 16px;
+        background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+        color: #fff;
+        text-align: center;
+        padding: 13px;
+        border-radius: 14px;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+
+        &.disabled {
+            opacity: 0.5;
+            pointer-events: none;
         }
     }
 }

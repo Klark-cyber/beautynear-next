@@ -1,236 +1,688 @@
-@import '/scss/variables.scss';
+// ═══════════════════════════════════════════════════════════════════════════
+// SALON DETAIL PAGE — 3 ustun: LEFT(rasm) + MIDDLE(info) + RIGHT(booking)
+// ═══════════════════════════════════════════════════════════════════════════
+.salon-detail-page {
+    min-width: 1300px;
+    background: #FAFAFA;
+    padding: 24px 0 60px;
 
-#mobile-wrap {
-    .salon-detail-page {
-        width: 100%;
-        padding-bottom: 80px;
-        background: $bg-page;
+    .salon-detail-inner {
+        width: calc(1300px + (100vw - 1300px) * 0.6);
+        min-width: 1300px;
+        max-width: 1760px;
+        margin: 0 auto;
+    }
 
-        // ── BACK BAR ──────────────────────────────────────────────────────
-        .mobile-back-bar {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 12px 16px;
-            background: $white;
-            border-bottom: 1px solid rgba(255, 77, 141, 0.08);
-            cursor: pointer;
+    /* Back link */
+    .back-link {
+        cursor: pointer;
+        color: #888;
+        margin-bottom: 20px;
+        width: fit-content;
+        transition: color 0.2s;
+
+        &:hover {
+            color: #FF4D8D;
         }
 
-        // ── GALLERY ───────────────────────────────────────────────────────
-        .mobile-gallery {
+        .MuiTypography-root {
+            font-family: 'Inter', sans-serif !important;
+        }
+    }
+
+    /* ════════════ 2 BLOK: CHAP(flex) + O'NG(sticky) ════════════ */
+    .detail-columns {
+        gap: 32px;
+        align-items: flex-start;
+    }
+
+    /* CHAP BLOK — rasm+info yuqorida, services/reviews ostida */
+    .salon-detail-left-block {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+
+    /* Yuqori qator: rasm gallery + salon info yonma-yon */
+    .detail-top-row {
+        gap: 32px;
+        align-items: flex-start;
+        width: 100%;
+    }
+
+    /* ── LEFT: gallery ── */
+    .salon-detail-left {
+        width: 420px;
+        flex-shrink: 0;
+
+        .main-img-wrap {
             position: relative;
-            height: 260px;
+            width: 100%;
+            height: 360px;
+            border-radius: 18px;
             overflow: hidden;
+
+            .main-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
 
             .open-chip {
                 position: absolute;
-                top: 12px;
-                left: 12px;
-                z-index: 2;
-                font-family: $font;
-                font-size: 11px;
-                font-weight: 700;
-                color: $white;
-                border: none;
+                top: 16px;
+                left: 16px;
+                height: 28px;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #fff !important;
 
                 &.open {
-                    background: #4CAF50;
+                    background: #4CAF50 !important;
                 }
 
                 &.closed {
-                    background: #e53935;
+                    background: #e53935 !important;
                 }
-            }
-        }
-
-        // ── INFO ──────────────────────────────────────────────────────────
-        .mobile-info {
-            background: $white;
-
-            .salon-name {
-                font-family: $font;
-                font-size: 20px;
-                font-weight: 800;
-                color: $text-dark;
-                letter-spacing: -0.4px;
-            }
-
-            .top-chip {
-                background: linear-gradient(135deg, $primary, $primary-light);
-                color: $white;
-                font-family: $font;
-                font-size: 10px;
-                font-weight: 700;
-                border: none;
-                height: 20px;
-            }
-
-            .type-chip {
-                background: rgba(255, 77, 141, 0.08);
-                color: $primary;
-                font-family: $font;
-                font-size: 11px;
-                font-weight: 600;
-                border: 1px solid rgba(255, 77, 141, 0.2);
-                height: 22px;
             }
 
             .like-btn {
-                width: 36px;
-                height: 36px;
-                background: rgba(255, 77, 141, 0.06);
-                border: 1px solid rgba(255, 77, 141, 0.15);
-                transition: $transition;
+                position: absolute;
+                top: 14px;
+                right: 14px;
+                width: 40px;
+                height: 40px;
+                background: rgba(255, 255, 255, 0.92) !important;
 
-                &.liked {
-                    background: rgba(255, 77, 141, 0.12);
-                }
-            }
-
-            // Mobile service cards
-            .mobile-service-card {
-                flex-shrink: 0;
-                width: 140px;
-                border-radius: $radius-md;
-                overflow: hidden;
-                background: $white;
-                border: 1px solid rgba(255, 77, 141, 0.08);
-                box-shadow: $shadow-card;
-                padding-bottom: 12px;
-
-                .svc-img {
-                    height: 100px;
-                    background-size: cover;
-                    background-position: center;
-                    background-color: #f5f5f5;
-                }
-
-                .svc-name {
-                    font-family: $font;
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: $text-dark;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    padding: 8px 10px 0;
-                }
-
-                .svc-price {
-                    font-family: $font;
-                    font-size: 12px;
-                    font-weight: 700;
-                    color: $primary;
-                    padding: 2px 10px 0;
-                }
-
-                .svc-dur {
-                    font-family: $font;
-                    font-size: 10px;
-                    color: $text-light;
-                    padding: 0 10px;
-                }
-
-                .svc-book-btn {
-                    width: calc(100% - 20px) !important;
-                    margin: 8px 10px 0 !important;
-                    padding: 6px !important;
-                    background: linear-gradient(135deg, $primary, $primary-light) !important;
-                    color: $white !important;
-                    border-radius: 6px !important;
-                    font-family: $font !important;
-                    font-size: 11px !important;
-                    font-weight: 700 !important;
+                &:hover {
+                    background: #fff !important;
                 }
             }
         }
 
-        // ── MOBILE BOOKING CARD ───────────────────────────────────────────
-        .mobile-booking-card {
-            background: $white;
-            border-radius: $radius-xl;
-            padding: 20px;
-            box-shadow: 0 4px 24px rgba(255, 77, 141, 0.1);
-            border: 1px solid rgba(255, 77, 141, 0.1);
+        .thumbnails {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
 
-            .time-slot {
-                padding: 7px 12px;
-                border-radius: 16px;
-                border: 1.5px solid rgba(255, 77, 141, 0.2);
-                font-family: $font;
-                font-size: 12px;
-                font-weight: 500;
-                color: #555;
+            .thumb {
+                flex: 1 1 0;
+                min-width: 0;
+                height: 84px;
+                border-radius: 12px;
+                background-size: cover;
+                background-position: center;
+                background-color: #FFE8F0;
                 cursor: pointer;
-                transition: $transition;
+                border: 2px solid transparent;
+                transition: all 0.2s;
 
-                &:active:not(.booked) {
-                    transform: scale(0.95);
+                &:hover {
+                    border-color: #FFB8CF;
                 }
 
-                &.selected {
-                    background: linear-gradient(135deg, $primary, $primary-light);
-                    color: $white;
-                    border-color: $primary;
-                    box-shadow: 0 3px 10px rgba(255, 77, 141, 0.3);
+                &.active {
+                    border-color: #FF4D8D;
                 }
+            }
+        }
+    }
 
-                &.booked {
-                    background: #f5f5f5;
-                    color: #bbb;
-                    border-color: #eee;
-                    cursor: not-allowed;
-                    text-decoration: line-through;
+    /* ── MIDDLE: salon info + about ── */
+    .salon-detail-middle {
+        flex: 1;
+        min-width: 0;
+
+        .salon-title {
+            font-family: 'Playfair Display', serif !important;
+            font-size: 34px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+
+        .top-chip {
+            background: linear-gradient(135deg, #FF4D8D, #FF85B3) !important;
+            color: #fff !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12px !important;
+            font-weight: 800 !important;
+            height: 26px !important;
+        }
+
+        .type-chip {
+            background: rgba(255, 77, 141, 0.08) !important;
+            color: #FF4D8D !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            height: 28px !important;
+        }
+
+        .info-rows .MuiTypography-root {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .about-section {
+            margin-top: 22px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+
+            .about-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 18px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                margin-bottom: 10px !important;
+            }
+        }
+    }
+
+    /* ── RIGHT: booking + specialist (sticky) ── */
+    .salon-detail-right {
+        width: 380px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 84px;
+        gap: 16px;
+    }
+
+    /* Section title (umumiy) */
+    .section-title {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 22px !important;
+        font-weight: 700 !important;
+        color: #1a1a1a !important;
+        margin-bottom: 18px !important;
+    }
+
+    /* ════════════ TO'LIQ KENGLIK SECTIONS ════════════ */
+    .full-section {
+        margin-top: 40px;
+        padding-top: 32px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+
+    /* ── Services (full width, KENG cardlar) ── */
+    .services-section {
+
+        /* Flexbox qator — 5 ta card teng kenglikda */
+        .services-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .services-grid .service-card {
+            flex: 0 0 calc((100% - 64px) / 5);
+            width: calc((100% - 64px) / 5);
+            max-width: calc((100% - 64px) / 5);
+            background: #fff;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 77, 141, 0.1);
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s;
+
+            &:hover {
+                box-shadow: 0 10px 28px rgba(255, 77, 141, 0.14);
+                transform: translateY(-4px);
+            }
+
+            .svc-img {
+                position: relative;
+                width: 100%;
+                height: 220px;
+                background-size: cover;
+                background-position: center;
+                background-color: #FFE8F0;
+
+                .svc-like-btn {
+                    position: absolute;
+                    top: 12px;
+                    right: 12px;
+                    width: 34px;
+                    height: 34px;
+                    background: rgba(255, 255, 255, 0.92) !important;
+                    color: #666 !important;
+
+                    &:hover {
+                        background: #fff !important;
+                    }
                 }
             }
 
-            .book-now-btn {
-                width: 100%;
-                padding: 14px !important;
-                background: linear-gradient(135deg, $primary, $primary-light) !important;
-                color: $white !important;
-                border-radius: 12px !important;
-                font-family: $font !important;
-                font-size: 15px !important;
-                font-weight: 700 !important;
-                box-shadow: 0 4px 16px rgba(255, 77, 141, 0.35) !important;
-                transition: $transition !important;
+            .svc-body {
+                padding: 16px 18px 18px;
+            }
 
-                &:active {
-                    transform: scale(0.98) !important;
+            .svc-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 16px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .svc-price {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 17px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                margin-top: 4px !important;
+            }
+
+            .svc-dur {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 14px !important;
+                color: #999 !important;
+            }
+
+            .svc-book-btn {
+                width: 100%;
+                margin-top: 14px !important;
+                padding: 11px 0 !important;
+                background: linear-gradient(135deg, #FF4D8D, #FF85B3) !important;
+                color: #fff !important;
+                border-radius: 12px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-weight: 700 !important;
+                font-size: 14px !important;
+                text-transform: none !important;
+
+                &:hover {
+                    box-shadow: 0 4px 14px rgba(255, 77, 141, 0.35) !important;
                 }
+            }
+        }
+    }
+
+    /* ── Reviews (full width) ── */
+    .reviews-section {
+        .rating-summary {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+            margin-bottom: 24px;
+
+            .big-rating-box {
+                padding-right: 36px;
+                border-right: 1px solid rgba(0, 0, 0, 0.06);
+            }
+
+            .big-rating {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 56px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+                line-height: 1 !important;
+                margin-bottom: 6px !important;
+            }
+
+            .rating-bar {
+                flex: 1;
+                height: 8px;
+                background: #f0f0f0;
+                border-radius: 4px;
+                overflow: hidden;
+
+                .rating-fill {
+                    height: 100%;
+                    background: linear-gradient(90deg, #FF4D8D, #FF85B3);
+                    border-radius: 4px;
+                }
+            }
+        }
+
+        /* Reviews — 3 ustunli grid (rasmga mos) */
+        .review-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+
+            .review-card {
+                background: #fff;
+                border-radius: 14px;
+                padding: 18px;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+
+                .MuiTypography-root {
+                    font-family: 'Inter', sans-serif !important;
+                }
+            }
+        }
+
+        .write-review-section {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            max-width: 700px;
+
+            .review-textarea {
+                width: 100%;
+                min-height: 100px;
+                padding: 14px;
+                border: 1.5px solid rgba(255, 77, 141, 0.2);
+                border-radius: 12px;
+                font-family: 'Inter', sans-serif;
+                font-size: 14px;
+                resize: vertical;
+                outline: none;
+                margin-bottom: 12px;
+
+                &:focus {
+                    border-color: #FF4D8D;
+                }
+            }
+
+            .submit-review-btn {
+                padding: 11px 28px !important;
+                background: linear-gradient(135deg, #FF4D8D, #FF85B3) !important;
+                color: #fff !important;
+                border-radius: 12px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-weight: 700 !important;
+                font-size: 14px !important;
+                text-transform: none !important;
+                align-self: flex-start;
 
                 &:disabled {
                     background: #eee !important;
                     color: #bbb !important;
-                    box-shadow: none !important;
                 }
             }
         }
     }
-}
 
-// ── FOLLOW BUTTONS MOBILE ─────────────────────────────────────────
-.follow-btn {
-    border: 1.5px solid $primary !important;
-    color: $primary !important;
-    border-radius: 8px !important;
-    font-family: $font !important;
-    font-size: 12px !important;
-    font-weight: 700 !important;
-
-    &.following {
-        background: $primary !important;
-        color: $white !important;
+    /* ── Map (full width) ── */
+    .map-section {
+        .map-wrap {
+            height: 360px;
+            border-radius: 14px;
+            overflow: hidden;
+        }
     }
-}
 
-.view-profile-btn {
-    border: 1.5px solid rgba(0, 0, 0, 0.12) !important;
-    color: #555 !important;
-    border-radius: 8px !important;
-    font-family: $font !important;
-    font-size: 12px !important;
-    font-weight: 600 !important;
+    /* ════════════ BOOKING CARD ════════════ */
+    .booking-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid rgba(255, 77, 141, 0.1);
+        box-shadow: 0 8px 32px rgba(255, 77, 141, 0.08);
+
+        .bc-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 18px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+            margin-bottom: 18px !important;
+        }
+
+        .bc-label {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            color: #333 !important;
+            margin-bottom: 7px !important;
+        }
+
+        .MuiTypography-root {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .time-slot {
+            text-align: center;
+            padding: 10px 0;
+            border-radius: 10px;
+            border: 1.5px solid rgba(255, 77, 141, 0.2);
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover:not(.booked) {
+                border-color: #FF4D8D;
+            }
+
+            &.selected {
+                background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+                border-color: transparent;
+                color: #fff;
+                font-weight: 700;
+            }
+
+            &.booked {
+                background: #f5f5f5;
+                color: #ccc;
+                cursor: not-allowed;
+                text-decoration: line-through;
+            }
+        }
+
+        .more-times {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13px !important;
+            color: #FF4D8D !important;
+            font-weight: 600 !important;
+            cursor: pointer;
+            margin-bottom: 16px !important;
+
+            &:hover {
+                opacity: 0.8;
+            }
+        }
+
+        .book-now-btn {
+            width: 100%;
+            padding: 14px 0 !important;
+            background: linear-gradient(135deg, #FF4D8D, #FF85B3) !important;
+            color: #fff !important;
+            border-radius: 14px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 15px !important;
+            text-transform: none !important;
+            box-shadow: 0 6px 20px rgba(255, 77, 141, 0.35) !important;
+            transition: all 0.25s !important;
+
+            &:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 10px 28px rgba(255, 77, 141, 0.45) !important;
+            }
+
+            &:disabled {
+                background: #eee !important;
+                color: #bbb !important;
+                box-shadow: none !important;
+            }
+        }
+
+        .deposit-note {
+            margin-top: 14px;
+            padding: 12px;
+            background: rgba(255, 77, 141, 0.05);
+            border-radius: 10px;
+        }
+    }
+
+    /* Follow salon */
+    .follow-salon-btn {
+        width: 100%;
+        padding: 12px 0 !important;
+        background: #fff !important;
+        border: 1.5px solid rgba(255, 77, 141, 0.3) !important;
+        color: #FF4D8D !important;
+        border-radius: 14px !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+        text-transform: none !important;
+
+        &:hover {
+            background: rgba(255, 77, 141, 0.05) !important;
+        }
+
+        &.following {
+            background: rgba(255, 77, 141, 0.08) !important;
+        }
+    }
+
+    /* Specialist card */
+    .specialist-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 24px;
+        border: 1px solid rgba(255, 77, 141, 0.1);
+        box-shadow: 0 8px 32px rgba(255, 77, 141, 0.06);
+
+        .sc-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 16px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+            margin-bottom: 18px !important;
+        }
+
+        .verified-dot {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FF4D8D;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+        }
+
+        .MuiTypography-root {
+            font-family: 'Inter', sans-serif !important;
+        }
+
+        .specialty-chip {
+            background: rgba(255, 77, 141, 0.08) !important;
+            color: #FF4D8D !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11px !important;
+            font-weight: 600 !important;
+            height: 24px !important;
+        }
+
+        .follow-btn {
+            padding: 9px 0 !important;
+            background: linear-gradient(135deg, #FF4D8D, #FF85B3) !important;
+            color: #fff !important;
+            border-radius: 10px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            text-transform: none !important;
+
+            &.following {
+                background: #f0f0f0 !important;
+                color: #888 !important;
+            }
+        }
+
+        // ⚠️ YANGI — avval bu klass HECH QANDAY uslubga ega emas edi,
+        // standart MUI IconButton koʻrinishida, boshqa tugmalar bilan
+        // mos kelmasdi
+        .message-agent-btn {
+            width: 44px !important;
+            height: 44px !important;
+            flex-shrink: 0;
+            border-radius: 10px !important;
+            background: rgba(255, 77, 141, 0.08) !important;
+            color: #FF4D8D !important;
+            border: 1.5px solid rgba(255, 77, 141, 0.25) !important;
+            transition: all 0.15s ease !important;
+
+            &:hover {
+                background: #FF4D8D !important;
+                color: #fff !important;
+            }
+        }
+
+        .view-profile-btn {
+            width: 100%;
+            padding: 9px 0 !important;
+            background: #fff !important;
+            border: 1.5px solid rgba(255, 77, 141, 0.3) !important;
+            color: #FF4D8D !important;
+            border-radius: 10px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            text-transform: none !important;
+
+            &:hover {
+                background: rgba(255, 77, 141, 0.05) !important;
+            }
+        }
+    }
+
+    /* Similar salons */
+    .similar-section {
+        .similar-card {
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 77, 141, 0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 30px rgba(255, 77, 141, 0.12);
+            }
+
+            .similar-img {
+                position: relative;
+                height: 140px;
+                background-size: cover;
+                background-position: center;
+                background-color: #FFE8F0;
+
+                .open-chip.small {
+                    position: absolute;
+                    top: 8px;
+                    left: 8px;
+                    height: 22px;
+                    font-size: 10px !important;
+                    font-weight: 700 !important;
+                    color: #fff !important;
+
+                    &.open {
+                        background: #4CAF50 !important;
+                    }
+
+                    &.closed {
+                        background: #e53935 !important;
+                    }
+                }
+            }
+
+            .MuiTypography-root {
+                font-family: 'Inter', sans-serif !important;
+            }
+        }
+    }
 }

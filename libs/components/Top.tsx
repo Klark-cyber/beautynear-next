@@ -4,12 +4,15 @@ import { useTranslation } from 'next-i18next';
 import { getJwtToken, logOut, updateUserInfo } from '../auth';
 import { Stack, Box, Badge, IconButton, Avatar, Menu, MenuItem, Divider, Typography } from '@mui/material';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
+import SupportAgentOutlinedIcon from '@mui/icons-material/SupportAgentOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { Logout } from '@mui/icons-material';
 import { CaretDown } from 'phosphor-react';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import Link from 'next/link';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../apollo/store';
+import { useNotificationSocket } from '../hooks/useNotificationSocket';
 import { REACT_APP_API_URL } from '../config';
 import { MemberType } from '../enums/member.enum';
 
@@ -18,6 +21,8 @@ const Top = () => {
 	const user = useReactiveVar(userVar);
 	const { t } = useTranslation('common');
 	const router = useRouter();
+	// ⚠️ YANGI — avval bell "2" degan hardcoded raqamni korsatardi
+	const { unreadCount, unreadMessageCount } = useNotificationSocket();
 	const [lang, setLang] = useState('en');
 	const [anchorUser, setAnchorUser] = useState<null | HTMLElement>(null);
 
@@ -152,9 +157,21 @@ const Top = () => {
 						))}
 					</Stack>
 
+					{/* ⚠️ YANGI — CS (yordam) markazi: user Notice/Event/FAQ'dan xabardor bolishi uchun */}
+					<IconButton className="cs-btn" onClick={() => router.push('/cs')} title="Support Center">
+						<SupportAgentOutlinedIcon />
+					</IconButton>
+
+					{/* ⚠️ YANGI — avval /messages sahifasiga hech qanday doimiy havola yoq edi */}
+					<IconButton className="msg-nav-btn" onClick={() => router.push('/messages')} title="Messages">
+						<Badge badgeContent={unreadMessageCount} color="error" max={9}>
+							<ChatBubbleOutlineIcon />
+						</Badge>
+					</IconButton>
+
 					{/* Notification */}
-					<IconButton className="bell-btn">
-						<Badge badgeContent={user?._id ? 2 : 0} color="error">
+					<IconButton className="bell-btn" onClick={() => router.push('/notifications')}>
+						<Badge badgeContent={unreadCount} color="error" max={9}>
 							<NotificationsOutlinedIcon />
 						</Badge>
 					</IconButton>

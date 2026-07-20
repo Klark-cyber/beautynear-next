@@ -1,17 +1,23 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { Stack, Box, Typography, Chip, Pagination as MuiPagination } from '@mui/material';
+import { Stack, Box, Typography, Chip, Pagination as MuiPagination, IconButton } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import StarIcon from '@mui/icons-material/Star';
+import CloseIcon from '@mui/icons-material/Close';
 import moment from 'moment';
-import { useQuery } from '@apollo/client';
-import { GET_MY_BOOKINGS } from '../../../apollo/user/query';
+import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
+import { GET_MY_BOOKINGS, GET_COMMENTS } from '../../../apollo/user/query';
+import { CANCEL_BOOKING, CREATE_COMMENT } from '../../../apollo/user/mutation';
+import { userVar } from '../../../apollo/store';
+import { initializeApollo } from '../../../apollo/client';
 import { BookingStatus } from '../../enums/booking.enum';
 import { REACT_APP_API_URL } from '../../config';
 import { T } from '../../types/common';
+import { sweetConfirmAlert, sweetErrorHandling, sweetMixinSuccessAlert } from '../../sweetAlert';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────── */
 
@@ -20,7 +26,7 @@ const formatPrice = (n?: number): string => {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
-const imgUrl = (raw?: string, fallback = '/img/banner/default.jpg'): string => {
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
     if (!raw) return fallback;
     return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
@@ -53,6 +59,7 @@ const statusBadge = (status: BookingStatus): { label: string; cls: string } => {
 const MyBookings: NextPage = () => {
     const router = useRouter();
     const { t } = useTranslation('common');
+    const user = useReactiveVar(userVar);
 
     const [activeTab, setActiveTab] = useState<string>('UPCOMING');
     const [bookings, setBookings] = useState<any[]>([]);
@@ -60,8 +67,15 @@ const MyBookings: NextPage = () => {
     const [page, setPage] = useState<number>(1);
     const limit = 6;
 
+    // ⚠️ YANGI — sharh yozilgan xizmat/salonlar ro'yxati (qayta yozdirmaslik uchun)
+    const [reviewedRefIds, setReviewedRefIds] = useState<string[]>([]);
+    const [rateModalBooking, setRateModalBooking] = useState<any | null>(null);
+    const [rateStars, setRateStars] = useState(5);
+    const [rateText, setRateText] = useState('');
+    const [rateSubmitting, setRateSubmitting] = useState(false);
+
     /** APOLLO **/
-    useQuery(GET_MY_BOOKINGS, {
+    const { refetch } = useQuery(GET_MY_BOOKINGS, {
         fetchPolicy: 'network-only',
         variables: { input: { page, limit, sort: 'bookingDate', direction: 'DESC', search: {} } },
         notifyOnNetworkStatusChange: true,
@@ -70,6 +84,88 @@ const MyBookings: NextPage = () => {
             setTotal(data?.getMyBookings?.metaCounter?.[0]?.total ?? 0);
         },
     });
+
+    const [cancelBooking] = useMutation(CANCEL_BOOKING);
+    const [createComment] = useMutation(CREATE_COMMENT);
+
+    // Har bir COMPLETED bron uchun — foydalanuvchi allaqachon sharh qoldirganmi tekshiramiz
+    useEffect(() => {
+        const completedSalonIds = Array.from(
+            new Set(bookings.filter((b) => b.bookingStatus === BookingStatus.COMPLETED).map((b) => b.salonId)),
+        );
+        if (!completedSalonIds.length || !user?._id) return;
+
+        const client = initializeApollo();
+        Promise.all(
+            completedSalonIds.map((salonId) =>
+                client
+                    .query({
+                        query: GET_COMMENTS,
+                        variables: { input: { page: 1, limit: 100, sort: 'createdAt', direction: 'DESC', search: { commentRefId: salonId, commentGroup: 'SALON' } } },
+                        fetchPolicy: 'network-only',
+                    })
+                    .then(({ data }) => {
+                        const mine = (data?.getComments?.list ?? []).some((c: T) => c.memberId === user._id);
+                        return mine ? salonId : null;
+                    })
+                    .catch(() => null),
+            ),
+        ).then((results) => setReviewedRefIds(results.filter(Boolean) as string[]));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [bookings, user?._id]);
+
+    /** HANDLERS **/
+    const cancelHandler = async (booking: any) => {
+        try {
+            const bookingDateTime = moment(booking.bookingDate);
+            const [h, m] = booking.bookingTime.split(':').map(Number);
+            bookingDateTime.set({ hour: h, minute: m });
+            const hoursLeft = bookingDateTime.diff(moment(), 'hours', true);
+            const willRefund = hoursLeft > 24;
+
+            const msg = willRefund
+                ? t('Cancel this booking? Your deposit will be fully refunded (more than 24h before appointment).')
+                : t('Cancel this booking? Your deposit will NOT be refunded (less than 24h before appointment).');
+
+            if (await sweetConfirmAlert(msg)) {
+                await cancelBooking({ variables: { input: booking._id } });
+                await sweetMixinSuccessAlert(t('Booking cancelled.'));
+                await refetch();
+            }
+        } catch (err: any) {
+            sweetErrorHandling(err).then();
+        }
+    };
+
+    const openRateModal = (booking: any) => {
+        setRateModalBooking(booking);
+        setRateStars(5);
+        setRateText('');
+    };
+
+    const submitRatingHandler = async () => {
+        if (!rateModalBooking || !rateText.trim()) return;
+        setRateSubmitting(true);
+        try {
+            await createComment({
+                variables: {
+                    input: {
+                        commentGroup: 'SALON',
+                        commentRefId: rateModalBooking.salonId,
+                        commentContent: rateText.trim(),
+                        commentRating: rateStars,
+                    },
+                },
+            });
+            setReviewedRefIds((prev) => [...prev, rateModalBooking.salonId]);
+            setRateModalBooking(null);
+            await sweetMixinSuccessAlert(t('Thank you for your review!'));
+        } catch (err: any) {
+            sweetErrorHandling(err).then();
+        } finally {
+            setRateSubmitting(false);
+        }
+    };
 
     /** Filter (frontend-side) **/
     const filtered = useMemo(() => {
@@ -154,10 +250,23 @@ const MyBookings: NextPage = () => {
                                     </Stack>
                                 </Stack>
 
-                                {/* O'ng: status + narx + View */}
+                                {/* O'ng: status + narx + View + Cancel/Rate */}
                                 <Stack className="booking-right" alignItems="flex-end" justifyContent="space-between">
                                     <Chip label={t(badge.label)} size="small" className={`status-badge ${badge.cls}`} />
                                     <Typography className="booking-price">₩{formatPrice(booking.totalAmount)}</Typography>
+
+                                    {(booking.bookingStatus === BookingStatus.PENDING || booking.bookingStatus === BookingStatus.CONFIRMED) && (
+                                        <Box component="div" className="cancel-btn" onClick={() => cancelHandler(booking)}>
+                                            {t('Cancel Booking')}
+                                        </Box>
+                                    )}
+
+                                    {booking.bookingStatus === BookingStatus.COMPLETED && !reviewedRefIds.includes(booking.salonId) && (
+                                        <Box component="div" className="rate-btn" onClick={() => openRateModal(booking)}>
+                                            ⭐ {t('Rate & Review')}
+                                        </Box>
+                                    )}
+
                                     <Stack
                                         direction="row"
                                         alignItems="center"
@@ -186,6 +295,44 @@ const MyBookings: NextPage = () => {
                         sx={{ '& .MuiPaginationItem-root.Mui-selected': { background: '#FF4D8D', color: '#fff' } }}
                     />
                 </Stack>
+            )}
+
+            {/* ⚠️ YANGI — Rate & Review modal */}
+            {rateModalBooking && (
+                <Box component="div" className="rate-modal-backdrop" onClick={() => setRateModalBooking(null)}>
+                    <Stack className="rate-modal" onClick={(e) => e.stopPropagation()}>
+                        <Stack direction="row" alignItems="center" justifyContent="space-between" className="rate-modal-head">
+                            <Typography className="rate-modal-title">{t('Rate Your Experience')}</Typography>
+                            <IconButton size="small" onClick={() => setRateModalBooking(null)}><CloseIcon /></IconButton>
+                        </Stack>
+
+                        <Typography className="rate-modal-salon">{rateModalBooking.salonData?.salonTitle}</Typography>
+
+                        <Stack direction="row" gap={0.5} className="rate-modal-stars">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                                <IconButton key={n} onClick={() => setRateStars(n)}>
+                                    <StarIcon sx={{ fontSize: 32, color: n <= rateStars ? '#FFB800' : '#e0e0e0' }} />
+                                </IconButton>
+                            ))}
+                        </Stack>
+
+                        <textarea
+                            className="rate-modal-textarea"
+                            placeholder={t('Share details about your experience...')}
+                            value={rateText}
+                            onChange={(e) => setRateText(e.target.value)}
+                            rows={4}
+                        />
+
+                        <Box
+                            component="div"
+                            className={`rate-modal-submit ${!rateText.trim() || rateSubmitting ? 'disabled' : ''}`}
+                            onClick={() => !rateSubmitting && rateText.trim() && submitRatingHandler()}
+                        >
+                            {rateSubmitting ? t('Submitting...') : t('Submit Review')}
+                        </Box>
+                    </Stack>
+                </Box>
             )}
         </Box>
     );

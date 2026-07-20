@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Button, FormControl, MenuItem, Stack, Typography, Select, TextField } from '@mui/material';
+import { Box, Button, FormControl, MenuItem, Stack, Typography, Select, TextField, IconButton } from '@mui/material';
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import { BoardArticleCategory } from '../../enums/board-article.enum';
 import { Editor } from '@toast-ui/react-editor';
 import { getJwtToken } from '../../auth';
@@ -27,10 +28,13 @@ const TuiEditor = () => {
 	const [articleTitle, setArticleTitle] = useState<string>('');
 	const [initialContent, setInitialContent] = useState<string>('Type here');
 	const [editorReady, setEditorReady] = useState<boolean>(!isEditMode); // create rejimida darhol tayyor
-
-	const memoizedValues = useMemo(() => {
-		return { articleImage: '' };
-	}, []);
+	// ⚠️ YANGI — avval bu qiymat useMemo ICHIDA (ko'rinmas holda) saqlanardi,
+	// foydalanuvchi UNI hech qachon KO'RA olmasdi — faqat matn ichiga rasm
+	// qo'yilganda "yon ta'sir" sifatida o'rnatilardi. Endi ALOHIDA, ANIQ
+	// "Cover Image" bo'limi orqali boshqariladi.
+	const [articleImage, setArticleImage] = useState<string>('');
+	const [coverUploading, setCoverUploading] = useState<boolean>(false);
+	const coverInputRef = useRef<HTMLInputElement>(null);
 
 	/** APOLLO REQUESTS **/
 	const [createBoardArticle] = useMutation(CREATE_BOARD_ARTICLE);
@@ -47,12 +51,14 @@ const TuiEditor = () => {
 			setArticleTitle(article.articleTitle ?? '');
 			setArticleCategory(article.articleCategory ?? BoardArticleCategory.FREE);
 			setInitialContent(article.articleContent || 'Type here');
-			memoizedValues.articleImage = article.articleImage ?? '';
+			setArticleImage(article.articleImage ?? '');
 			setEditorReady(true); // data kelgach Editor'ni initialValue bilan render qilamiz
 		},
 	});
 
 	/** HANDLERS **/
+	// Muharrir ICHIGA (matn orasiga) rasm qo'yish uchun — endi bu FAQAT
+	// content ichidagi rasm, Cover Image'ga hech qanday ta'sir qilmaydi
 	const uploadImage = async (image: any) => {
 		try {
 			const formData = new FormData();
@@ -85,11 +91,43 @@ const TuiEditor = () => {
 			});
 
 			const responseImage = response.data.data.imageUploader;
-			memoizedValues.articleImage = responseImage;
-
 			return `${REACT_APP_API_URL}/${responseImage}`;
 		} catch (err) {
 			console.log('Error, uploadImage:', err);
+		}
+	};
+
+	// ⚠️ YANGI — aniq, ALOHIDA "Cover Image" yuklash (matnga tegmaydi)
+	const coverUploadHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		try {
+			const image = e.target.files?.[0];
+			if (!image) return;
+			setCoverUploading(true);
+
+			const formData = new FormData();
+			formData.append('operations', JSON.stringify({
+				query: `mutation ImageUploader($file: Upload!, $target: String!) {
+					imageUploader(file: $file, target: $target)
+				}`,
+				variables: { file: null, target: 'article' },
+			}));
+			formData.append('map', JSON.stringify({ '0': ['variables.file'] }));
+			formData.append('0', image);
+
+			const response = await axios.post(`${process.env.REACT_APP_API_GRAPHQL_URL}`, formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data',
+					'apollo-require-preflight': true,
+					Authorization: `Bearer ${token}`,
+				},
+			});
+
+			setArticleImage(response.data.data.imageUploader);
+		} catch (err) {
+			console.log('Error, coverUploadHandler:', err);
+			sweetMixinErrorAlert('Image upload failed').then();
+		} finally {
+			setCoverUploading(false);
 		}
 	};
 
@@ -118,7 +156,7 @@ const TuiEditor = () => {
 							_id: articleId,
 							articleTitle,
 							articleContent,
-							articleImage: memoizedValues.articleImage,
+							articleImage: articleImage,
 						},
 					},
 				});
@@ -127,7 +165,7 @@ const TuiEditor = () => {
 				// ── CREATE: yangi maqola ──
 				await createBoardArticle({
 					variables: {
-						input: { articleTitle, articleContent, articleImage: memoizedValues.articleImage, articleCategory },
+						input: { articleTitle, articleContent, articleImage: articleImage, articleCategory },
 					},
 				});
 				await sweetTopSuccessAlert('Article is created successfully', 700);
@@ -196,6 +234,67 @@ const TuiEditor = () => {
 						style={{ width: '300px', background: 'white' }}
 					/>
 				</Box>
+				{/* ⚠️ YANGI — avval ALOHIDA Cover Image yuklash imkoniyati
+				    umuman yo'q edi, rasm faqat muharrir matni ICHIGA
+				    qo'yilardi */}
+				<Box component={'div'} style={{ width: '300px', flexDirection: 'column' }}>
+					<Typography style={{ color: '#7f838d', margin: '10px' }} variant="h3">
+						Cover Image
+					</Typography>
+					<Box
+						component="div"
+						onClick={() => coverInputRef.current?.click()}
+						style={{
+							width: '300px',
+							height: '160px',
+							background: '#fff',
+							border: articleImage ? 'none' : '1.5px dashed rgba(255,77,141,0.4)',
+							borderRadius: '10px',
+							display: 'flex',
+							flexDirection: 'column',
+							alignItems: 'center',
+							justifyContent: 'center',
+							gap: '8px',
+							cursor: 'pointer',
+							overflow: 'hidden',
+							position: 'relative',
+						}}
+					>
+						{articleImage ? (
+							<>
+								<img
+									src={articleImage.startsWith('http') ? articleImage : `${REACT_APP_API_URL}/${articleImage}`}
+									alt="cover"
+									style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+								/>
+								<Box
+									component="div"
+									style={{
+										position: 'absolute',
+										bottom: 0,
+										left: 0,
+										right: 0,
+										padding: '6px',
+										background: 'rgba(0,0,0,0.55)',
+										textAlign: 'center',
+									}}
+								>
+									<Typography sx={{ fontSize: 11.5, color: '#fff', fontWeight: 600 }}>
+										{coverUploading ? 'Uploading...' : 'Click to change'}
+									</Typography>
+								</Box>
+							</>
+						) : (
+							<>
+								<AddPhotoAlternateIcon sx={{ color: '#FF4D8D', fontSize: 30 }} />
+								<Typography sx={{ fontSize: 13, color: '#888' }}>
+									{coverUploading ? 'Uploading...' : 'Upload cover image'}
+								</Typography>
+							</>
+						)}
+					</Box>
+					<input ref={coverInputRef} type="file" hidden accept="image/jpg, image/jpeg, image/png" onChange={coverUploadHandler} />
+				</Box>
 			</Stack>
 
 			<Editor
@@ -220,7 +319,16 @@ const TuiEditor = () => {
 					},
 				}}
 				events={{
-					load: function (param: any) { },
+					// ⚠️ TUZATILDI: useEffect orqali urinish ishlamadi — Toast UI
+					// Editor o'zining ICHKI tayyorlanish jarayoniga ega, va React
+					// effect undan OLDINROQ ishga tushishi mumkin edi. Endi
+					// editor'ning O'ZINING "load" hodisasidan foydalanamiz — bu
+					// editor HAQIQATAN tayyor bo'lgandagina ishga tushadi.
+					load: function () {
+						if (isEditMode && editorRef.current) {
+							editorRef.current.getInstance().setHTML(initialContent);
+						}
+					},
 				}}
 			/>
 

@@ -4,15 +4,14 @@ import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
+import { initializeApollo } from '../../apollo/client';
 import {
 	Stack, Box, Typography, Button, IconButton, Chip,
 	Select, MenuItem, CircularProgress, Avatar,
 	TextField, Pagination as MuiPagination,
 } from '@mui/material';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import SwiperCore from 'swiper';
-// @ts-ignore — TypeScript 4.6 'swiper/modules' subpath eksportini to'liq tushunmaydi (runtime'ga ta'siri yo'q)
-import { Autoplay, Navigation } from 'swiper/modules';
+import SwiperCore, { Autoplay, Navigation } from 'swiper';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
@@ -25,6 +24,7 @@ import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import PersonAddOutlinedIcon from '@mui/icons-material/PersonAddOutlined';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PersonRemoveOutlinedIcon from '@mui/icons-material/PersonRemoveOutlined';
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import Link from 'next/link';
@@ -33,8 +33,9 @@ import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import RatingStars from '../../libs/components/common/Ratingstars';
 import EmptyList from '../../libs/components/common/Emptylist';
-import { GET_SALON, GET_SALONS, GET_SERVICES, GET_COMMENTS, GET_MY_BOOKINGS } from '../../apollo/user/query';
-import { LIKE_TARGET_SALON, LIKE_TARGET_SERVICE, CREATE_COMMENT, CREATE_BOOKING, SUBSCRIBE, UNSUBSCRIBE } from '../../apollo/user/mutation';
+import MobileSalonDetail from '../../libs/components/salon/MobileSalonDetail';
+import { GET_SALON, GET_SALONS, GET_SERVICES, GET_COMMENTS, GET_MY_BOOKINGS, GET_BOOKED_SLOTS } from '../../apollo/user/query';
+import { LIKE_TARGET_SALON, CREATE_COMMENT, CREATE_BOOKING, SUBSCRIBE, UNSUBSCRIBE } from '../../apollo/user/mutation';
 import { T } from '../../libs/types/common';
 import { Salon } from '../../libs/types/salon/salon';
 import { Service } from '../../libs/types/service/service';
@@ -47,6 +48,7 @@ import { FollowGroup } from '../../libs/enums/follow.enum';
 import { Direction, Message } from '../../libs/enums/common.enum';
 import { REACT_APP_API_URL } from '../../libs/config';
 import { userVar } from '../../apollo/store';
+import { useChatContext } from '../../libs/context/ChatContext';
 import { isSalonOpen } from '../../libs/utils';
 import { sweetErrorHandling, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 
@@ -65,7 +67,7 @@ const formatPrice = (n?: number): string => {
 };
 
 // Rasm http-aware (Unsplash URL yoki backend fayl)
-const imgUrl = (raw?: string, fallback = '/img/banner/default.jpg'): string => {
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
 	if (!raw) return fallback;
 	return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
@@ -97,6 +99,7 @@ const SalonDetail: NextPage = () => {
 	const router = useRouter();
 	const device = useDeviceDetect();
 	const user = useReactiveVar(userVar);
+	const { openChatWith } = useChatContext();
 
 	const salonId = router.query.id as string;
 
@@ -126,6 +129,7 @@ const SalonDetail: NextPage = () => {
 		commentGroup: CommentGroup.SALON,
 		commentContent: '',
 		commentRefId: '',
+		commentRating: 5,
 	});
 
 	const canWriteReview = myBookings.some(
@@ -134,7 +138,6 @@ const SalonDetail: NextPage = () => {
 
 	/** APOLLO **/
 	const [likeTargetSalon] = useMutation(LIKE_TARGET_SALON);
-	const [likeTargetService] = useMutation(LIKE_TARGET_SERVICE);
 	const [subscribe] = useMutation(SUBSCRIBE);
 	const [unsubscribe] = useMutation(UNSUBSCRIBE);
 	const [createComment] = useMutation(CREATE_COMMENT);
@@ -189,12 +192,14 @@ const SalonDetail: NextPage = () => {
 			input: {
 				page: 1, limit: 6, sort: 'salonRank', direction: Direction.DESC,
 				search: {
-					locationList: salon?.salonLocation ? [salon.salonLocation] : [],
-					typeList: salon?.salonType ? [salon.salonType] : [],
+					// ⚠️ TUZATILDI: bo'sh satr enum sifatida yuborilib "Bad Request"
+					// xatosiga sabab bo'lgan bo'lishi mumkin edi — endi aniq tekshiriladi
+					...(salon?.salonLocation ? { locationList: [salon.salonLocation] } : {}),
+					...(salon?.salonType ? { typeList: [salon.salonType] } : {}),
 				},
 			},
 		},
-		skip: !salon,
+		skip: !salon?._id,
 		onCompleted: (data: T) => {
 			const list = (data?.getSalons?.list ?? []).filter((s: Salon) => s._id !== salonId);
 			setSimilarSalons(list);
@@ -208,16 +213,22 @@ const SalonDetail: NextPage = () => {
 		}
 	}, [commentInquiry]);
 
+	// ⚠️ TUZATILDI: avval faqat FOYDALANUVCHINING O'Z bronlaridan (myBookings)
+	// tekshirilar edi — boshqa mijozlar band qilgan vaqt "bo'sh" ko'rinib,
+	// ikki marta bron qilishga yo'l qo'yardi. Endi HAMMA mijozlar bo'yicha
+	// (backend'dagi xavfsiz getBookedSlots so'rovi orqali) tekshiriladi.
 	useEffect(() => {
-		if (selectedDate && salonId) {
-			const booked = myBookings
-				.filter((b) => b.salonId === salonId &&
-					moment(b.bookingDate).format('YYYY-MM-DD') === selectedDate &&
-					b.bookingStatus !== BookingStatus.CANCELLED)
-				.map((b) => b.bookingTime);
-			setBookedSlots(booked);
-		}
-	}, [selectedDate, salonId, myBookings]);
+		if (!selectedDate || !salonId) return;
+		const client = initializeApollo();
+		client
+			.query({
+				query: GET_BOOKED_SLOTS,
+				variables: { salonId, date: selectedDate },
+				fetchPolicy: 'network-only',
+			})
+			.then(({ data }) => setBookedSlots(data?.getBookedSlots ?? []))
+			.catch(() => setBookedSlots([]));
+	}, [selectedDate, salonId]);
 
 	/** HANDLERS **/
 	const likeHandler = useCallback(async () => {
@@ -234,19 +245,20 @@ const SalonDetail: NextPage = () => {
 		}
 	}, [user, salonId]);
 
-	// Service (xizmat) like handler
-	const serviceLikeHandler = useCallback(async (serviceId: string) => {
-		try {
-			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
-			await likeTargetService({ variables: { input: serviceId } });
-			// ⚠️ TUZATILDI: xuddi shu naqsh — natijadan to'g'ridan-to'g'ri yangilaymiz
-			const result = await servicesRefetch({ input: { page: 1, limit: 10, sort: 'createdAt', direction: Direction.DESC, search: { salonId } } });
-			if (result?.data?.getServices?.list) setServices(result.data.getServices.list);
-			await sweetTopSmallSuccessAlert('success', 800);
-		} catch (err: any) {
-			sweetMixinErrorAlert(err.message).then();
+
+	// ⚠️ YANGI — Salon egasi (Agent) bilan 1-ga-1 chatni ochish
+	const messageAgentHandler = useCallback(() => {
+		if (!user?._id) {
+			router.push('/account/join');
+			return;
 		}
-	}, [user, salonId]);
+		if (!salon?.memberData?._id) return;
+		openChatWith({
+			memberId: String(salon.memberData._id),
+			nick: salon.memberData.memberNick,
+			image: salon.memberData.memberImage,
+		});
+	}, [user, salon, openChatWith, router]);
 
 	const followHandler = useCallback(async (
 		group: FollowGroup, targetId: string, isFollowing: boolean, setter: (v: boolean) => void,
@@ -357,134 +369,7 @@ const SalonDetail: NextPage = () => {
 
 	/** MOBILE **/
 	if (device === 'mobile') {
-		return (
-			<Stack className="salon-detail-page mobile">
-				<Stack direction="row" alignItems="center" gap={1} className="mobile-back-bar" onClick={() => router.back()}>
-					<ArrowBackIcon sx={{ fontSize: 20, color: '#FF4D8D' }} />
-					<Typography sx={{ fontSize: 14, color: '#FF4D8D', fontWeight: 600 }}>{t('Back to salons')}</Typography>
-				</Stack>
-
-				<Box component="div" className="mobile-gallery">
-					<Swiper slidesPerView={1} modules={[]}>
-						{salon.salonImages?.map((img, i) => (
-							<SwiperSlide key={i}>
-								<img src={imgUrl(img)} alt="" style={{ width: '100%', height: 260, objectFit: 'cover' }} />
-							</SwiperSlide>
-						))}
-					</Swiper>
-					<Chip label={isOpen ? t('Open') : t('Closed')} className={`open-chip ${isOpen ? 'open' : 'closed'}`} />
-				</Box>
-
-				<Stack className="mobile-info" sx={{ px: 2, py: 2 }}>
-					<Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-						<Stack>
-							<Stack direction="row" alignItems="center" gap={1}>
-								<Typography className="salon-name">{salon.salonTitle}</Typography>
-								{isTop && <Chip label="⚡ TOP" size="small" className="top-chip" />}
-							</Stack>
-							<RatingStars rating={4.9} count={320} size="small" />
-						</Stack>
-						<IconButton onClick={likeHandler} className={`like-btn ${liked ? 'liked' : ''}`}>
-							{liked ? <FavoriteIcon sx={{ color: '#FF4D8D' }} /> : <FavoriteBorderIcon />}
-						</IconButton>
-					</Stack>
-
-					<Stack gap={0.75} sx={{ mt: 1.5 }}>
-						<Stack direction="row" alignItems="center" gap={0.75}>
-							<LocationOnOutlinedIcon sx={{ fontSize: 14, color: '#FF4D8D' }} />
-							<Typography sx={{ fontSize: 13, color: '#666' }}>{salon.salonAddress}</Typography>
-						</Stack>
-						{salon.memberData && (
-							<Stack direction="row" alignItems="center" gap={0.75}>
-								<PersonOutlineIcon sx={{ fontSize: 14, color: '#888' }} />
-								<Link href={`/member?memberId=${salon.memberData._id}`}>
-									<Typography sx={{ fontSize: 13, color: '#FF4D8D', fontWeight: 600, cursor: 'pointer' }}>
-										{t('By')}: {salon.memberData.memberNick}
-									</Typography>
-								</Link>
-							</Stack>
-						)}
-						<Stack direction="row" gap={0.75} flexWrap="wrap">
-							<Chip label={t(salon.salonType)} size="small" className="type-chip" />
-						</Stack>
-						<Stack direction="row" alignItems="center" gap={0.75}>
-							<AccessTimeIcon sx={{ fontSize: 14, color: isOpen ? '#4CAF50' : '#e53935' }} />
-							<Typography sx={{ fontSize: 13, color: isOpen ? '#4CAF50' : '#e53935', fontWeight: 600 }}>
-								{t('Open')}: {salon.salonWorkHours}
-							</Typography>
-						</Stack>
-					</Stack>
-
-					<Typography sx={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', mt: 2.5, mb: 1.5 }}>
-						{t('Services offered')}
-					</Typography>
-					<Stack direction="row" gap={1.5} sx={{ overflowX: 'auto', pb: 1, '&::-webkit-scrollbar': { display: 'none' } }}>
-						{services.map((svc) => (
-							<Stack key={svc._id} className="mobile-service-card">
-								<Box component="div" className="svc-img" style={{ backgroundImage: `url(${imgUrl(svc.serviceImages?.[0])})` }} />
-								<Typography className="svc-name">{svc.serviceTitle}</Typography>
-								<Typography className="svc-price">₩{formatPrice(svc.servicePrice)}</Typography>
-								<Typography className="svc-dur">{svc.serviceDuration} min</Typography>
-								<Button className="svc-book-btn" onClick={() => {
-									setSelectedService(svc._id);
-									document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth' });
-								}}>
-									{t('Book')}
-								</Button>
-							</Stack>
-						))}
-					</Stack>
-				</Stack>
-
-				<Stack id="booking-section" className="mobile-booking-card" sx={{ mx: 2, mb: 3 }}>
-					<Typography sx={{ fontSize: 16, fontWeight: 700, color: '#1a1a1a', mb: 2 }}>{t('Book Appointment')}</Typography>
-					<Stack direction="row" justifyContent="space-between" sx={{ mb: 2 }}>
-						<Box component="div">
-							<Typography sx={{ fontSize: 11, color: '#888' }}>{t('Starting from')}</Typography>
-							<Typography sx={{ fontSize: 20, fontWeight: 800, color: '#FF4D8D' }}>
-								₩{formatPrice(minPrice)}
-							</Typography>
-						</Box>
-						<Box component="div" sx={{ textAlign: 'right' }}>
-							<Typography sx={{ fontSize: 11, color: '#888' }}>{t('Deposit')}</Typography>
-							<Typography sx={{ fontSize: 16, fontWeight: 700, color: '#333' }}>₩{formatPrice(salon.depositAmount)}</Typography>
-						</Box>
-					</Stack>
-
-					<Typography sx={{ fontSize: 12, fontWeight: 600, color: '#555', mb: 0.75 }}>{t('Select Service')}</Typography>
-					<Select fullWidth size="small" value={selectedService} onChange={(e) => setSelectedService(e.target.value)}
-						displayEmpty sx={{ mb: 1.5, borderRadius: 2, '& fieldset': { borderColor: 'rgba(255,77,141,0.2)' } }}>
-						<MenuItem value="" disabled>{t('Choose a service')}</MenuItem>
-						{services.map((svc) => (
-							<MenuItem key={svc._id} value={svc._id}>{svc.serviceTitle} — ₩{formatPrice(svc.servicePrice)}</MenuItem>
-						))}
-					</Select>
-
-					<Typography sx={{ fontSize: 12, fontWeight: 600, color: '#555', mb: 0.75 }}>{t('Select Date')}</Typography>
-					<TextField fullWidth size="small" type="date" value={selectedDate}
-						onChange={(e) => setSelectedDate(e.target.value)}
-						inputProps={{ min: moment().add(1, 'day').format('YYYY-MM-DD') }}
-						sx={{ mb: 1.5, '& fieldset': { borderColor: 'rgba(255,77,141,0.2)' }, borderRadius: 2 }} />
-
-					<Typography sx={{ fontSize: 12, fontWeight: 600, color: '#555', mb: 1 }}>{t('Select Time')}</Typography>
-					<Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
-						{timeSlots.map((slot) => {
-							const isBooked = bookedSlots.includes(slot);
-							return (
-								<Box key={slot} component="div" onClick={() => !isBooked && setSelectedTime(slot)}
-									className={`time-slot ${selectedTime === slot ? 'selected' : ''} ${isBooked ? 'booked' : ''}`}>
-									{slot}
-								</Box>
-							);
-						})}
-					</Stack>
-
-					<Button fullWidth className="book-now-btn" onClick={bookingHandler} disabled={bookingLoading}>
-						{bookingLoading ? '...' : `${t('Book Now')} — ₩${formatPrice(salon.depositAmount)}`}
-					</Button>
-				</Stack>
-			</Stack>
-		);
+		return <MobileSalonDetail salonId={salonId} />;
 	}
 
 
@@ -493,7 +378,7 @@ const SalonDetail: NextPage = () => {
 		<Stack className="salon-detail-page">
 			<Stack className="salon-detail-inner">
 				{/* Back */}
-				<Stack direction="row" alignItems="center" gap={0.75} className="back-link" onClick={() => router.back()}>
+				<Stack direction="row" alignItems="center" gap={0.75} className="back-link" onClick={() => router.push('/salons')}>
 					<ArrowBackIcon sx={{ fontSize: 16 }} />
 					<Typography sx={{ fontSize: 13 }}>{t('Back to salons')}</Typography>
 				</Stack>
@@ -533,7 +418,10 @@ const SalonDetail: NextPage = () => {
 								</Stack>
 
 								<Stack direction="row" alignItems="center" gap={1} sx={{ mb: 2 }}>
-									<RatingStars rating={4.9} count={320} size="medium" />
+									<RatingStars rating={salon.salonRating || 0} count={commentTotal} size="medium" />
+									<Typography sx={{ fontSize: 13, color: '#999', fontFamily: 'Poppins, sans-serif' }}>
+										· {salon.salonFollowers ?? 0} {t('followers')}
+									</Typography>
 								</Stack>
 
 								<Stack gap={1.25} className="info-rows">
@@ -593,14 +481,9 @@ const SalonDetail: NextPage = () => {
 							) : (
 								<Box component="div" className="services-grid">
 									{services.map((svc) => {
-										const svcLiked = svc.meLiked?.[0]?.myFavorite;
 										return (
 											<Stack key={svc._id} className="service-card">
-												<Box component="div" className="svc-img" style={{ backgroundImage: `url(${imgUrl(svc.serviceImages?.[0])})` }}>
-													<IconButton className={`svc-like-btn ${svcLiked ? 'liked' : ''}`} onClick={() => serviceLikeHandler(svc._id)}>
-														{svcLiked ? <FavoriteIcon sx={{ fontSize: 16, color: '#FF4D8D' }} /> : <FavoriteBorderIcon sx={{ fontSize: 16 }} />}
-													</IconButton>
-												</Box>
+												<Box component="div" className="svc-img" style={{ backgroundImage: `url(${imgUrl(svc.serviceImages?.[0])})` }} />
 												<Box component="div" className="svc-body">
 													<Typography className="svc-name">{svc.serviceTitle}</Typography>
 													<Typography className="svc-price">₩{formatPrice(svc.servicePrice)}</Typography>
@@ -626,9 +509,9 @@ const SalonDetail: NextPage = () => {
 
 							<Stack direction="row" gap={4} className="rating-summary">
 								<Stack alignItems="center" justifyContent="center" className="big-rating-box">
-									<Typography className="big-rating">4.9</Typography>
-									<RatingStars rating={4.9} size="medium" showNumber={false} />
-									<Typography sx={{ fontSize: 12, color: '#888', mt: 0.5 }}>(320 {t('reviews')})</Typography>
+									<Typography className="big-rating">{(salon.salonRating || 0).toFixed(1)}</Typography>
+									<RatingStars rating={salon.salonRating || 0} size="medium" showNumber={false} />
+									<Typography sx={{ fontSize: 12, color: '#888', mt: 0.5 }}>({commentTotal} {t('reviews')})</Typography>
 								</Stack>
 								<Stack flex={1} gap={0.75} sx={{ maxWidth: 420 }}>
 									{ratingBreakdown.map((r) => (
@@ -686,6 +569,13 @@ const SalonDetail: NextPage = () => {
 							{canWriteReview && (
 								<Stack className="write-review-section">
 									<Typography className="section-title">{t('Leave A Review')}</Typography>
+									<Stack direction="row" gap={0.5} sx={{ my: 1 }}>
+										{[1, 2, 3, 4, 5].map((n) => (
+											<IconButton key={n} size="small" onClick={() => setInsertCommentData((prev) => ({ ...prev, commentRating: n }))}>
+												<StarIcon sx={{ fontSize: 26, color: n <= (insertCommentData.commentRating ?? 5) ? '#FFB800' : '#e0e0e0' }} />
+											</IconButton>
+										))}
+									</Stack>
 									<textarea className="review-textarea" placeholder={t('Share your experience...')}
 										value={insertCommentData.commentContent}
 										onChange={(e) => setInsertCommentData((prev) => ({ ...prev, commentContent: e.target.value }))} />
@@ -837,6 +727,9 @@ const SalonDetail: NextPage = () => {
 										<Link href={`/member?memberId=${salon.memberData._id}`} style={{ flex: 1 }}>
 											<Button fullWidth className="view-profile-btn">{t('View Profile')}</Button>
 										</Link>
+										<IconButton className="message-agent-btn" onClick={messageAgentHandler}>
+											<ChatBubbleOutlineIcon sx={{ fontSize: 18 }} />
+										</IconButton>
 									</Stack>
 								</Stack>
 							</Stack>

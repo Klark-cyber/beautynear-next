@@ -1,0 +1,1183 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   MOBILE SALON DETAIL — 1:1 mockup asosida
+   scss/mobile/main.scss ga: @import '/scss/mobile/salon/mobile-salon-detail';
+═══════════════════════════════════════════════════════════════════════ */
+
+#mobile-salon-detail {
+    width: 100%;
+    min-width: 0;
+    max-width: 100vw;
+    overflow-x: hidden;
+    background: #FFF8FA;
+    padding-bottom: 90px; // sticky bar uchun joy
+
+    * {
+        box-sizing: border-box;
+    }
+
+    /* ═══ GALEREYA ═══ */
+    .sd-gallery {
+        position: relative;
+        height: 150px; // ⚠️ TUZATILDI: yanada kichraytirildi
+        overflow: hidden; // ⚠️ TUZATILDI: "visible" xato edi — rasmning o'zi
+        width: auto;
+
+        .sd-swiper,
+        .swiper-slide {
+            height: 100%;
+        }
+
+        .sd-gallery-img {
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+        }
+
+        .sd-icon-btn {
+            position: absolute;
+            right: 0px;
+            z-index: 10;
+            width: 34px;
+            height: 34px;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+            pointer-events: auto;
+        }
+
+        .sd-back {
+            top: 12px;
+            left: 12px;
+        }
+
+        .sd-top-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .sd-photo-count {
+            position: absolute;
+            bottom: 14px;
+            left: 16px;
+            z-index: 3;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fff;
+            padding: 3px 9px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .swiper-pagination-bullet {
+            background: #fff;
+            opacity: 0.6;
+        }
+
+        .swiper-pagination-bullet-active {
+            opacity: 1;
+            background: #FF4D8D;
+        }
+    }
+
+    /* ═══ ASOSIY KARTA ═══ */
+    .sd-info-card {
+        top: 17px;
+        position: relative;
+        z-index: 2;
+        margin-top: -16px;
+        background: #fff;
+        border-radius: 18px 18px 0 0;
+        padding: 16px 16px 6px;
+
+        .sd-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 16.5px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .sd-type-badge {
+            background: rgba(255, 77, 141, 0.1);
+            color: #FF4D8D;
+            font-family: 'Inter', sans-serif;
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 7px;
+        }
+
+        .sd-open-badge {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 9.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 7px;
+
+            .dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+            }
+
+            &.open {
+                background: rgba(62, 160, 67, 0.1);
+                color: #3EA043;
+
+                .dot {
+                    background: #3EA043;
+                }
+            }
+
+            &.closed {
+                background: rgba(220, 53, 69, 0.1);
+                color: #DC3545;
+
+                .dot {
+                    background: #DC3545;
+                }
+            }
+        }
+
+        .sd-rating {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11.5px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+
+        .sd-dot {
+            color: #ccc !important;
+        }
+
+        .sd-dist {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11px !important;
+            color: #777 !important;
+        }
+
+        .sd-meta-text {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11px !important;
+            color: #555 !important;
+        }
+
+        .sd-phone-link {
+            color: #FF4D8D !important;
+            text-decoration: none;
+        }
+    }
+
+    /* ═══ SALON EGASI ═══ */
+    .sd-owner-card {
+        margin-top: 18px;
+        padding: 14px;
+        background: rgba(255, 77, 141, 0.04);
+        border-radius: 16px;
+        cursor: pointer;
+
+        .sd-owner-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+            flex-shrink: 0;
+        }
+
+        .sd-owner-name {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13.5px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .sd-agent-badge {
+            background: #1a1a1a;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 8.5px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 5px;
+        }
+
+        .sd-owner-role {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 11px !important;
+            color: #888 !important;
+        }
+
+        .sd-owner-exp {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #aaa !important;
+        }
+
+        .sd-follow-btn {
+            flex-shrink: 0;
+            background: #FF4D8D;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 18px;
+            border-radius: 10px;
+
+            &.following {
+                background: #eee;
+                color: #666;
+            }
+        }
+
+        // ⚠️ YANGI — Salon egasiga (Agentga) shaxsiy xabar yozish tugmasi
+        .sd-message-btn {
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            background: rgba(255, 77, 141, 0.08);
+            color: #FF4D8D;
+            border: 1.5px solid rgba(255, 77, 141, 0.25);
+        }
+    }
+
+    /* ═══ BO'LIM SARLAVHASI (umumiy) ═══ */
+    .sd-section-title {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 13.5px !important;
+        font-weight: 800 !important;
+        color: #1a1a1a !important;
+    }
+
+    .sd-viewall {
+        margin-top: 10px;
+        padding: 10px 0;
+        color: #FF4D8D;
+        font-family: 'Inter', sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .sd-viewall-link {
+        font-family: 'Inter', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+        color: #FF4D8D !important;
+        cursor: pointer;
+    }
+
+    /* ═══ ABOUT ═══ */
+    .sd-about {
+        margin-top: 22px;
+
+        .sd-about-text {
+            margin-top: 8px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12.5px !important;
+            color: #666 !important;
+            line-height: 1.6 !important;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+
+            &.expanded {
+                -webkit-line-clamp: unset;
+                line-clamp: unset;
+                overflow: visible;
+            }
+        }
+
+        .sd-readmore {
+            margin-top: 4px;
+            color: #FF4D8D;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+    }
+
+    /* ═══ SERVICES ═══ */
+    .sd-services {
+        margin-top: 22px;
+
+        .sd-service-row {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+
+            .sd-service-radio {
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                border: 2px solid #ddd;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                &.checked {
+                    border-color: #FF4D8D;
+                }
+            }
+
+            .sd-service-img {
+                width: 48px;
+                height: 48px;
+                border-radius: 10px;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                flex-shrink: 0;
+            }
+
+            .sd-service-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+            }
+
+            .sd-service-dur {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11px !important;
+                color: #999 !important;
+            }
+
+            .sd-service-price {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+        }
+    }
+
+    .sd-more-services-table {
+        margin-top: 8px;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+        .sd-more-svc-row {
+            padding: 10px 4px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+
+            .sd-more-svc-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+            }
+
+            .sd-more-svc-dur {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10px !important;
+                color: #999 !important;
+            }
+
+            .sd-more-svc-price {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12px !important;
+                font-weight: 700 !important;
+                color: #FF4D8D !important;
+                white-space: nowrap;
+            }
+        }
+    }
+
+    /* ═══ REVIEWS ═══ */
+    .sd-reviews {
+        margin-top: 22px;
+
+        .sd-rating-big {
+            .sd-rating-num {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 26px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+                line-height: 1 !important;
+            }
+
+            .sd-rating-count {
+                margin-top: 4px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10.5px !important;
+                color: #999 !important;
+            }
+        }
+
+        .sd-bar-star {
+            width: 26px;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #888 !important;
+        }
+
+        .sd-bar-track {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .sd-bar-fill {
+            height: 100%;
+            background: #FFB800;
+            border-radius: 3px;
+        }
+
+        .sd-bar-pct {
+            width: 28px;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10px !important;
+            color: #aaa !important;
+            text-align: right;
+        }
+
+        .sd-review-item {
+            margin-top: 16px;
+            padding: 11px;
+            background: #FAFAFA;
+            border-radius: 12px;
+
+            .sd-review-avatar {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                flex-shrink: 0;
+            }
+
+            .sd-review-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+            }
+
+            .sd-review-time {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10px !important;
+                color: #aaa !important;
+            }
+
+            .sd-review-text {
+                margin-top: 4px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10.5px !important;
+                color: #666 !important;
+                line-height: 1.5 !important;
+            }
+        }
+    }
+
+    /* ═══ SIMILAR SALONS ═══ */
+    .sd-similar {
+        margin-top: 22px;
+
+        .sd-similar-row {
+            margin-top: 12px;
+            overflow-x: auto;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+        .sd-similar-card {
+            flex-shrink: 0;
+            width: 118px;
+            cursor: pointer;
+
+            .sd-similar-img {
+                position: relative;
+                width: 100%;
+                height: 90px;
+                border-radius: 12px;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+
+                .sd-similar-heart-btn {
+                    position: absolute;
+                    top: 4px;
+                    right: 4px;
+                    width: 26px;
+                    height: 26px;
+                    padding: 0;
+                }
+            }
+
+            .sd-similar-title {
+                margin-top: 6px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11.5px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .sd-similar-dist,
+            .sd-similar-rating {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10px !important;
+                color: #888 !important;
+            }
+        }
+    }
+
+    /* ═══ STICKY PASTKI PANEL ═══ */
+    /* ═══ PASTKI NAVIGATSIYA (tanlanmaganda) — Homepage bilan bir xil ═══ */
+    .sd-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 90;
+        background: #fff;
+        border-top: 1px solid rgba(0, 0, 0, 0.06);
+        padding: 8px 0;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+        justify-content: space-around;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+
+        .sd-nav-item {
+            color: #999;
+            cursor: pointer;
+
+            .sd-nav-label {
+                margin-top: 2px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 9.5px !important;
+                font-weight: 600 !important;
+                color: inherit !important;
+            }
+        }
+    }
+
+    .sd-sticky-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 90;
+        background: #fff;
+        padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.08);
+
+        .sd-sticky-name {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12.5px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+
+        .sd-sticky-price {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 15px !important;
+            font-weight: 800 !important;
+            color: #FF4D8D !important;
+        }
+
+        .sd-book-btn {
+            background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 12px 32px;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(255, 77, 141, 0.3);
+        }
+    }
+
+    /* ═══ BOOKING VARAQASI ═══ */
+    .sd-booking-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 300;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .sd-booking-sheet {
+        width: 100%;
+        max-height: 90vh;
+        background: #fff;
+        border-radius: 24px 24px 0 0;
+        overflow-y: auto;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+
+        .sd-sheet-handle {
+            width: 40px;
+            height: 4px;
+            border-radius: 3px;
+            background: #ddd;
+            margin: 10px auto;
+        }
+
+        .sd-sheet-head {
+            padding: 0 12px 12px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+            .sd-sheet-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 16px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .sd-sheet-body {
+            padding: 18px 20px 24px;
+        }
+
+        .sd-step-head {
+            margin-bottom: 10px;
+
+            .sd-step-num {
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #FF4D8D;
+                color: #fff;
+                font-family: 'Inter', sans-serif;
+                font-size: 10px;
+                font-weight: 800;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .sd-step-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13.5px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .sd-booking-svc-card {
+            padding: 10px;
+            border: 1.5px solid #eee;
+            border-radius: 12px;
+            cursor: pointer;
+
+            &.selected {
+                border-color: #FF4D8D;
+                background: rgba(255, 77, 141, 0.04);
+            }
+
+            .sd-booking-svc-img {
+                width: 40px;
+                height: 40px;
+                border-radius: 8px;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                flex-shrink: 0;
+            }
+
+            .sd-booking-svc-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+            }
+
+            .sd-booking-svc-dur {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10.5px !important;
+                color: #999 !important;
+            }
+
+            .sd-booking-svc-price {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .sd-month-label {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            color: #1a1a1a !important;
+        }
+
+        .sd-cal-dow-row {
+            .sd-cal-dow {
+                width: calc(100% / 7);
+                text-align: center;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10px !important;
+                font-weight: 700 !important;
+                color: #aaa !important;
+            }
+        }
+
+        .sd-cal-grid {
+            margin-top: 4px;
+        }
+
+        .sd-cal-cell {
+            width: calc(100% / 7);
+            aspect-ratio: 1;
+            border-radius: 10px;
+            cursor: pointer;
+
+            &.selected {
+                background: #FF4D8D;
+
+                .sd-cal-num {
+                    color: #fff !important;
+                    font-weight: 800 !important;
+                }
+            }
+
+            &.disabled {
+                opacity: 0.28;
+                pointer-events: none;
+            }
+
+            .sd-cal-num {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 600 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .sd-time-grid {
+            row-gap: 8px;
+        }
+
+        .sd-time-slot {
+            width: calc(25% - 6px);
+            text-align: center;
+            padding: 9px 0;
+            border: 1.5px solid #eee;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+
+            &.selected {
+                border-color: #FF4D8D;
+                color: #FF4D8D;
+                background: rgba(255, 77, 141, 0.04);
+            }
+
+            &.disabled {
+                position: relative;
+                color: #bbb;
+                background: repeating-linear-gradient(45deg,
+                        #f5f5f5,
+                        #f5f5f5 4px,
+                        #eeeeee 4px,
+                        #eeeeee 8px); // ⚠️ TUZATILDI: chiziqli naqsh — band ekanligi yanada aniq ko'rinsin
+                text-decoration: line-through;
+                text-decoration-color: #ccc;
+                border-color: #f0f0f0;
+                pointer-events: none;
+            }
+        }
+
+        .sd-legend-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+
+            &.available {
+                background: #FF4D8D;
+            }
+
+            &.unavailable {
+                background: #ddd;
+            }
+        }
+
+        .sd-legend-text {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #999 !important;
+        }
+
+        .sd-deposit-row {
+            margin-top: 20px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+
+            .sd-deposit-label {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+
+                span {
+                    font-weight: 400;
+                    color: #999;
+                    font-size: 10.5px;
+                }
+            }
+
+            .sd-deposit-amount {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 16px !important;
+                font-weight: 800 !important;
+                color: #FF4D8D !important;
+            }
+        }
+
+        .sd-confirm-btn {
+            margin-top: 16px;
+            background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+            color: #fff;
+            text-align: center;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+
+            &.disabled {
+                opacity: 0.5;
+                pointer-events: none;
+            }
+        }
+
+        .sd-confirm-note {
+            margin-top: 10px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #aaa !important;
+            text-align: center;
+            line-height: 1.4 !important;
+        }
+    }
+
+    /* ═══ TASDIQLASH EKRANI ═══ */
+    .sd-confirmed-view {
+        padding: 8px 20px 28px;
+
+        .sd-confirm-icon {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 24px rgba(255, 77, 141, 0.3);
+        }
+
+        .sd-confirmed-title {
+            margin-top: 16px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 19px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .sd-confirmed-sub {
+            margin-top: 4px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12px !important;
+            color: #888 !important;
+            text-align: center;
+        }
+
+        .sd-confirmed-card {
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: rgba(255, 77, 141, 0.05);
+            border-radius: 14px;
+
+            .sd-confirmed-img {
+                width: 52px;
+                height: 52px;
+                border-radius: 10px;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                flex-shrink: 0;
+            }
+
+            .sd-confirmed-salon {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 13px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+
+            .sd-confirmed-svc {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11.5px !important;
+                color: #888 !important;
+            }
+
+            .sd-confirmed-price {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 12.5px !important;
+                font-weight: 700 !important;
+                color: #FF4D8D !important;
+            }
+        }
+
+        .sd-confirmed-details {
+            width: 100%;
+            margin-top: 14px;
+            gap: 10px;
+
+            .k {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11.5px !important;
+                color: #999 !important;
+            }
+
+            .v {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11.5px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .sd-confirmed-note {
+            width: 100%;
+            margin-top: 18px;
+            padding: 12px;
+            background: rgba(255, 77, 141, 0.06);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10.5px;
+            color: #c04070;
+            line-height: 1.5;
+        }
+
+        .sd-confirmed-btn {
+            width: 100%;
+            margin-top: 12px;
+            text-align: center;
+            padding: 14px;
+            border-radius: 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #666;
+            border: 1.5px solid #eee;
+            cursor: pointer;
+
+            &.primary {
+                background: linear-gradient(135deg, #FF4D8D, #FF85B3);
+                color: #fff;
+                border: none;
+                box-shadow: 0 6px 16px rgba(255, 77, 141, 0.25);
+            }
+        }
+    }
+
+    /* ═══ BARCHA SHARHLAR VARAG'I ═══ */
+    .sd-reviews-sheet {
+        max-height: 85vh;
+
+        .sd-full-review-item {
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+            .sd-review-avatar {
+                width: 36px;
+                height: 36px;
+                border-radius: 50%;
+                background-size: cover;
+                background-position: center;
+                background-color: #eee;
+                flex-shrink: 0;
+            }
+
+            .sd-review-name {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                color: #1a1a1a !important;
+            }
+
+            .sd-review-time {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10px !important;
+                color: #aaa !important;
+            }
+
+            .sd-review-text {
+                margin-top: 4px !important;
+                font-family: 'Inter', sans-serif !important;
+                font-size: 10.5px !important;
+                color: #555 !important;
+                line-height: 1.5 !important;
+            }
+
+            .sd-review-suggest {
+                margin-top: 10px;
+                margin-left: 48px;
+                padding: 8px 12px;
+                background: rgba(255, 77, 141, 0.06);
+                border-radius: 10px;
+
+                .sd-review-suggest-text {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 10.5px !important;
+                    color: #888 !important;
+
+                    b {
+                        color: #1a1a1a;
+                    }
+                }
+
+                .sd-review-suggest-btn {
+                    flex-shrink: 0;
+                    background: #FF4D8D;
+                    color: #fff;
+                    font-family: 'Inter', sans-serif;
+                    font-size: 10.5px;
+                    font-weight: 700;
+                    padding: 6px 12px;
+                    border-radius: 8px;
+                }
+            }
+        }
+    }
+
+    /* ═══ RATE & REVIEW TAKLIF KARTASI ═══ */
+    .sd-rate-prompt {
+        margin-top: 14px;
+        padding: 12px 14px;
+        background: linear-gradient(135deg, rgba(255, 184, 0, 0.08), rgba(255, 77, 141, 0.06));
+        border: 1px solid rgba(255, 184, 0, 0.25);
+        border-radius: 14px;
+        cursor: pointer;
+
+        .sd-rate-prompt-title {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 12.5px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+        }
+
+        .sd-rate-prompt-desc {
+            margin-top: 2px !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 10.5px !important;
+            color: #888 !important;
+        }
+    }
+
+    /* ═══ RATE FORMASI VARAG'I ═══ */
+    .sd-rate-sheet {
+        .sd-rate-salon-name {
+            font-family: 'Inter', sans-serif !important;
+            font-size: 14px !important;
+            font-weight: 800 !important;
+            color: #1a1a1a !important;
+            margin-bottom: 16px !important;
+        }
+
+        .sd-rate-stars {
+            margin-bottom: 16px;
+        }
+
+        .sd-rate-textarea {
+            width: 100%;
+            border: 1.5px solid #eee;
+            border-radius: 14px;
+            padding: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #333;
+            resize: none;
+            outline: none;
+
+            &:focus {
+                border-color: #FF4D8D;
+            }
+
+            &::placeholder {
+                color: #bbb;
+            }
+        }
+    }
+
+    /* ═══ EXPLORE MENYUSI ═══ */
+    .sd-explore-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: flex-end;
+    }
+
+    .sd-explore-sheet {
+        width: 100%;
+        background: #fff;
+        border-radius: 24px 24px 0 0;
+        padding: 20px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+
+        .sd-explore-head {
+            margin-bottom: 16px;
+
+            .sd-explore-title {
+                font-family: 'Inter', sans-serif !important;
+                font-size: 16px !important;
+                font-weight: 800 !important;
+                color: #1a1a1a !important;
+            }
+        }
+
+        .sd-explore-grid {
+            .sd-explore-item {
+                width: calc(50% - 6px);
+                cursor: pointer;
+
+                .sd-explore-icon {
+                    width: 56px;
+                    height: 56px;
+                    border-radius: 16px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .sd-explore-label {
+                    font-family: 'Inter', sans-serif !important;
+                    font-size: 12px !important;
+                    font-weight: 700 !important;
+                    color: #333 !important;
+                }
+            }
+        }
+    }
+}

@@ -3,6 +3,8 @@ import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
+import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileServiceDetail from '../../libs/components/service/MobileServiceDetail';
 import {
     Stack,
     Box,
@@ -62,7 +64,7 @@ const formatRating = (n?: number): string => {
     return n.toFixed(1);
 };
 
-const imgUrl = (raw?: string, fallback = '/img/banner/default.jpg'): string => {
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
     if (!raw) return fallback;
     return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
@@ -105,6 +107,7 @@ const ServiceDetail: NextPage = () => {
     const { t } = useTranslation('common');
     const user = useReactiveVar(userVar);
     const serviceId = router.query.id as string;
+    const device = useDeviceDetect();
 
     const [service, setService] = useState<any>(null);
     const [salon, setSalon] = useState<any>(null);
@@ -113,6 +116,7 @@ const ServiceDetail: NextPage = () => {
     const [commentInquiry, setCommentInquiry] = useState<any>({ page: 1, limit: 4 });
     const [insertCommentData, setInsertCommentData] = useState<any>({ commentContent: '' });
     const [showWriteReview, setShowWriteReview] = useState<boolean>(false);
+    const [canWriteReview, setCanWriteReview] = useState<boolean>(false);
 
     // Rasm: Before/After toggle
     const [imgMode, setImgMode] = useState<'before' | 'after'>('before');
@@ -181,6 +185,14 @@ const ServiceDetail: NextPage = () => {
                 )
                 .map((b: any) => b.bookingTime);
             setBookedSlots(slots);
+
+            // ⚠️ YANGI — avval "Write a Review" tugmasi HAR DOIM ko'rinardi,
+            // faqat SUBMIT bosilgach "Not Allowed Request!" xatosi chiqardi.
+            // Endi COMPLETED bron bor-yo'qligi OLDINDAN tekshiriladi.
+            const hasCompleted = list.some(
+                (b: any) => b.serviceId === serviceId && b.bookingStatus === BookingStatus.COMPLETED,
+            );
+            setCanWriteReview(hasCompleted);
         },
     });
 
@@ -211,7 +223,11 @@ const ServiceDetail: NextPage = () => {
         try {
             if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
             await likeTargetService({ variables: { input: serviceId } });
-            await serviceRefetch({ input: serviceId });
+            // ⚠️ TUZATILDI: avval refetch natijasi hech qayerga
+            // saqlanmasdi, shuning uchun `service` holati (va demak
+            // yurakcha) yangilanmasdi
+            const result = await serviceRefetch({ input: serviceId });
+            if (result?.data?.getService) setService(result.data.getService);
             await sweetTopSmallSuccessAlert('success', 800);
         } catch (err: any) {
             sweetMixinErrorAlert(err.message).then();
@@ -279,7 +295,11 @@ const ServiceDetail: NextPage = () => {
             });
             setInsertCommentData({ commentContent: '' });
             setShowWriteReview(false);
-            await commentsRefetch();
+            // ⚠️ TUZATILDI: xuddi shu sabab — refetch natijasi saqlanmasdi
+            const commentResult = await commentsRefetch();
+            if (commentResult?.data?.getComments) {
+                setComments(commentResult.data.getComments.list ?? []);
+            }
             await sweetTopSmallSuccessAlert('Review submitted!', 1200);
         } catch (err: any) {
             sweetMixinErrorAlert(err.message).then();
@@ -289,6 +309,11 @@ const ServiceDetail: NextPage = () => {
     const commentPageHandler = useCallback((_e: any, page: number) => {
         setCommentInquiry((prev: any) => ({ ...prev, page }));
     }, []);
+
+    // ⚠️ TUZATILDI: mobil return BARCHA hook'lardan keyin bo'lishi shart
+    if (device === 'mobile') {
+        return <MobileServiceDetail serviceId={serviceId} />;
+    }
 
     if (!service) {
         return (
@@ -467,27 +492,37 @@ const ServiceDetail: NextPage = () => {
                                 </Stack>
                             </Stack>
 
-                            {/* Write a Review */}
-                            <Button className="write-review-btn" onClick={() => setShowWriteReview(!showWriteReview)}>
-                                {t('Write a Review')}
-                            </Button>
-
-                            {showWriteReview && (
-                                <Stack className="write-review-box">
-                                    <textarea
-                                        className="review-textarea"
-                                        placeholder={t('Share your experience...')}
-                                        value={insertCommentData.commentContent}
-                                        onChange={(e) => setInsertCommentData({ commentContent: e.target.value })}
-                                    />
-                                    <Button
-                                        className="submit-review-btn"
-                                        disabled={!insertCommentData.commentContent}
-                                        onClick={createCommentHandler}
-                                    >
-                                        {t('Submit Review')}
+                            {/* Write a Review — endi faqat COMPLETED bron bo'lsa ko'rinadi */}
+                            {canWriteReview ? (
+                                <>
+                                    <Button className="write-review-btn" onClick={() => setShowWriteReview(!showWriteReview)}>
+                                        {t('Write a Review')}
                                     </Button>
-                                </Stack>
+
+                                    {showWriteReview && (
+                                        <Stack className="write-review-box">
+                                            <textarea
+                                                className="review-textarea"
+                                                placeholder={t('Share your experience...')}
+                                                value={insertCommentData.commentContent}
+                                                onChange={(e) => setInsertCommentData({ commentContent: e.target.value })}
+                                            />
+                                            <Button
+                                                className="submit-review-btn"
+                                                disabled={!insertCommentData.commentContent}
+                                                onClick={createCommentHandler}
+                                            >
+                                                {t('Submit Review')}
+                                            </Button>
+                                        </Stack>
+                                    )}
+                                </>
+                            ) : (
+                                user._id && (
+                                    <Typography sx={{ fontSize: 12.5, color: '#bbb', fontFamily: 'Poppins, sans-serif', mt: 1 }}>
+                                        {t('Complete a booking for this service to write a review')}
+                                    </Typography>
+                                )
                             )}
 
                             {/* Review cardlar (2 ustun) */}

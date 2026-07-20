@@ -31,7 +31,7 @@ const formatRating = (n?: number): string => {
 	return n.toFixed(1);
 };
 
-const imgUrl = (raw?: string, fallback = '/img/banner/default.jpg'): string => {
+const imgUrl = (raw?: string, fallback = '/img/banner/hero.jpg'): string => {
 	if (!raw) return fallback;
 	return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };

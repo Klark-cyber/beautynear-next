@@ -1,29 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NextPage } from 'next';
-import { useTranslation } from 'next-i18next';
-import { Box, Stack, Typography, Chip, Select, MenuItem, Pagination as MuiPagination } from '@mui/material';
+import withAdminLayout from '../../../libs/components/layout/LayoutAdmin';
+import { Box, Stack, Typography, Chip, Select, MenuItem, TablePagination } from '@mui/material';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import { useMutation, useQuery } from '@apollo/client';
 import moment from 'moment';
-import { GET_AGENT_BOOKINGS, GET_AGENT_SALONS } from '../../../apollo/user/query';
-import { UPDATE_BOOKING_BY_AGENT } from '../../../apollo/user/mutation';
-import EmptyList from '../../../libs/components/common/Emptylist';
+import { GET_ALL_BOOKINGS_BY_ADMIN } from '../../../apollo/admin/query';
+import { UPDATE_BOOKING_BY_ADMIN } from '../../../apollo/admin/mutation';
 import { Booking } from '../../../libs/types/booking/booking';
-import { AgentBookingsInquiry } from '../../../libs/types/booking/booking.input';
-import { Salon } from '../../../libs/types/salon/salon';
 import { BookingStatus } from '../../../libs/enums/booking.enum';
 import { T } from '../../../libs/types/common';
 import { REACT_APP_API_URL } from '../../../libs/config';
-import { sweetConfirmAlert, sweetErrorHandling, sweetMixinSuccessAlert } from '../../../libs/sweetAlert';
+import { sweetConfirmAlert, sweetErrorHandling } from '../../../libs/sweetAlert';
 
 /* ─── Helpers ─────────────────────────────────────────────────────────── */
 
-const formatPrice = (n?: number): string => {
-    if (n === undefined || n === null) return '0';
-    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
+const formatPrice = (n?: number): string => (n ?? 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 const imgUrl = (raw?: string, fallback = '/img/profile/defaultUser.svg'): string => {
     if (!raw) return fallback;
@@ -38,258 +31,172 @@ const STATUS_TABS = [
     { label: 'Cancelled', value: BookingStatus.CANCELLED },
 ];
 
-const STATUS_COLOR: Record<string, string> = {
-    PENDING: 'paused',
-    CONFIRMED: 'active',
-    COMPLETED: 'active',
-    CANCELLED: 'deleted',
+const STATUS_CHIP: Record<string, string> = {
+    PENDING: 'status-paused',
+    CONFIRMED: 'status-active',
+    COMPLETED: 'status-active',
+    CANCELLED: 'status-deleted',
 };
 
-// Umumiy dropdown'da CANCELLED yo'q — bekor qilish alohida, maxsus tugma orqali
-const CHANGEABLE_STATUSES = [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.COMPLETED];
+const CHANGEABLE_STATUSES = [BookingStatus.PENDING, BookingStatus.CONFIRMED, BookingStatus.COMPLETED, BookingStatus.CANCELLED];
 
 const limit = 10;
 
 /* ─── Component ───────────────────────────────────────────────────────────── */
 
-const AgentBookings: NextPage = ({
-    initialInput = { page: 1, limit, search: {} },
-    ...props
-}: any) => {
-    const { t } = useTranslation('common');
+// ⚠️ MUHIM: bu sahifa avval AGENT'ning o'z GET_AGENT_BOOKINGS so'rovidan
+// FOYDALANAR EDI (hatto ichki nomi ham "AgentBookings" edi, withAdminLayout
+// ham yo'q edi) — shuning uchun Admin uchun HECH QANDAY ma'lumot
+// qaytmasdi (chunki bu so'rov faqat joriy login qilgan AGENT'ning o'z
+// salonlariga tegishli bronlarni qaytaradi). Endi to'g'ri
+// GET_ALL_BOOKINGS_BY_ADMIN ishlatiladi va admin CSS'ga ulanadi.
 
-    const [searchFilter, setSearchFilter] = useState<AgentBookingsInquiry>(initialInput);
+const AdminBookings: NextPage = () => {
+    const [activeStatus, setActiveStatus] = useState<BookingStatus | undefined>(undefined);
     const [bookings, setBookings] = useState<Booking[]>([]);
-    const [total, setTotal] = useState<number>(0);
-    const [salons, setSalons] = useState<Salon[]>([]);
-    const [salonFilter, setSalonFilter] = useState<string>('ALL');
+    const [total, setTotal] = useState(0);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(limit);
 
     /** APOLLO REQUESTS **/
-    const [updateBookingByAgent] = useMutation(UPDATE_BOOKING_BY_AGENT);
+    const [updateBookingByAdmin] = useMutation(UPDATE_BOOKING_BY_ADMIN);
 
-    // ⚠️ TUZATILDI: avval faqat ACTIVE salonlar olinar edi — agar biror
-    // bron Paused/Inactive salonga tegishli bo'lsa, uning nomi "-" bo'lib
-    // ko'rinar edi. Endi statusdan qat'iy nazar BARCHA salonlar olinadi.
-    useQuery(GET_AGENT_SALONS, {
-        fetchPolicy: 'network-only',
-        variables: { input: { page: 1, limit: 50, search: {} } },
-        onCompleted: (data: T) => setSalons(data?.getAgentSalons?.list ?? []),
-    });
+    const buildSearch = (): T => {
+        const search: T = {};
+        if (activeStatus) search.bookingStatus = activeStatus;
+        return search;
+    };
 
-    const { refetch } = useQuery(GET_AGENT_BOOKINGS, {
+    const { refetch } = useQuery(GET_ALL_BOOKINGS_BY_ADMIN, {
         fetchPolicy: 'network-only',
-        variables: { input: searchFilter },
-        notifyOnNetworkStatusChange: true,
+        variables: { input: { page: page + 1, limit: rowsPerPage, sort: 'createdAt', direction: 'DESC', search: buildSearch() } },
         onCompleted: (data: T) => {
-            setBookings(data?.getAgentBookings?.list ?? []);
-            setTotal(data?.getAgentBookings?.metaCounter?.[0]?.total ?? 0);
+            setBookings(data?.getAllBookingsByAdmin?.list ?? []);
+            setTotal(data?.getAllBookingsByAdmin?.metaCounter?.[0]?.total ?? 0);
         },
     });
 
+    useEffect(() => {
+        refetch({ input: { page: page + 1, limit: rowsPerPage, sort: 'createdAt', direction: 'DESC', search: buildSearch() } }).then(({ data }) => {
+            setBookings(data?.getAllBookingsByAdmin?.list ?? []);
+            setTotal(data?.getAllBookingsByAdmin?.metaCounter?.[0]?.total ?? 0);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeStatus, page, rowsPerPage]);
+
     /** HANDLERS **/
-    const tabChangeHandler = (status: BookingStatus | undefined) => {
-        const search: T = { ...searchFilter.search };
-        if (status) search.bookingStatus = status;
-        else delete search.bookingStatus;
-        setSearchFilter({ ...searchFilter, page: 1, search });
-    };
-
-    const salonChangeHandler = (salonId: string) => {
-        setSalonFilter(salonId);
-        const search: T = { ...searchFilter.search };
-        if (salonId !== 'ALL') search.salonId = salonId;
-        else delete search.salonId;
-        setSearchFilter({ ...searchFilter, page: 1, search });
-    };
-
-    const paginationHandler = (_e: any, value: number) => {
-        setSearchFilter({ ...searchFilter, page: value });
-    };
-
     const updateStatusHandler = async (bookingId: string, status: BookingStatus) => {
         try {
             if (await sweetConfirmAlert(`Are you sure to change status to ${status}?`)) {
-                await updateBookingByAgent({ variables: { input: { _id: bookingId, bookingStatus: status } } });
-                await refetch({ input: searchFilter });
+                await updateBookingByAdmin({ variables: { input: { _id: bookingId, bookingStatus: status } } });
+                await refetch({ input: { page: page + 1, limit: rowsPerPage, sort: 'createdAt', direction: 'DESC', search: buildSearch() } });
             }
         } catch (err: any) {
-            await sweetErrorHandling(err);
+            sweetErrorHandling(err).then();
         }
     };
-
-    // ⚠️ A-variant: haqiqiy avtomatik pul qaytarish (TossPayments) yo'q —
-    // faqat status CANCELLED'ga o'zgaradi, depozit haqida statik xabar
-    // ko'rsatiladi. Agar kelajakda haqiqiy refund kerak bo'lsa, backend'da
-    // alohida "cancelBookingByAgent" mutation kerak bo'ladi.
-    const cancelHandler = async (bookingId: string) => {
-        const confirmed = await sweetConfirmAlert(
-            'Are you sure to cancel this booking? The ₩10,000 deposit will be refunded to the customer within 3-5 business days.',
-        );
-        if (!confirmed) return;
-
-        // ⚠️ A-variant (siz tasdiqlagan): backend'ning haqiqiy TossPayments
-        // refund urinishi muvaffaqiyatsiz bo'lsa ham (test-kalitlar bilan),
-        // xatoni FOYDALANUVCHIGA ko'rsatmaymiz — jim yutib, har doim
-        // "muvaffaqiyatli" xabarini ko'rsatamiz.
-        try {
-            await updateBookingByAgent({ variables: { input: { _id: bookingId, bookingStatus: BookingStatus.CANCELLED } } });
-        } catch (err: any) {
-            console.log('Refund backend error (suppressed):', err);
-        }
-        await refetch({ input: searchFilter });
-        await sweetMixinSuccessAlert('Payment refunded successfully!');
-    };
-
-    const activeStatus = searchFilter.search.bookingStatus;
 
     return (
-        <Box component="div" className="mypage-content">
-            <Typography className="content-title">{t('Booking Requests')}</Typography>
-            <Typography className="content-subtitle">{t('Manage bookings made at your salons')}</Typography>
+        <Box component="div" className="admin-content">
+            <Typography className="admin-page-title">Booking Management</Typography>
+            <Typography className="admin-page-subtitle">View and manage all bookings across the platform</Typography>
 
-            {/* Status tablar */}
-            <Stack direction="row" gap={1.5} className="filter-tabs">
+            <Stack direction="row" gap={1.5} className="admin-filter-tabs">
                 {STATUS_TABS.map((tab) => (
                     <Box
                         key={tab.label}
                         component="div"
-                        className={`filter-tab ${activeStatus === tab.value ? 'active' : ''}`}
-                        onClick={() => tabChangeHandler(tab.value)}
+                        className={`admin-filter-tab ${activeStatus === tab.value ? 'active' : ''}`}
+                        onClick={() => setActiveStatus(tab.value)}
                     >
-                        {t(tab.label)}
+                        {tab.label}
                     </Box>
                 ))}
             </Stack>
 
-            {/* Salon filtri */}
-            <Stack direction="row" gap={2} sx={{ mb: 2.5 }}>
-                <Select
-                    value={salonFilter}
-                    onChange={(e) => salonChangeHandler(e.target.value)}
-                    size="small"
-                    sx={{
-                        minWidth: 220, height: 44, borderRadius: 3, background: '#fff',
-                        fontFamily: 'Inter, sans-serif', fontSize: 14,
-                        '& fieldset': { borderColor: 'rgba(0,0,0,0.1)' },
-                    }}
-                >
-                    <MenuItem value="ALL">{t('All Salons')}</MenuItem>
-                    {salons.map((s) => (
-                        <MenuItem key={s._id} value={s._id}>{s.salonTitle}</MenuItem>
-                    ))}
-                </Select>
-            </Stack>
+            <Box component="div" className="admin-table-frame">
+                <Stack direction="row" alignItems="center" className="admin-table-head">
+                    <Typography className="th" sx={{ width: '22%' }}>CUSTOMER</Typography>
+                    <Typography className="th" sx={{ width: '22%' }}>SALON / SERVICE</Typography>
+                    <Typography className="th" sx={{ width: '18%' }}>DATE / TIME</Typography>
+                    <Typography className="th" sx={{ width: '15%' }}>STATUS</Typography>
+                    <Typography className="th" sx={{ width: '13%' }}>PRICE</Typography>
+                </Stack>
 
-            {/* Bronlar ro'yxati */}
-            {bookings.length === 0 ? (
-                <Box component="div" className="follow-page-frame">
-                    <EmptyList emoji="📅" title={t('No bookings found')} desc={t('Bookings made at your salons will appear here')} />
-                </Box>
-            ) : (
-                <Box component="div" className="follow-page-frame">
-                    <Stack className="booking-list">
-                        {bookings.map((booking) => {
-                            const salon = salons.find((s) => String(s._id) === String(booking.salonId));
-                            return (
-                                <Stack key={booking._id} direction="row" alignItems="center" className="booking-row">
-                                    {/* Mijoz */}
-                                    <Stack direction="row" alignItems="center" gap={1.25} sx={{ flex: '0 0 220px', minWidth: 0 }}>
-                                        <Box
-                                            component="div"
-                                            sx={{
-                                                width: 44, height: 44, borderRadius: '50%', flexShrink: 0,
-                                                backgroundImage: `url(${imgUrl(booking.memberData?.memberImage)})`,
-                                                backgroundSize: 'cover', backgroundPosition: 'center',
-                                            }}
-                                        />
-                                        <Box component="div" sx={{ minWidth: 0 }}>
-                                            <Typography className="booking-salon-name" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                                {booking.memberData?.memberNick}
-                                            </Typography>
-                                            <Typography className="booking-service">{booking.memberData?.memberPhone}</Typography>
-                                        </Box>
-                                    </Stack>
-
-                                    {/* Salon / Xizmat */}
-                                    <Stack className="booking-info" sx={{ flex: '0 0 220px', minWidth: 0 }}>
-                                        <Typography className="booking-salon-name" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {salon?.salonTitle ?? '-'}
-                                        </Typography>
-                                        <Typography className="booking-service">{booking.serviceData?.serviceTitle}</Typography>
-                                    </Stack>
-
-                                    {/* Sana / vaqt */}
-                                    <Stack className="booking-datetime-col">
-                                        <Stack direction="row" alignItems="center" gap={0.75}>
-                                            <CalendarMonthOutlinedIcon sx={{ fontSize: 16, color: '#FF4D8D' }} />
-                                            <Typography className="booking-date">{moment(booking.bookingDate).format('MMM DD, YYYY')}</Typography>
-                                        </Stack>
-                                        <Stack direction="row" alignItems="center" gap={0.75} sx={{ mt: 0.75 }}>
-                                            <AccessTimeIcon sx={{ fontSize: 16, color: '#999' }} />
-                                            <Typography className="booking-time">{booking.bookingTime}</Typography>
-                                        </Stack>
-                                    </Stack>
-
-                                    {/* Status */}
-                                    <Box component="div" className="booking-status-col">
-                                        <Select
-                                            value={booking.bookingStatus}
-                                            disabled={booking.bookingStatus === BookingStatus.CANCELLED}
-                                            onChange={(e) => updateStatusHandler(booking._id, e.target.value as BookingStatus)}
-                                            className={`status-select ${STATUS_COLOR[booking.bookingStatus]}`}
-                                            size="small"
-                                        >
-                                            {CHANGEABLE_STATUSES.map((s) => (
-                                                <MenuItem key={s} value={s}>{t(s)}</MenuItem>
-                                            ))}
-                                            {booking.bookingStatus === BookingStatus.CANCELLED && (
-                                                <MenuItem value={BookingStatus.CANCELLED}>{t('Cancelled')}</MenuItem>
-                                            )}
-                                        </Select>
-                                    </Box>
-
-                                    {/* Narx + Cancel */}
-                                    <Stack alignItems="flex-end" className="booking-price-col">
-                                        <Typography className="booking-price">₩{formatPrice(booking.totalAmount)}</Typography>
-                                        {booking.bookingStatus !== BookingStatus.CANCELLED && booking.bookingStatus !== BookingStatus.COMPLETED && (
-                                            <Chip
-                                                icon={<CancelOutlinedIcon sx={{ fontSize: 14 }} />}
-                                                label={t('Cancel')}
-                                                size="small"
-                                                onClick={() => cancelHandler(booking._id)}
-                                                sx={{
-                                                    mt: 0.5, cursor: 'pointer',
-                                                    background: 'rgba(255,77,106,0.1)', color: '#FF4D6A',
-                                                    fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 11,
-                                                    '&:hover': { background: 'rgba(255,77,106,0.18)' },
-                                                }}
-                                            />
-                                        )}
-                                    </Stack>
-                                </Stack>
-                            );
-                        })}
+                {bookings.length === 0 && (
+                    <Stack alignItems="center" className="admin-no-data">
+                        <Typography>No bookings found</Typography>
                     </Stack>
+                )}
 
-                    {bookings.length !== 0 && (
-                        <Stack alignItems="center" sx={{ mt: 4 }}>
-                            <MuiPagination
-                                page={searchFilter.page}
-                                count={Math.ceil(total / searchFilter.limit) || 1}
-                                onChange={paginationHandler}
-                                shape="circular"
-                                sx={{ '& .MuiPaginationItem-root.Mui-selected': { background: '#FF4D8D', color: '#fff' } }}
+                {bookings.map((booking: any) => (
+                    <Stack key={booking._id} direction="row" alignItems="center" className="admin-table-row">
+                        <Stack direction="row" alignItems="center" gap={1.25} sx={{ width: '22%', minWidth: 0 }}>
+                            <Box
+                                component="div"
+                                sx={{
+                                    width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+                                    backgroundImage: `url(${imgUrl(booking.memberData?.memberImage)})`,
+                                    backgroundSize: 'cover', backgroundPosition: 'center',
+                                }}
                             />
+                            <Box sx={{ minWidth: 0 }}>
+                                <Typography className="member-nick" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                    {booking.memberData?.memberNick}
+                                </Typography>
+                                <Typography className="member-fullname">{booking.memberData?.memberPhone}</Typography>
+                            </Box>
                         </Stack>
-                    )}
-                </Box>
-            )}
+
+                        <Box sx={{ width: '22%', minWidth: 0 }}>
+                            <Typography className="td" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {booking.salonData?.salonTitle ?? '-'}
+                            </Typography>
+                            <Typography className="member-fullname">{booking.serviceData?.serviceTitle}</Typography>
+                        </Box>
+
+                        <Box sx={{ width: '18%' }}>
+                            <Stack direction="row" alignItems="center" gap={0.5}>
+                                <CalendarMonthOutlinedIcon sx={{ fontSize: 14, color: '#FF4D8D' }} />
+                                <Typography className="td" sx={{ fontSize: '13px !important' }}>{moment(booking.bookingDate).format('MMM DD, YYYY')}</Typography>
+                            </Stack>
+                            <Stack direction="row" alignItems="center" gap={0.5} sx={{ mt: 0.5 }}>
+                                <AccessTimeIcon sx={{ fontSize: 14, color: '#999' }} />
+                                <Typography className="td" sx={{ fontSize: '13px !important' }}>{booking.bookingTime}</Typography>
+                            </Stack>
+                        </Box>
+
+                        <Box sx={{ width: '15%' }}>
+                            <Select
+                                value={booking.bookingStatus}
+                                onChange={(e) => updateStatusHandler(booking._id, e.target.value as BookingStatus)}
+                                size="small"
+                                sx={{ minWidth: 130, height: 36, borderRadius: 2, fontFamily: 'Inter, sans-serif', fontSize: 13 }}
+                            >
+                                {CHANGEABLE_STATUSES.map((s) => (
+                                    <MenuItem key={s} value={s}>{s}</MenuItem>
+                                ))}
+                            </Select>
+                        </Box>
+
+                        <Box sx={{ width: '13%' }}>
+                            <Typography className="td" sx={{ fontWeight: 700, color: '#FF4D8D !important' }}>₩{formatPrice(booking.totalAmount)}</Typography>
+                        </Box>
+                    </Stack>
+                ))}
+
+                <TablePagination
+                    rowsPerPageOptions={[10, 20, 40]}
+                    component="div"
+                    count={total}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={(_, newPage) => setPage(newPage)}
+                    onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+                />
+            </Box>
         </Box>
     );
 };
 
-AgentBookings.defaultProps = {
-    initialInput: { page: 1, limit, search: {} },
-};
-
-export default AgentBookings;
+export default withAdminLayout(AdminBookings);

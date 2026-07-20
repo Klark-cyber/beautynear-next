@@ -85,7 +85,22 @@ function createApolloClient() {
 	return new ApolloClient({
 		ssrMode: typeof window === 'undefined',
 		link: createIsomorphicLink(),
-		cache: new InMemoryCache(),
+		// ⚠️ YANGI — avval hech qanday typePolicies yo'q edi. Turli
+		// so'rovlar BIR XIL Member/Salon/Service obyektini TURLI
+		// maydonlar to'plami bilan qaytarganda (masalan bir joyda
+		// meFollowed bor, boshqasida yo'q), Apollo standart birlashtirish
+		// qoidasi "Cannot convert object to primitive value" xatosiga
+		// olib kelardi. `merge: true` — maydonlarni majburiy bir xil
+		// deb talab qilmasdan, xavfsiz birlashtiradi.
+		cache: new InMemoryCache({
+			typePolicies: {
+				Member: { merge: true },
+				Salon: { merge: true },
+				Service: { merge: true },
+				BoardArticle: { merge: true },
+				Notification: { merge: true },
+			},
+		}),
 		resolvers: {},
 	});
 }

@@ -27,6 +27,7 @@ import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import moment from 'moment';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
+import MobileCS from '../../libs/components/cs/MobileCS';
 import EmptyList from '../../libs/components/common/Emptylist';
 import { GET_FAQS, GET_NOTICES, GET_MY_INQUIRIES } from '../../apollo/user/query';
 import { CREATE_INQUIRY } from '../../apollo/user/mutation';
@@ -144,7 +145,7 @@ const CsPage: NextPage = () => {
 	};
 
 	if (device === 'mobile') {
-		return <h1>CS PAGE MOBILE</h1>;
+		return <MobileCS />;
 	}
 
 	return (
