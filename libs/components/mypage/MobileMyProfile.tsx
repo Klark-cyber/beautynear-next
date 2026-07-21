@@ -57,7 +57,7 @@ const MobileMyProfile = () => {
 	// holat so'raladi va userVar shunga moslab yangilanadi.
 	useQuery(GET_MEMBER, {
 		fetchPolicy: 'network-only',
-		variables: { memberId: user?._id },
+		variables: { input: user?._id },
 		skip: !user?._id,
 		onCompleted: (data: any) => {
 			const fresh = data?.getMember;

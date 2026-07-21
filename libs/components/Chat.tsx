@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
 	Stack, Box, Avatar, Typography, IconButton,
 	TextField,
@@ -12,24 +12,18 @@ import { REACT_APP_API_URL } from '../config';
 import { useTranslation } from 'next-i18next';
 import ScrollableFeed from 'react-scrollable-feed';
 import moment from 'moment';
-import { getJwtToken } from '../auth';
 import { useChatContext } from '../context/ChatContext';
+import useDeviceDetect from '../hooks/useDeviceDetect';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 
-interface Message {
-	_id: string;
-	senderId: string;
-	receiverId: string;
-	text: string;
-	createdAt: string;
-}
-
-// ⚠️ MUHIM: bu — avval UMUMIY (hamma ko'radigan) ochiq chat edi. Endi
-// ChatContext orqali BELGILANGAN bitta odam bilan SHAXSIY (1-ga-1)
-// xabarlashish. Oyna faqat "Message" tugmasi bosilganda (Salon/Specialist
-// Detail sahifasida) ochiladi — hech kim tanlanmagan bo'lsa hech narsa
-// ko'rsatilmaydi.
-const CHAT_WS_URL = REACT_APP_API_URL.replace(/^http/, 'ws').replace(/:\d+$/, ':3008');
-
+// ⚠️ MUHIM: WebSocket ulanishi, xabarlar ro'yxati va yuborish mantig'i
+// endi bu yerda EMAS — ChatContext.tsx'da (butun sessiya uchun YAGONA,
+// doimiy ulanish sifatida). Bu komponent endi FAQAT UI: kontekstdan
+// o'qiydi va foydalanuvchi harakatlarini kontekstga uzatadi. Shu tufayli
+// bu komponent har safar sahifa almashtirilganda qayta mount bo'lsa ham
+// (LayoutBasic/LayoutFull/LayoutHome ichida joylashgani uchun), bu endi
+// muammo emas — chunki underlying WebSocket ulanishi ChatContext orqali
+// _app.tsx darajasida barqaror qoladi.
 const imgUrl = (raw?: string): string => {
 	if (!raw) return '/img/profile/defaultUser.svg';
 	return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
@@ -38,98 +32,181 @@ const imgUrl = (raw?: string): string => {
 const Chat = () => {
 	const { t } = useTranslation('common');
 	const user = useReactiveVar(userVar);
-	const { activeChat, isOpen, closeChat, setUnreadMessageCount } = useChatContext();
-	// ⚠️ YANGI — WebSocket 'onmessage' funksiyasi FAQAT BIR MARTA
-	// (komponent birinchi ulanganda) yaratiladi, shuning uchun ichidagi
-	// `activeChat` state qiymati O'SHA paytdagi holatda (odatda `null`)
-	// "muzlab qoladi" — bu ESKIRGAN CLOSURE muammosi. Shu sababli
-	// yuborilgan xabarlar hech qachon ekranga chiqmasdi. `useRef` esa
-	// har doim ENG SO'NGGI qiymatni saqlaydi, closure buzilmaydi.
-	const activeChatRef = useRef(activeChat);
-	useEffect(() => {
-		activeChatRef.current = activeChat;
-	}, [activeChat]);
+	const { activeChat, isOpen, closeChat, messages, sendMessage } = useChatContext();
+	const device = useDeviceDetect();
+	const isMobile = device === 'mobile';
 
 	const [message, setMessage] = useState('');
-	const [messages, setMessages] = useState<Message[]>([]);
-	const wsRef = useRef<WebSocket | null>(null);
-
-	/** WEBSOCKET ULANISH **/
-	useEffect(() => {
-		if (!user?._id) return;
-		const token = getJwtToken();
-		const ws = new WebSocket(`${CHAT_WS_URL}?token=${token}`);
-		wsRef.current = ws;
-
-		ws.onmessage = (event) => {
-			try {
-				const data = JSON.parse(event.data);
-
-				if (data.event === 'conversationHistory' && Array.isArray(data.data)) {
-					setMessages(data.data);
-				}
-
-				// ⚠️ YANGI — Chat oynasida xabar o'qilganda, Top.tsx'dagi Message
-				// ikonkasi ustidagi umumiy hisobni ham DARHOL kamaytiradi
-				// (avval bu ikkisi bir-biridan XABARSIZ edi)
-				if (data.event === 'notification_removed' && data.data?.notificationType === 'NEW_MESSAGE') {
-					setUnreadMessageCount((prev: number) => Math.max(0, prev - (data.data?.count ?? 1)));
-				}
-
-				if (data.event === 'message' && data.data) {
-					const incoming: Message = data.data;
-					setMessages((prev) => {
-						const currentChat = activeChatRef.current; // ⚠️ TUZATILDI: activeChat oʻrniga
-						const belongsToActiveChat =
-							currentChat &&
-							(incoming.senderId === currentChat.memberId || incoming.receiverId === currentChat.memberId);
-						if (!belongsToActiveChat) return prev;
-						if (prev.some((m) => m._id === incoming._id)) return prev;
-						return [...prev, incoming];
-					});
-				}
-			} catch (err) {
-				console.log('Chat message parse error:', err);
-			}
-		};
-
-		ws.onerror = (err) => console.log('Chat WebSocket error:', err);
-
-		return () => ws.close();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [user?._id]);
-
-	// Suhbat ochilganda (yoki almashtirilganda) — tarixni so'raymiz
-	useEffect(() => {
-		if (!activeChat || !isOpen) return;
-		setMessages([]);
-		const trySend = () => {
-			if (wsRef.current?.readyState === WebSocket.OPEN) {
-				wsRef.current.send(JSON.stringify({ event: 'getConversation', data: { withMemberId: activeChat.memberId } }));
-			} else {
-				setTimeout(trySend, 300);
-			}
-		};
-		trySend();
-	}, [activeChat, isOpen]);
 
 	/** HANDLERS **/
-	const sendMessage = useCallback(() => {
-		if (!message.trim() || !activeChat) return;
-		if (wsRef.current?.readyState !== WebSocket.OPEN) return;
-
-		wsRef.current.send(JSON.stringify({ event: 'message', data: { receiverId: activeChat.memberId, text: message.trim() } }));
+	const handleSend = () => {
+		if (!message.trim()) return;
+		sendMessage(message);
 		setMessage('');
-	}, [message, activeChat]);
+	};
 
 	const handleKeyDown = (e: React.KeyboardEvent) => {
 		if (e.key === 'Enter' && !e.shiftKey) {
 			e.preventDefault();
-			sendMessage();
+			handleSend();
 		}
 	};
 
 	if (!activeChat) return null;
+
+	// ⚠️ TUZATILDI: avval mobil va desktop uchun BITTA xil o'lcham (340×480px,
+	// pastki-o'ngga yopishgan) ishlatilardi. Mobilda bu ekran chetiga "tiqilib
+	// qolgan", pastdagi bottom-nav (Home/Explore/Favorites/My Page) bilan
+	// ustma-ust tushib matnlarni buzib ko'rsatadigan holatga olib kelardi.
+	// Endi mobilda chat butun ekranni qoplaydigan (fixed inset:0, zIndex juda
+	// baland) to'liq ekran rejimida ochiladi — orqasida hech narsa bosilmaydi,
+	// va "<" orqaga strelkasi bosilganda closeChat() chaqiriladi.
+	if (isMobile) {
+		return (
+			<Stack className="chatting chatting--mobile">
+				{/* Yopiq holatdagi kichik "bubble" tugma — pastki navbar (64px) ustiga chiqib ketmasligi uchun ko'tarilgan */}
+				<Box
+					component="div"
+					onClick={closeChat}
+					sx={{
+						position: 'fixed',
+						bottom: 88,
+						right: 20,
+						width: 56,
+						height: 56,
+						borderRadius: '50%',
+						background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
+						display: isOpen ? 'none' : 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						cursor: 'pointer',
+						boxShadow: '0 8px 28px rgba(255,77,141,0.5)',
+						border: '3px solid #fff',
+						zIndex: 1900,
+					}}
+				>
+					<ChatBubbleIcon sx={{ color: '#fff', fontSize: 26 }} />
+				</Box>
+
+				{isOpen && (
+					<Stack
+						className="chat-frame chat-frame--mobile open"
+						sx={{
+							position: 'fixed',
+							inset: 0,
+							width: '100%',
+							height: '100dvh',
+							zIndex: 2000,
+							background: '#fff',
+						}}
+					>
+						<Stack
+							direction="row"
+							alignItems="center"
+							gap={1.25}
+							sx={{
+								px: 1.5, py: 1.5,
+								pt: 'calc(env(safe-area-inset-top, 0px) + 12px)',
+								background: 'linear-gradient(135deg, #FF4D8D, #FF85B3)',
+								flexShrink: 0,
+							}}
+						>
+							<IconButton size="small" onClick={closeChat} sx={{ color: '#fff' }}>
+								<ArrowBackIosNewIcon sx={{ fontSize: 18 }} />
+							</IconButton>
+							<Avatar src={imgUrl(activeChat.image)} sx={{ width: 34, height: 34 }} />
+							<Typography sx={{ color: '#fff', fontWeight: 700, fontSize: 15, lineHeight: 1.3 }}>
+								{activeChat.nick}
+							</Typography>
+						</Stack>
+
+						<Box component="div" sx={{ flex: 1, minHeight: 0, position: 'relative', background: '#F9F9FB' }}>
+							<Box component="div" sx={{ position: 'absolute', inset: 0, overflowY: 'auto' }}>
+								<ScrollableFeed>
+									<Stack sx={{ p: 2, gap: 1.5 }}>
+										{messages.length === 0 && (
+											<Typography sx={{ textAlign: 'center', fontSize: 12, color: '#bbb', mt: 4 }}>
+												{t('Start the conversation!')}
+											</Typography>
+										)}
+										{messages.map((msg) => {
+											const isSent = msg.senderId === user?._id;
+											return (
+												<Stack key={msg._id} direction={isSent ? 'row-reverse' : 'row'} alignItems="flex-end" gap={1}>
+													<Avatar src={isSent ? imgUrl(user?.memberImage) : imgUrl(activeChat.image)} sx={{ width: 28, height: 28, flexShrink: 0 }} />
+													<Stack alignItems={isSent ? 'flex-end' : 'flex-start'} sx={{ maxWidth: '75%' }}>
+														<Box
+															component="div"
+															sx={{
+																px: 1.5, py: 1,
+																borderRadius: isSent ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+																background: isSent ? 'linear-gradient(135deg, #FF4D8D, #FF85B3)' : '#fff',
+																boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+																color: isSent ? '#fff' : '#333',
+																fontSize: 13, lineHeight: 1.5,
+															}}
+														>
+															{msg.text}
+														</Box>
+														<Typography sx={{ fontSize: 10, color: '#bbb', mt: 0.25, mx: 0.5 }}>
+															{moment(msg.createdAt).format('hh:mm A')}
+														</Typography>
+													</Stack>
+												</Stack>
+											);
+										})}
+									</Stack>
+								</ScrollableFeed>
+							</Box>
+						</Box>
+
+						<Stack
+							direction="row"
+							alignItems="center"
+							gap={1}
+							sx={{
+								px: 1.5, py: 1.25,
+								pb: 'calc(env(safe-area-inset-bottom, 0px) + 10px)',
+								borderTop: '1px solid rgba(0,0,0,0.06)',
+								background: '#fff',
+								flexShrink: 0,
+							}}
+						>
+							<TextField
+								fullWidth
+								size="small"
+								placeholder={t('Type a message...')}
+								value={message}
+								onChange={(e) => setMessage(e.target.value)}
+								onKeyDown={handleKeyDown}
+								multiline
+								maxRows={3}
+								sx={{
+									'& .MuiOutlinedInput-root': {
+										borderRadius: 3, fontSize: 13,
+										'& fieldset': { borderColor: 'rgba(0,0,0,0.1)' },
+										'&:hover fieldset': { borderColor: 'rgba(255,77,141,0.4)' },
+										'&.Mui-focused fieldset': { borderColor: '#FF4D8D' },
+									},
+								}}
+							/>
+							<IconButton
+								onClick={handleSend}
+								disabled={!message.trim()}
+								sx={{
+									flexShrink: 0, width: 36, height: 36,
+									background: message.trim() ? 'linear-gradient(135deg, #FF4D8D, #FF85B3)' : 'rgba(0,0,0,0.06)',
+									color: message.trim() ? '#fff' : '#bbb',
+								}}
+							>
+								<SendIcon sx={{ fontSize: 18 }} />
+							</IconButton>
+						</Stack>
+					</Stack>
+				)}
+			</Stack>
+		);
+	}
 
 	return (
 		<Stack className="chatting">
@@ -255,7 +332,7 @@ const Chat = () => {
 						}}
 					/>
 					<IconButton
-						onClick={sendMessage}
+						onClick={handleSend}
 						disabled={!message.trim()}
 						sx={{
 							flexShrink: 0, width: 36, height: 36,

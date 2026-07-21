@@ -4,11 +4,11 @@ export default function Document() {
 	return (
 		<Html lang="en">
 			<Head>
-				{/* ⚠️ TUZATILDI: bu teg umuman yo'q edi — shuning uchun
-				    mobil brauzerlar sahifani "desktop kengligida" (~980px)
-				    render qilib, keyin butunlay kichraytirib ko'rsatardi
-				    (matn mayda, hammasi siqilgan ko'rinishi shundan edi) */}
-				<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+				{/* ⚠️ TUZATILDI: viewport meta tegi bu yerdan (_document.tsx)
+				    olib tashlandi va _app.tsx'ga ko'chirildi — Next.js buni
+				    aniq tavsiya qiladi, chunki _document.js faqat serverda,
+				    bir marta render qilinadigan HTML "qobiq" bo'lib, sahifa
+				    o'tishlarida ishtirok etmaydi. */}
 
 				{/* ⚠️ TUZATILDI: sahifa doim OCH rejimda ko'rinishi uchun —
 				    ba'zi telefonlarning tizim darajasidagi "qorong'i rejim"

@@ -18,7 +18,6 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { userVar } from '../../../apollo/store';
 import { useReactiveVar } from '@apollo/client';
 import { getJwtToken, updateUserInfo } from '../../auth';
-import Chat from '../Chat';
 import { useTranslation } from 'next-i18next';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -89,8 +88,7 @@ const withLayoutMain = (Component: any) => {
 					    tashlandi — MobileHome endi o'zining header, hero va
 					    pastki navigatsiyasini o'z ichida to'liq boshqaradi. */}
 					<Component {...props} />
-					{/* ⚠️ YANGI — avval Chat faqat Desktop'da render qilinardi */}
-					{user?._id && <Chat />}
+					{/* ⚠️ TUZATILDI: <Chat/> endi _app.tsx darajasida BIR MARTA render qilinadi */}
 				</>
 			);
 		}
@@ -249,8 +247,6 @@ const withLayoutMain = (Component: any) => {
 					<Stack id="main">
 						<Component {...props} />
 					</Stack>
-
-					{user?._id && <Chat />}
 
 					<Stack id="footer">
 						<Footer />

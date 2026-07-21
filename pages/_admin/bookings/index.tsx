@@ -7,7 +7,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useMutation, useQuery } from '@apollo/client';
 import moment from 'moment';
 import { GET_ALL_BOOKINGS_BY_ADMIN } from '../../../apollo/admin/query';
-import { UPDATE_BOOKING_BY_ADMIN } from '../../../apollo/admin/mutation';
+import { UPDATE_BOOKING_BY_ADMIN, CANCEL_BOOKING_BY_ADMIN } from '../../../apollo/admin/mutation';
 import { Booking } from '../../../libs/types/booking/booking';
 import { BookingStatus } from '../../../libs/enums/booking.enum';
 import { T } from '../../../libs/types/common';
@@ -60,6 +60,7 @@ const AdminBookings: NextPage = () => {
 
     /** APOLLO REQUESTS **/
     const [updateBookingByAdmin] = useMutation(UPDATE_BOOKING_BY_ADMIN);
+    const [cancelBookingByAdmin] = useMutation(CANCEL_BOOKING_BY_ADMIN);
 
     const buildSearch = (): T => {
         const search: T = {};
@@ -88,7 +89,19 @@ const AdminBookings: NextPage = () => {
     const updateStatusHandler = async (bookingId: string, status: BookingStatus) => {
         try {
             if (await sweetConfirmAlert(`Are you sure to change status to ${status}?`)) {
-                await updateBookingByAdmin({ variables: { input: { _id: bookingId, bookingStatus: status } } });
+                // ⚠️ TUZATILDI: "Cancelled" holatiga o'tkazish avval oddiy
+                // updateBookingByAdmin orqali yuborilardi — bu esa faqat
+                // maydonni yangilaydi, TossPayments orqali zakladni QAYTARISH
+                // (refund) mantig'ini UMUMAN ishga tushirmaydi. Backend'da
+                // buning uchun to'g'ri, refund'ni ham bajaradigan
+                // cancelBookingByAdmin allaqachon mavjud edi — u shunchaki bu
+                // sahifadan hech qachon chaqirilmagan edi. Endi "Cancelled"
+                // tanlanganda aynan shu, refund'li mutatsiya ishlatiladi.
+                if (status === BookingStatus.CANCELLED) {
+                    await cancelBookingByAdmin({ variables: { input: bookingId } });
+                } else {
+                    await updateBookingByAdmin({ variables: { input: { _id: bookingId, bookingStatus: status } } });
+                }
                 await refetch({ input: { page: page + 1, limit: rowsPerPage, sort: 'createdAt', direction: 'DESC', search: buildSearch() } });
             }
         } catch (err: any) {

@@ -1,89 +1,47 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
 import { Box, Stack, Typography, IconButton, Badge } from '@mui/material';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import { useReactiveVar } from '@apollo/client';
 import moment from 'moment';
-import { userVar } from '../../../apollo/store';
 import { REACT_APP_API_URL } from '../../config';
-import { getJwtToken } from '../../auth';
-import { useChatContext } from '../../context/ChatContext';
+import { useChatContext, Conversation } from '../../context/ChatContext';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { sweetConfirmAlert } from '../../sweetAlert';
-
-const CHAT_WS_URL = REACT_APP_API_URL.replace(/^http/, 'ws').replace(/:\d+$/, ':3008');
 
 const imgUrl = (raw?: string): string => {
     if (!raw) return '/img/profile/defaultUser.svg';
     return raw.startsWith('http') ? raw : `${REACT_APP_API_URL}/${raw}`;
 };
 
-interface Conversation {
-    memberId: string;
-    nick: string;
-    image: string;
-    memberType: string;
-    lastText: string;
-    lastAt: string;
-    unreadCount: number;
-}
-
 // ⚠️ MUHIM: xabarlar endi MongoDB'da DOIMIY saqlanadi (Telegram kabi) —
 // server qayta ishga tushsa ham, foydalanuvchi qayta kirsa ham
 // suhbatlar YO'QOLMAYDI. Faqat ANIQ "o'chirish" tugmasi bosilsagina
 // o'chadi (xabar o'qilgani uchun emas).
-
+//
+// ⚠️ TUZATILDI: bu sahifa avval O'ZINING alohida WebSocket ulanishini
+// ochardi (ChatContext'nikidan MUSTAQIL) — /messages'ga har kirib-
+// chiqishda yana bir ulanish ochilib-yopilib turardi, bu esa backend'dagi
+// "kim onlayn" xaritasida beqarorlik keltirib chiqarardi. Endi suhbatlar
+// ro'yxati va o'chirish amali ChatContext'dagi YAGONA, doimiy ulanish
+// orqali ishlaydi.
 const MessagesPage = () => {
     const { t } = useTranslation('common');
     const router = useRouter();
     const device = useDeviceDetect();
-    const user = useReactiveVar(userVar);
-    const { openChatWith } = useChatContext();
-
-    const [conversations, setConversations] = useState<Conversation[]>([]);
-    const wsRef = useRef<WebSocket | null>(null);
-
-    useEffect(() => {
-        if (!user?._id) return;
-        const token = getJwtToken();
-        const ws = new WebSocket(`${CHAT_WS_URL}?token=${token}`);
-        wsRef.current = ws;
-
-        ws.onopen = () => {
-            ws.send(JSON.stringify({ event: 'getMyConversations', data: {} }));
-        };
-
-        ws.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.event === 'myConversations') {
-                    setConversations(data.data ?? []);
-                }
-                // ⚠️ YANGI — suhbat o'chirilgandan keyin ro'yxatdan darhol olib tashlanadi
-                if (data.event === 'conversationDeleted') {
-                    setConversations((prev) => prev.filter((c) => c.memberId !== data.data?.withMemberId));
-                }
-            } catch (err) {
-                console.log('Messages page ws error:', err);
-            }
-        };
-
-        return () => ws.close();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user?._id]);
+    const { openChatWith, conversations, deleteConversation: deleteConversationCtx, markConversationRead } = useChatContext();
 
     const openConversation = (conv: Conversation) => {
         openChatWith({ memberId: conv.memberId, nick: conv.nick, image: conv.image });
-        setConversations((prev) => prev.map((c) => (c.memberId === conv.memberId ? { ...c, unreadCount: 0 } : c)));
+        markConversationRead(conv.memberId);
     };
 
-    // ⚠️ YANGI — suhbatni butunlay o'chirish (foydalanuvchi ANIQ so'rasa)
+    // ⚠️ suhbatni butunlay o'chirish (foydalanuvchi ANIQ so'rasa)
     const deleteConversation = async (e: React.MouseEvent, conv: Conversation) => {
         e.stopPropagation();
         if (await sweetConfirmAlert(t('Delete this conversation? This cannot be undone.'))) {
-            wsRef.current?.send(JSON.stringify({ event: 'deleteConversation', data: { withMemberId: conv.memberId } }));
+            deleteConversationCtx(conv.memberId);
         }
     };
 

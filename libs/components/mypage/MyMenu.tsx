@@ -11,8 +11,9 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import LogoutIcon from '@mui/icons-material/Logout';
 import StorefrontOutlinedIcon from '@mui/icons-material/StorefrontOutlined';
 import AddBusinessOutlinedIcon from '@mui/icons-material/AddBusinessOutlined';
-import { useReactiveVar } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
+import { GET_MEMBER } from '../../../apollo/user/query';
 import { logOut } from '../../auth';
 import { REACT_APP_API_URL } from '../../config';
 import { MemberType } from '../../enums/member.enum';
@@ -31,6 +32,22 @@ const MyMenu = () => {
 
 	const category = (router.query.category as string) ?? 'myBookings';
 	const isAgent = user?.memberType === MemberType.AGENT;
+
+	// ⚠️ YANGI — MyMenu /mypage sahifasida qaysi category tanlanganidan
+	// qat'i nazar doim mount bo'ladi, shuning uchun admin foydalanuvchini
+	// agentga o'tkazgandan keyin "MY BUSINESS" bo'limi (sidebar) qayta
+	// login qilmasdan, shu yerning o'zida yangilanishi uchun eng qulay joy.
+	useQuery(GET_MEMBER, {
+		fetchPolicy: 'network-only',
+		variables: { input: user?._id },
+		skip: !user?._id,
+		onCompleted: (data: any) => {
+			const fresh = data?.getMember;
+			if (fresh && user && (fresh.memberType !== user.memberType || fresh.agentRequestStatus !== user.agentRequestStatus)) {
+				userVar({ ...user, memberType: fresh.memberType, agentRequestStatus: fresh.agentRequestStatus });
+			}
+		},
+	});
 
 	const activityItems: MenuItem[] = [
 		{ category: 'myBookings', label: 'My Bookings', icon: <CalendarMonthOutlinedIcon /> },

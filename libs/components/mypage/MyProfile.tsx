@@ -90,6 +90,11 @@ const MyProfile: NextPage = ({
 	const [updateMember] = useMutation(UPDATE_MEMBER);
 	const [requestAgentRole] = useMutation(REQUEST_AGENT_ROLE);
 
+	// ⚠️ MUHIM: memberType/agentRequestStatus self-heal so'rovi bu yerda emas,
+	// <MyMenu /> ichida — chunki MyMenu /mypage'da category'dan qat'i nazar
+	// doim mount bo'ladi (MyProfile esa faqat category=myProfile bo'lganda).
+	// Ikkalasida ham bir xil so'rovni takrorlab yubormaslik uchun markazlashtirildi.
+
 	/** LIFECYCLES **/
 	useEffect(() => {
 		if (!user?._id) return;

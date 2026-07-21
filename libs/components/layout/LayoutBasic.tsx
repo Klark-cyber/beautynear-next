@@ -6,9 +6,6 @@ import Top from '../Top';
 import Footer from '../Footer';
 import { Stack, Box, Typography } from '@mui/material';
 import { getJwtToken, updateUserInfo } from '../../auth';
-import Chat from '../Chat';
-import { useReactiveVar } from '@apollo/client';
-import { userVar } from '../../../apollo/store';
 import { useTranslation } from 'next-i18next';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -20,7 +17,6 @@ const withLayoutBasic = (Component: any) => {
 		const router = useRouter();
 		const { t } = useTranslation('common');
 		const device = useDeviceDetect();
-		const user = useReactiveVar(userVar);
 
 		useEffect(() => {
 			const jwt = getJwtToken();
@@ -103,8 +99,7 @@ const withLayoutBasic = (Component: any) => {
 			return (
 				<>
 					<Head>
-						<title>BeautyNear — {t(pageConfig.title)}</title>
-						<meta name="viewport" content="width=device-width, initial-scale=1" />
+						<title>{`BeautyNear — ${t(pageConfig.title)}`}</title>
 					</Head>
 					<Stack id="mobile-wrap" sx={{ minHeight: '100vh', background: '#FAFAFA' }}>
 						<Stack id="top">
@@ -132,6 +127,12 @@ const withLayoutBasic = (Component: any) => {
 						<Stack id="main" sx={{ flex: 1 }}>
 							<Component {...props} />
 						</Stack>
+
+						{/* ⚠️ TUZATILDI: <Chat/> endi bu yerda emas — _app.tsx darajasida
+						    BIR MARTA render qilinadi, chunki bu Layout har sahifaga
+						    o'tishda qayta mount bo'ladi va WebSocket ulanishi doimiy
+						    bo'lishi kerak edi. */}
+
 						<Stack id="footer">
 							<Footer />
 						</Stack>
@@ -144,7 +145,7 @@ const withLayoutBasic = (Component: any) => {
 		return (
 			<>
 				<Head>
-					<title>BeautyNear — {t(pageConfig.title)}</title>
+					<title>{`BeautyNear — ${t(pageConfig.title)}`}</title>
 				</Head>
 				<Stack id="pc-wrap" sx={{ minHeight: '100vh', background: '#FAFAFA' }}>
 					<Stack id="top">
@@ -241,8 +242,6 @@ const withLayoutBasic = (Component: any) => {
 					<Stack id="main" sx={{ flex: 1 }}>
 						<Component {...props} />
 					</Stack>
-
-					{user?._id && <Chat />}
 
 					<Stack id="footer">
 						<Footer />

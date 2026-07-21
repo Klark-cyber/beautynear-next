@@ -5,9 +5,6 @@ import Top from '../Top';
 import Footer from '../Footer';
 import { Stack, Box, Typography } from '@mui/material';
 import { getJwtToken, updateUserInfo } from '../../auth';
-import Chat from '../Chat';
-import { useReactiveVar } from '@apollo/client';
-import { userVar } from '../../../apollo/store';
 import { useTranslation } from 'next-i18next';
 import { useRouter } from 'next/router';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
@@ -147,7 +144,6 @@ const MobileBottomNav = () => {
 const withLayoutFull = (Component: any) => {
 	return (props: any) => {
 		const device = useDeviceDetect();
-		const user = useReactiveVar(userVar);
 		const { t } = useTranslation('common');
 
 		useEffect(() => {
@@ -161,7 +157,6 @@ const withLayoutFull = (Component: any) => {
 					<Head>
 						<title>BeautyNear</title>
 						<meta name="title" content="BeautyNear — K-Beauty Near You" />
-						<meta name="viewport" content="width=device-width, initial-scale=1" />
 					</Head>
 					<Stack
 						id="mobile-wrap"
@@ -181,8 +176,7 @@ const withLayoutFull = (Component: any) => {
 							<Footer />
 						</Stack>
 						<MobileBottomNav />
-						{/* ⚠️ YANGI — avval Chat faqat Desktop'da render qilinardi */}
-						{user?._id && <Chat />}
+						{/* ⚠️ TUZATILDI: <Chat/> endi _app.tsx darajasida BIR MARTA render qilinadi */}
 					</Stack>
 				</>
 			);
@@ -207,7 +201,6 @@ const withLayoutFull = (Component: any) => {
 					<Stack id="main" sx={{ flex: 1 }}>
 						<Component {...props} />
 					</Stack>
-					{user?._id && <Chat />}
 					<Stack id="footer">
 						<Footer />
 					</Stack>

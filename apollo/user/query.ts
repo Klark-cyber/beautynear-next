@@ -60,6 +60,7 @@ export const GET_MEMBER = gql`
 			memberType
 			memberStatus
 			memberAuthType
+			agentRequestStatus
 			memberPhone
 			memberNick
 			memberFullName

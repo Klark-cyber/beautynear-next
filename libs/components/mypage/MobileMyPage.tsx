@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { Box, Stack, Typography, IconButton } from '@mui/material';
+import { Box, Stack, Typography, IconButton, Badge } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
@@ -21,6 +22,7 @@ import AppsIcon from '@mui/icons-material/Apps';
 import { useQuery, useReactiveVar } from '@apollo/client';
 import { GET_MY_BOOKINGS, GET_FAVORITE_SALONS, GET_MEMBER } from '../../../apollo/user/query';
 import { userVar } from '../../../apollo/store';
+import { useNotificationSocket } from '../../hooks/useNotificationSocket';
 import { sweetConfirmAlert } from '../../sweetAlert';
 import { REACT_APP_API_URL } from '../../config';
 import { T } from '../../types/common';
@@ -48,6 +50,7 @@ const MobileMyPage = () => {
     const [liveMember, setLiveMember] = useState<any>(null);
 
     const isAgent = user?.memberType === 'AGENT';
+    const { unreadMessageCount } = useNotificationSocket();
 
     /** APOLLO REQUESTS — faqat statistikalar uchun (yengil, limit:1) **/
     useQuery(GET_MY_BOOKINGS, {
@@ -68,7 +71,17 @@ const MobileMyPage = () => {
         fetchPolicy: 'network-only',
         variables: { input: user?._id },
         skip: !user?._id,
-        onCompleted: (data: T) => setLiveMember(data?.getMember ?? null),
+        onCompleted: (data: T) => {
+            const fresh = data?.getMember;
+            setLiveMember(fresh ?? null);
+            // ⚠️ TUZATILDI: bu yerda faqat liveMember (statistikalar) yangilanardi,
+            // userVar/isAgent esa eski keshda qolib ketardi — shuning uchun admin
+            // agentga o'tkazgandan keyin "Business" menyu bo'limi (My Salons/My
+            // Services/Agent Bookings) qayta kirmaguncha ko'rinmasdi.
+            if (fresh && user && (fresh.memberType !== user.memberType || fresh.agentRequestStatus !== user.agentRequestStatus)) {
+                userVar({ ...user, memberType: fresh.memberType, agentRequestStatus: fresh.agentRequestStatus });
+            }
+        },
     });
 
     /** HANDLERS **/
@@ -132,6 +145,21 @@ const MobileMyPage = () => {
             {/* ═══ MY ACTIVITY ═══ */}
             <Typography className="mp-section-title">{t('My Activity')}</Typography>
             <Stack className="mp-menu-group">
+                {/* ⚠️ YANGI — mobil Top navbar'da (faqat logo + avatar) desktopdagi
+                    kabi Message ikonkasiga joy yo'q, shuning uchun /messages
+                    sahifasiga (chatting ro'yxati) shu yerdan kirish imkoni qo'shildi */}
+                <Stack direction="row" alignItems="center" gap={1.25} className="mp-menu-item" onClick={() => router.push('/messages')}>
+                    <Box component="div" className="mp-menu-icon">
+                        <Badge badgeContent={unreadMessageCount} color="error" max={9}>
+                            <ChatBubbleOutlineIcon sx={{ fontSize: 19 }} />
+                        </Badge>
+                    </Box>
+                    <Box sx={{ flex: 1 }}>
+                        <Typography className="mp-menu-label">{t('My Chats')}</Typography>
+                        <Typography className="mp-menu-desc">{t('Conversations with agents')}</Typography>
+                    </Box>
+                    <ChevronRightIcon sx={{ fontSize: 20, color: '#ccc' }} />
+                </Stack>
                 <Stack direction="row" alignItems="center" gap={1.25} className="mp-menu-item" onClick={() => goTo('myBookings')}>
                     <Box component="div" className="mp-menu-icon"><CalendarMonthOutlinedIcon sx={{ fontSize: 19 }} /></Box>
                     <Box sx={{ flex: 1 }}>
