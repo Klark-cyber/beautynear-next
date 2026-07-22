@@ -86,6 +86,7 @@ const Top = () => {
 		{ href: '/service', label: 'Services' },
 		{ href: '/specialist', label: 'Specialists' },
 		{ href: '/community', label: 'Community' },
+		{ href: '/cs', label: 'CS' },
 		...(user?._id ? [{ href: '/mypage', label: 'Mypage' }] : []),
 	];
 
