@@ -1,8 +1,6 @@
 import { useMemo } from 'react';
-import { ApolloClient, ApolloLink, InMemoryCache, split, from, NormalizedCacheObject } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, from, NormalizedCacheObject } from '@apollo/client';
 import createUploadLink from 'apollo-upload-client/public/createUploadLink.js';
-import { WebSocketLink } from '@apollo/client/link/ws';
-import { getMainDefinition } from '@apollo/client/utilities';
 import { onError } from '@apollo/client/link/error';
 import { getJwtToken } from '../libs/auth';
 import { TokenRefreshLink } from 'apollo-link-token-refresh';
@@ -27,6 +25,15 @@ const tokenRefreshLink = new TokenRefreshLink({
 	},
 });
 
+// ⚠️ TUZATILDI: avval bu yerda `WebSocketLink` va `split` orqali,
+// hech qanday subscription so'rovi ishlatilmasa ham, HAR DOIM
+// WebSocket ulanishi ochilardi. Agar bu ulanish muvaffaqiyatsiz
+// bo'lsa yoki osilib qolsa, BUTUN Apollo Client ishga tushmay
+// qolishi (yoki juda kech tushishi) mumkin edi — bu, ehtimol,
+// nega hech qanday GraphQL so'rovi (salon, xizmat) hatto
+// Network panelida ko'rinmasligining sababi edi. Chat funksiyasi
+// o'zining alohida, oddiy WebSocket ulanishidan foydalanadi — bu
+// Apollo linkiga umuman bog'liq emas edi.
 function createIsomorphicLink() {
 	if (typeof window !== 'undefined') {
 		const authLink = new ApolloLink((operation, forward) => {
@@ -44,18 +51,6 @@ function createIsomorphicLink() {
 			uri: process.env.REACT_APP_API_GRAPHQL_URL,
 		});
 
-		/* WEBSOCKET SUBSCRIPTION LINK */
-		const wsLink = new WebSocketLink({
-			uri: process.env.REACT_APP_API_WS ?? 'ws://127.0.0.1:3007',
-			options: {
-				reconnect: false,
-				timeout: 30000,
-				connectionParams: () => {
-					return { headers: getHeaders() };
-				},
-			},
-		});
-
 		const errorLink = onError(({ graphQLErrors, networkError }) => {
 			if (graphQLErrors) {
 				graphQLErrors.map(({ message, locations, path }) =>
@@ -68,16 +63,7 @@ function createIsomorphicLink() {
 			}
 		});
 
-		const splitLink = split(
-			({ query }) => {
-				const definition = getMainDefinition(query);
-				return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
-			},
-			wsLink,
-			authLink.concat(link),
-		);
-
-		return from([errorLink, tokenRefreshLink, splitLink]);
+		return from([errorLink, tokenRefreshLink, authLink.concat(link)]);
 	}
 }
 
