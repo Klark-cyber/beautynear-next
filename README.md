@@ -1,38 +1,85 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# BeautyNear
 
-## Getting Started
+> A scalable full-stack SaaS platform for discovering, booking, and managing K-Beauty salons across South Korea.
 
-First, run the development server:
+## Overview
+BeautyNear is a modern multi-role salon booking platform built with Next.js, NestJS, GraphQL, MongoDB, and Socket.IO. The platform enables customers to discover salons, book appointments, communicate with salon owners in real time, and provides comprehensive management tools for salon owners and administrators through a secure, scalable architecture.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## Key Features
+### Member
+- Search salons
+- View salon details
+- Browse services
+- Create bookings
+- Manage profile
+- Follow salons
+- Like content
+- Write reviews and comments
+- Receive notifications
+- Real-time chat
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Salon Owner
+- Create/update salons
+- Create/update services
+- Manage bookings
+- Accept/cancel bookings
+- Manage working hours
+- Manage gallery
+- View customer reviews
+- Real-time chat
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+### Admin
+- Members management
+- Salon owners management
+- Salon approval
+- Services management
+- Booking monitoring
+- Review moderation
+- Payment monitoring structure
+- Dashboard analytics
+- Banner/Event management
+- Community posts management
+- Notifications management
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## Tech Stack
+**Frontend:** Next.js, React, TypeScript, Apollo Client, GraphQL, Tailwind CSS, Material UI, Redux Toolkit, React Hook Form, Swiper
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+**Backend:** NestJS, GraphQL, Apollo Server, REST API, MongoDB, Mongoose, JWT Authentication, bcrypt, Multer, Socket.IO
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Authentication
+- MemberNick + Phone Number
+- JWT Access Token
 
-## Learn More
+## API Architecture
+- GraphQL for business logic
+- REST API (Axios + Multer) for file uploads
 
-To learn more about Next.js, take a look at the following resources:
+## Database
+members, salons, services, bookings, messages, notifications, likes, follows, views, comments, boardArticles, boardarticles, notices, faqs, inquiries
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture Patterns
+- MVC
+- Dependency Injection
+- Middleware
+- Guards
+- Decorators
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Deployment
+- Frontend: Vercel
+- Backend: DigitalOcean VPS (PM2, Nginx, SSL)
 
-## Deploy on Vercel
+## Development Workflow
+- Git
+- GitHub
+- main / develop / feature branches
+- Pull Requests
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Project Highlights
+- Multi-role SaaS architecture
+- Hybrid GraphQL + REST API
+- JWT Authentication
+- Socket.IO real-time communication
+- MongoDB with Mongoose
+- Vercel & DigitalOcean deployment
+- Modular NestJS architecture
+- Git-based collaborative workflow
